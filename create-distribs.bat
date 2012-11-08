@@ -2,15 +2,13 @@ rem
 rem create distribution files for www.hebbut.net
 rem
                           
-set name=btyacc-3.0.4.i_a
+set name=btyacc-3.0.4.i_a-v2
                                                        
 mkdir .\distrib
 
 pushd .\distrib
 
 del *.bak
-for %%f in ( *.exe *.tar *.z *.bz2 ) do move "%%f" "%%f.bak"
-
 del *.exe 
 del *.tar
 del *.bz2
@@ -35,9 +33,21 @@ tar -cvvvvvvvvvvvvvvpf ../%name%.full-src.tar *
 
 cd ..
 echo Y | rmdir tmp /s
+
+
+
+
+mkdir tmp
+cd tmp
+"c:\Program Files\WinRAR\Rar.exe" x -y ..\%name%.bin-win32.exe *.* 
+
+tar -cvvvvvvvvvvvvvvpf ../%name%.bin-win32.tar * 
+
+cd ..
+echo Y | rmdir tmp /s
+
 popd
 
-tar -cvpf ./distrib/%name%.bin-win32.tar *.exe ChangeLog* README* !README* *.1
                                          
                                          
 pushd .\distrib

@@ -45,6 +45,8 @@ void output_rule_data()
     register int i;
     register int j;
 
+	open_output_files();
+
     if (!rflag)
 	fprintf(output_file, "static ");
     fprintf(output_file, "Yshort yylhs[] = {%42d,",
@@ -93,6 +95,8 @@ void output_rule_data()
 void output_yydefred()
 {
     register int i, j;
+
+	open_output_files();
 
     if (!rflag)
 		fprintf(output_file, "static ");
@@ -279,6 +283,8 @@ void token_actions()
 void goto_actions()
 {
     register int i, j, k;
+
+	open_output_files();
 
     state_count = NEW2(nstates, Yshort);
 
@@ -605,6 +611,8 @@ void output_base()
 {
     register int i, j;
 
+	open_output_files();
+
     if (!rflag)
 	fprintf(output_file, "static ");
     fprintf(output_file, "Yshort yysindex[] = {%39d,", base[0]);
@@ -677,9 +685,12 @@ void output_table()
     register int i;
     register int j;
 
+	open_output_files();
+
     ++outline;
 
-    fprintf(stderr, "YYTABLESIZE: %d\n", high);
+    if (tflag)
+	    fprintf(stderr, "YYTABLESIZE: %d\n", high);
     if(high >= MAXSHORT) {
       fprintf(stderr, "Table is longer than %d elements. It's not gonna fly.\n", MAXSHORT);
       exit(1);
@@ -717,6 +728,8 @@ void output_check()
     register int i;
     register int j;
 
+	open_output_files();
+
     if (!rflag)
 	fprintf(output_file, "static ");
     fprintf(output_file, "Yshort yycheck[] = {%40d,", check[0]);
@@ -745,6 +758,8 @@ void output_ctable()
 {
     register int i;
     register int j;
+
+	open_output_files();
 
     if (!rflag)
 	fprintf(output_file, "static ");
@@ -809,6 +824,8 @@ void output_defines()
     register char *s;
     FILE *dc_file;
 
+	open_output_files();
+
     if(dflag) {
       fprintf(defines_file, "#ifndef _yacc_defines_h_\n");
       fprintf(defines_file, "#define _yacc_defines_h_\n\n");
@@ -870,6 +887,8 @@ void output_stored_text()
     register FILE *in, *out;
     register int state;	/* 0=middle of line, 1=start of line, 2=seen '#' */
 
+	open_output_files();
+
     state = 1;
     fclose(text_file);
     text_file = fopen(text_file_name, "r");
@@ -902,6 +921,8 @@ void output_debug()
 {
     register int i, j, k, max;
     char **symnam, *s;
+
+	open_output_files();
 
     ++outline;
     fprintf(code_file, "#define YYFINAL %d\n", final_state);
@@ -1030,7 +1051,7 @@ void output_debug()
 	    }
 	    else
 	    {
-		k = strlen(s) + 3;
+		k = (int)strlen(s) + 3;
 		j += k;
 		if (j > 80)
 		{
@@ -1119,6 +1140,8 @@ void output_debug()
 
 void output_stype()
 {
+	open_output_files();
+
     if (!unionized && ntags == 0)
     {
 	outline += 3;
@@ -1133,7 +1156,9 @@ void output_trailing_text()
     register FILE *in, *out;
 
     if (line == 0)
-	return;
+		return;
+
+	open_output_files();
 
     in = input_file;
     out = code_file;
@@ -1190,14 +1215,16 @@ void output_semantic_actions()
     register FILE *out;
     register int state;	/* 0=middle of line, 1=start of line, 2=seen '#' */
 
+	open_output_files();
+
     state = 1;
     fclose(action_file);
     action_file = fopen(action_file_name, "r");
     if (action_file == NULL)
-	open_error(action_file_name);
+		open_error(action_file_name);
 
     if ((c = getc(action_file)) == EOF)
-	return;
+		return;
 
     out = code_file;
     do {
@@ -1274,6 +1301,8 @@ void write_section(char *section_name)
     FILE *fp;
     int i;
     struct section *sl;
+
+	open_output_files();
 
     for(sl=&section_list[0]; sl->name; sl++) {
       if(strcmp(sl->name,section_name)==0) {

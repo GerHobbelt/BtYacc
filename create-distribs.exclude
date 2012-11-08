@@ -1,3 +1,13 @@
 distrib
-Release
-Debug
+*.old
+*.bak
+*.user
+*.suo
+*.ncb
+*.o
+btyacc_x64_Release x86_x64
+btyacc_Win32_Release
+btyacc_Itanium_Release Itanium
+btyacc_Win32_Debug
+btyacc_x64_Debug x86_x64
+btyacc_Itanium_Debug Itanium

@@ -143,10 +143,6 @@ SOURCE=.\readskel.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\skeleton.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\symtab.c
 # End Source File
 # Begin Source File
@@ -175,15 +171,11 @@ SOURCE=.\mstring.h
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # Begin Source File
 
-SOURCE=.\btyaccpa.ske
+SOURCE=.\btyacc.rc
 # End Source File
 # Begin Source File
 
 SOURCE=.\manpage.txt
-# End Source File
-# Begin Source File
-
-SOURCE=.\push.skel
 # End Source File
 # Begin Source File
 
@@ -193,9 +185,76 @@ SOURCE=.\README
 
 SOURCE=.\README.BYACC
 # End Source File
+# End Group
+# Begin Group "Generated Files"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\btyaccpa.ske
+
+!IF  "$(CFG)" == "btyacc - Win32 Release"
+
+# Begin Custom Build - generate C skeleton for $(InputPath)
+InputPath=.\btyaccpa.ske
+
+"skeleton.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	awk -f skel2c $(InputPath) > skeleton.c
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "btyacc - Win32 Debug"
+
+# Begin Custom Build - generate C skeleton for $(InputPath)
+InputPath=.\btyaccpa.ske
+
+"skeleton.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	awk -f skel2c $(InputPath) > skeleton.c
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\push.skel
+
+!IF  "$(CFG)" == "btyacc - Win32 Release"
+
+# Begin Custom Build - generate C skeleton for $(InputPath)
+InputPath=.\push.skel
+
+"push_skel.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	awk -f skel2c $(InputPath) > push_skel.c
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "btyacc - Win32 Debug"
+
+# Begin Custom Build - generate C skeleton for $(InputPath)
+InputPath=.\push.skel
+
+"push_skel.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	awk -f skel2c $(InputPath) > push_skel.c
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\push_skel.c
+# PROP Exclude_From_Build 1
+# End Source File
 # Begin Source File
 
 SOURCE=.\skel2c
+# End Source File
+# Begin Source File
+
+SOURCE=.\skeleton.c
 # End Source File
 # End Group
 # End Target

@@ -21,9 +21,9 @@ int		len;
     vsprintf(buf, fmt, args);
     va_end(args);
 
-    len = strlen(buf);
+    len = (int)strlen(buf);
     if (len > (s->end - s->ptr)) {
-	int	cp = s->ptr - s->base, cl = s->end - s->base, nl = cl;
+	int	cp = (int)(s->ptr - s->base), cl = (int)(s->end - s->base), nl = cl;
 	while (len > (nl - cp))
 	    nl = nl + nl + TAIL;
 	if ((s->base = realloc(s->base, nl))) {
@@ -40,7 +40,7 @@ int mputchar(struct mstring *s, int ch)
 {
     if (!s || !s->base) return ch;
     if (s->ptr == s->end) {
-	int len = s->end - s->base;
+	int len = (int)(s->end - s->base);
 	if ((s->base = realloc(s->base, len+len+TAIL))) {
 	    s->ptr = s->base + len;
 	    s->end = s->base + len+len+TAIL; }

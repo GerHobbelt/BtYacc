@@ -14,6 +14,37 @@
 */
 #define YYBTYACC 1
 
+
+
+/* [i_a] */
+#ifndef HAS_MSVC_2005_ISO_RTL
+#if defined(_MSC_VER)
+#if _MSC_VER >= 1400 /* VS.NET 2005 or above: 'fix' those deprecated functions */
+#define HAS_MSVC_2005_ISO_RTL     1
+#endif
+#endif
+
+#ifndef HAS_MSVC_2005_ISO_RTL
+#define HAS_MSVC_2005_ISO_RTL     0
+#endif
+
+#if HAS_MSVC_2005_ISO_RTL
+#pragma warning(disable : 4996)
+// Or just turn off warnings about the newly deprecated CRT functions.
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+#ifndef _CRT_NONSTDC_NO_DEPRECATE
+#define _CRT_NONSTDC_NO_DEPRECATE
+#endif
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES     1
+#endif
+#endif
+/* [/i_a] */
+
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -162,7 +193,7 @@ struct YYParseState_s
   Yshort       *ss;          /* state stack base */
   YYSTYPE      *vs;          /* values stack base */
   YYPOSN       *ps;          /* position stack base */
-  int           lexeme;      /* index of conflict lexeme in lexical queue */
+  int           lexeme;      /* index of the conflict lexeme in the lexical queue */
   unsigned int  stacksize;   /* current maximum stack size */
   Yshort        ctry;        /* index in yyctable[] for this conflict */
 };
@@ -377,7 +408,7 @@ yyloop:
       {
 #if YYDEBUG
         if (yydebug && yychar >= 0)
-          fputs("btyacc[trial]: backtracking 1 token\n", stderr);
+          fprintf(stderr, "btyacc[%s]: backtracking 1 token\n", (yytrial ? "trial" : "---"));
 #       endif
         ctry++;
       }
@@ -551,8 +582,8 @@ yyerrhandler:
 #if YYDEBUG
       if (yydebug)
       {
-        fputs("btyacc[trial]: trial parse FAILED, entering ERROR mode\n",
-              stderr);
+        fprintf(stder, "btyacc[%s]: trial parse FAILED, entering ERROR mode\n",
+              (yytrial ? "trial" : ""));
       }
 #endif
       /* Restore state as it was in the most forward-advanced error */
@@ -898,7 +929,7 @@ yyaccept:
 
 
 /* Call yylex() unless the token has already been read. */
-static int yyLex1()
+static int yyLex1(void)
 {
   if(yylvp < yylve)
   {
@@ -927,7 +958,7 @@ static int yyLex1()
 }
 
 /* Enlarge lexical value queue */
-static int yyExpand()
+static int yyExpand(void)
 {
   int p = yylvp - yylvals;
   int s = yylvlim - yylvals;

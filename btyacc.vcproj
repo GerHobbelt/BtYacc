@@ -1,239 +1,1224 @@
-<?xml version="1.0" encoding = "Windows-1252"?>
+<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.00"
+	Version="8.00"
 	Name="btyacc"
-	SccProjectName=""
-	SccLocalPath="">
+	ProjectGUID="{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}"
+	RootNamespace="btyacc"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
+		<Platform
+			Name="Itanium"
+		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			Name="Debug|Win32"
+			OutputDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
 			<Tool
-				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE"
-				StringPooling="TRUE"
-				RuntimeLibrary="4"
-				EnableFunctionLevelLinking="TRUE"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderFile=".\Release/btyacc.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
-				WarningLevel="3"
-				SuppressStartupBanner="TRUE"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
 				Name="VCCustomBuildTool"
-				CommandLine="copy $(TargetPath) .\btyacc.exe
-"
-				Outputs="btyacc.exe"/>
+				Description="copy $(TargetFileName) to bin directory"
+				CommandLine="mkdir &quot;$(SolutionDir)bin&quot;&#x0D;&#x0A;mkdir &quot;$(SolutionDir)bin\$(PlatformName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
+				Outputs="$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)"
+			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile=".\Release/btyacc.exe"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				ProgramDatabaseFile=".\Release/btyacc.pdb"
-				SubSystem="1"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\Release/btyacc.tlb"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-		</Configuration>
-		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
-			ConfigurationType="1"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
+				HeaderFileName=""
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE"
+				StringPooling="true"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderFile=".\Debug/btyacc.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
 				BrowseInformation="1"
 				WarningLevel="3"
-				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"/>
+				SuppressStartupBanner="true"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"
-				CommandLine="copy $(TargetPath) .\btyacc.exe
-"
-				Outputs="btyacc.exe"/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile=".\Debug/btyacc.exe"
-				LinkIncremental="2"
-				SuppressStartupBanner="TRUE"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\Debug/btyacc.pdb"
-				SubSystem="1"/>
-			<Tool
-				Name="VCMIDLTool"
-				TypeLibraryName=".\Debug/btyacc.tlb"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"/>
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG"
+				Culture="1033"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
+				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+				Description="copy $(TargetFileName) to bin directory"
+				CommandLine="mkdir &quot;$(SolutionDir)bin&quot;&#x0D;&#x0A;mkdir &quot;$(SolutionDir)bin\$(PlatformName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
+				Outputs="$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				InlineFunctionExpansion="2"
+				FavorSizeOrSpeed="1"
+				EnableFiberSafeOptimizations="true"
+				WholeProgramOptimization="true"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug Itanium|Itanium"
+			OutputDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+				Description="copy $(TargetFileName) to bin directory"
+				CommandLine="mkdir &quot;$(SolutionDir)bin&quot;&#x0D;&#x0A;mkdir &quot;$(SolutionDir)bin\$(PlatformName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
+				Outputs="$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="2"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE"
+				StringPooling="true"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				BrowseInformation="1"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="5"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug x86_x64|x64"
+			OutputDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+				Description="copy $(TargetFileName) to bin directory"
+				CommandLine="mkdir &quot;$(SolutionDir)bin&quot;&#x0D;&#x0A;mkdir &quot;$(SolutionDir)bin\$(PlatformName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
+				Outputs="$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE"
+				StringPooling="true"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				BrowseInformation="1"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release x86_x64|x64"
+			OutputDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+				Description="copy $(TargetFileName) to bin directory"
+				CommandLine="mkdir &quot;$(SolutionDir)bin&quot;&#x0D;&#x0A;mkdir &quot;$(SolutionDir)bin\$(PlatformName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
+				Outputs="$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				InlineFunctionExpansion="2"
+				FavorSizeOrSpeed="1"
+				EnableFiberSafeOptimizations="true"
+				WholeProgramOptimization="true"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release Itanium|Itanium"
+			OutputDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectName)_$(PlatformName)_$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+				Description="copy $(TargetFileName) to bin directory"
+				CommandLine="mkdir &quot;$(SolutionDir)bin&quot;&#x0D;&#x0A;mkdir &quot;$(SolutionDir)bin\$(PlatformName)&quot;&#x0D;&#x0A;copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)&quot;&#x0D;&#x0A;"
+				Outputs="$(SolutionDir)bin\$(PlatformName)\$(TargetFileName)"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="2"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				InlineFunctionExpansion="2"
+				FavorSizeOrSpeed="1"
+				EnableFiberSafeOptimizations="true"
+				WholeProgramOptimization="true"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
+				TargetMachine="5"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
+	<References>
+	</References>
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+			>
 			<File
-				RelativePath=".\closure.c">
+				RelativePath="closure.c"
+				>
 			</File>
 			<File
-				RelativePath=".\error.c">
+				RelativePath="error.c"
+				>
 			</File>
 			<File
-				RelativePath=".\lalr.c">
+				RelativePath="lalr.c"
+				>
 			</File>
 			<File
-				RelativePath=".\lr0.c">
+				RelativePath="lr0.c"
+				>
 			</File>
 			<File
-				RelativePath=".\main.c">
+				RelativePath="main.c"
+				>
 			</File>
 			<File
-				RelativePath=".\mkpar.c">
+				RelativePath="mkpar.c"
+				>
 			</File>
 			<File
-				RelativePath=".\mstring.c">
+				RelativePath="mstring.c"
+				>
 			</File>
 			<File
-				RelativePath=".\output.c">
+				RelativePath="output.c"
+				>
 			</File>
 			<File
-				RelativePath=".\reader.c">
+				RelativePath="reader.c"
+				>
 			</File>
 			<File
-				RelativePath=".\readskel.c">
+				RelativePath="readskel.c"
+				>
 			</File>
 			<File
-				RelativePath=".\skeleton.c">
+				RelativePath="symtab.c"
+				>
 			</File>
 			<File
-				RelativePath=".\symtab.c">
+				RelativePath="verbose.c"
+				>
 			</File>
 			<File
-				RelativePath=".\verbose.c">
-			</File>
-			<File
-				RelativePath=".\warshall.c">
+				RelativePath="warshall.c"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl">
+			Filter="h;hpp;hxx;hm;inl"
+			>
 			<File
-				RelativePath=".\defs.h">
+				RelativePath="defs.h"
+				>
 			</File>
 			<File
-				RelativePath=".\mstring.h">
+				RelativePath="mstring.h"
+				>
+			</File>
+			<File
+				RelativePath=".\resource.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+			>
 			<File
-				RelativePath="!README.TXT">
+				RelativePath=".\btyacc.ico"
+				>
 			</File>
 			<File
-				RelativePath="ChangeLog">
+				RelativePath="btyacc.rc"
+				>
 			</File>
 			<File
-				RelativePath=".\README">
+				RelativePath="manpage.txt"
+				>
 			</File>
 			<File
-				RelativePath=".\README.BYACC">
+				RelativePath="README"
+				>
 			</File>
 			<File
-				RelativePath="README.Debian">
+				RelativePath="README.BYACC"
+				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Generated Files"
+			>
 			<File
-				RelativePath="btyacc.1">
-			</File>
-			<File
-				RelativePath="btyacc.sgml">
-			</File>
-			<File
-				RelativePath=".\btyaccpa.ske">
-			</File>
-			<File
-				RelativePath="create-distribs.bat">
-			</File>
-			<File
-				RelativePath="create-distribs.exclude">
-			</File>
-			<File
-				RelativePath=".\manpage.txt">
-			</File>
-			<File
-				RelativePath=".\push.skel">
-			</File>
-			<File
-				RelativePath="push_skel.c">
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
+				RelativePath="btyaccpa.ske"
+				>
 				<FileConfiguration
 					Name="Debug|Win32"
-					ExcludedFromBuild="TRUE">
+					>
 					<Tool
-						Name="VCCLCompilerTool"/>
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Itanium|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Itanium|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Itanium|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug x86_x64|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug x86_x64|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug x86_x64|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release x86_x64|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release x86_x64|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release x86_x64|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Itanium|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Itanium|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Itanium|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; skeleton.c&#x0D;&#x0A;"
+						Outputs="skeleton.c"
+					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\skel2c">
+				RelativePath="push.skel"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Itanium|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Itanium|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Itanium|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug x86_x64|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug x86_x64|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug x86_x64|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release x86_x64|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release x86_x64|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release x86_x64|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Itanium|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Itanium|Itanium"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Itanium|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="generate C skeleton for $(InputPath)"
+						CommandLine="awk -f skel2c $(InputPath) &gt; push_skel.c&#x0D;&#x0A;"
+						Outputs="push_skel.c"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="push_skel.c"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Itanium|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Itanium|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug Itanium|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug x86_x64|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug x86_x64|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug x86_x64|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release x86_x64|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release x86_x64|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release x86_x64|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Itanium|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Itanium|Itanium"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release Itanium|x64"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="skel2c"
+				>
+			</File>
+			<File
+				RelativePath="skeleton.c"
+				>
 			</File>
 		</Filter>
 	</Files>

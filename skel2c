@@ -1,45 +1,71 @@
-BEGIN { havesection = 0;
-	nsec = 0;
-	printf  "/*\n** This file generated automatically from %s\n*/\n\n",
-		FILENAME; 
-	printf "#include \"defs.h\"\n";
-      }
-/^%%/ { if (havesection) {
-	    printf "    0\n};\n\n";
-	}
-	if (NF >= 2) {
-	    havesection = 1;
-	    section = $2;
-	    seclist[nsec] = section;
-	    nsec = nsec + 1;
-	    printf "char *%s[] =\n{\n", $2;
-	    printf "    \"#line %d \\\"%s\\\"\",\n", FNR+1, FILENAME; 
-	} else {
-	    havesection = 0;
-	}
-	next; 
-      }
-      { if (havesection) {
-	    gsub(/\\/, "\\\\");
-	    # Could use 'gsub(/\\/, "\\\\")' instead of the following
-	    # two lines, but there's a bug in mawk and the original
-	    # awk (not in gawk) which is triggered by that.
-	    gsub(/\\/, "\\\1");
-	    gsub(/\1/, "\\");
- 	    gsub(/\t/, "\\t");
- 	    gsub(/\"/, "\\\"");
-	    printf "    \"%s\",\n", $0; 
-        } else {
-	    print $0; 
-        }
-      }
-END   { if (havesection) {
-            printf "    0\n};\n\n"; 
-	}
-	if (nsec > 0) {
-	    printf "struct section section_list[] = {\n";
-	    for (i=0; i<nsec; i++)
-		printf "\t{ \"%s\", &%s[0] },\n", seclist[i], seclist[i];
-	    printf "\t{ 0, 0 } };\n"
-	}
-      }
+BEGIN { 
+    havesection = 0;
+    nsec = 0;
+    printf  "/*\n** This file generated automatically from %s\n*/\n\n", FILENAME; 
+    printf "#include \"defs.h\"\n";
+}
+
+/^%%/ { 
+    if (havesection) 
+    {
+        printf "    0\n};\n\n";
+    }
+    if (NF >= 2) 
+    {
+        havesection = 1;
+        section = $2;
+        seclist[nsec] = section;
+        nsec = nsec + 1;
+        fname = FILENAME;
+        
+        printf "char *%s[] =\n{\n", $2;
+
+        # Could use 'gsub(/\\/, "\\\\")' instead of the following
+        # two lines, but there's a bug in mawk and the original
+        # awk (not in gawk) which is triggered by that.
+        gsub(/\\/, "\\\1", fname);
+        gsub(/\1/, "\\", fname);
+        gsub(/\t/, "\\t", fname);
+        gsub(/\"/, "\\\"", fname);
+
+        printf "    \"#line %d \\\"%s\\\"\",\n", FNR+1, fname; 
+    } 
+    else 
+    {
+        havesection = 0;
+    }
+    next; 
+}
+
+{ 
+    if (havesection) 
+    {
+        #gsub(/\\/, "\\\\");
+        # Could use 'gsub(/\\/, "\\\\")' instead of the following
+        # two lines, but there's a bug in mawk and the original
+        # awk (not in gawk) which is triggered by that.
+        gsub(/\\/, "\\\1");
+        gsub(/\1/, "\\");
+        gsub(/\t/, "\\t");
+        gsub(/\"/, "\\\"");
+        printf "    \"%s\",\n", $0; 
+    } 
+    else 
+    {
+        print $0; 
+    }
+}
+
+END   { 
+    if (havesection) 
+    {
+        printf "    0\n};\n\n"; 
+    }
+    if (nsec > 0) 
+    {
+        printf "struct section section_list[] = {\n";
+        for (i=0; i<nsec; i++)
+        printf "\t{ \"%s\", &%s[0] },\n", seclist[i], seclist[i];
+        printf "\t{ 0, 0 } };\n"
+    }
+}

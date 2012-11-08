@@ -26,7 +26,7 @@ static void add_ptr(char *p)
 
 static void add_string(char *s)
 {
-int	len = strlen(s)+1;
+int	len = (int)strlen(s)+1;
 
     if (len > cp_end - cp) {
 	int size = len > CHUNK ? len : CHUNK;
@@ -72,7 +72,7 @@ FILE	*fp;
     while(fgets(buf, 255, fp)) {
 	if ((sline = eline))
 	    line++;
-	if ((i = strlen(buf)) == 0)
+	if ((i = (int)strlen(buf)) == 0)
 	    continue;
 	if (buf[i-1] == '\n') {
 	    buf[--i] = 0;

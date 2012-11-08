@@ -1,3 +1,10 @@
+btyacc (3.0-4-i_a-v2)
+
+  * Updated my MSVC project files for MSVC2005SP1; now includes 64-bit build settings for Itanium and AMD64
+
+  * Fixed makefile to build btyacc.1 manpage using latest docbook2man tools.
+    (Also made this part of the default 'make all' build chain.)
+  
 btyacc (3.0-4) unstable; urgency=low
 
   * Remove dependency on btyacc.1 in Makefile, to prevent make from

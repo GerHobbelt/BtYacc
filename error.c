@@ -89,6 +89,11 @@ void error(int lineno, char *line, char *cptr, char *msg, ...)
   read_errs++;
 }
 
+void unsupported_feature(int lineno, char *line, char *cptr) { 
+  error(lineno, line, cptr, "unsupported feature: %%%s", cptr); 
+  exit(1);
+}
+
 void syntax_error(int lineno, char *line, char *cptr) { 
   error(lineno, line, cptr, "syntax error"); 
   exit(1);

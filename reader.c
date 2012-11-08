@@ -262,20 +262,53 @@ int nextc()
 	    return (*s); } }
 }
 
-static struct keyword { char name[12]; int token; } keywords[] = {
-    { "binary", NONASSOC }, 
-    { "ident", IDENT }, 
-    { "left", LEFT },
-    { "nonassoc", NONASSOC }, 
-    { "right", RIGHT }, 
-    { "start", START },
-    { "term", TOKEN }, 
-    { "token", TOKEN }, 
-    { "type", TYPE },
-    { "union", UNION },
+static struct keyword { char name[20]; int token; } keywords[] = {
+	{ "binary", NONASSOC }, 
+	{ "debug", BISON_DEBUG },                         /* [i_a] bison emulation additions */
+	{ "define", BISON_DEFINE },                       /* [i_a] bison emulation additions */
+	{ "defines", BISON_DEFINES },                     /* [i_a] bison emulation additions */
+	{ "destructor", BISON_DESTRUCTOR },               /* [i_a] bison emulation additions */
+	{ "dprec", BISON_DPREC },			              /* [i_a] bison emulation additions */
+	{ "error-verbose", BISON_ERR_VERBOSE },           /* [i_a] bison emulation additions */
+	{ "error_verbose", BISON_ERR_VERBOSE },           /* [i_a] bison emulation additions */
+	{ "expect", BISON_EXPECT },                       /* [i_a] bison emulation additions */
+	{ "file-prefix", BISON_FILE_PREFIX },             /* [i_a] bison emulation additions */
+	{ "file_prefix", BISON_FILE_PREFIX },             /* [i_a] bison emulation additions */
+	{ "fixed-output-files", BISON_YACC },             /* [i_a] bison emulation additions */
+	{ "fixed_output_files", BISON_YACC },             /* [i_a] bison emulation additions */
+	{ "glr-parser", BISON_GLR_PARSER },               /* [i_a] bison emulation additions */
+	{ "glr_parser", BISON_GLR_PARSER },               /* [i_a] bison emulation additions */
+	{ "ident", IDENT }, 
+	{ "left", LEFT },
+	{ "lex-param", BISON_LEX_PARAM },                 /* [i_a] bison emulation additions */
+	{ "lex_param", BISON_LEX_PARAM },                 /* [i_a] bison emulation additions */
+	{ "locations", BISON_LOCATIONS },                 /* [i_a] bison emulation additions */
+	{ "merge", BISON_MERGE },						  /* [i_a] bison emulation additions */
+	{ "name-prefix", BISON_NAME_PREFIX },             /* [i_a] bison emulation additions */
+	{ "name_prefix", BISON_NAME_PREFIX },             /* [i_a] bison emulation additions */
+	{ "no-lines", BISON_NO_LINES },                   /* [i_a] bison emulation additions */
+	{ "no_lines", BISON_NO_LINES },                   /* [i_a] bison emulation additions */
+	{ "nonassoc", NONASSOC }, 
+	{ "nterm", BISON_NTERM },                         /* [i_a] bison emulation additions */
+	{ "output", BISON_OUTPUT },                       /* [i_a] bison emulation additions */
+	{ "parse-param", BISON_PARSE_PARAM },             /* [i_a] bison emulation additions */
+	{ "prec", BISON_PREC },	  		              	  /* [i_a] bison emulation additions */
+	{ "printer", BISON_PRINTER },                     /* [i_a] bison emulation additions */
+	{ "pure-parser", BISON_PURE },                    /* [i_a] bison emulation additions */
+	{ "pure_parser", BISON_PURE },                    /* [i_a] bison emulation additions */
+	{ "right", RIGHT }, 
+	{ "skeleton", BISON_SKELETON },                   /* [i_a] bison emulation additions */
+	{ "start", START },
+	{ "term", TOKEN }, 
+	{ "token", TOKEN }, 
+	{ "token-table", BISON_TOKEN_TABLE },             /* [i_a] bison emulation additions */
+	{ "type", TYPE },
+	{ "union", UNION },
+	{ "verbose", BISON_VERBOSE },                     /* [i_a] bison emulation additions */
+	{ "yacc", BISON_YACC },                           /* [i_a] bison emulation additions */
 };
 
-int keyword()
+int keyword(void)
 {
   register int	c;
   char		*t_cptr = cptr;
@@ -284,15 +317,14 @@ int keyword()
   c = *++cptr;
   if (isalpha(c)) {
     cinc = 0;
-    while (isalnum(c) || c == '_' || c == '.' || c == '$') {
+    while (isalnum(c) || c == '_' || c == '-' || c == '.' || c == '$') {
       cachec(tolower(c));
       c = *++cptr; 
     }
     cachec(NUL);
-    
-    if ((key = bsearch(cache, keywords, sizeof(keywords)/sizeof(*key),
+    if ((key = bsearch(cache, keywords, sizeof(keywords)/sizeof(keywords[0]),
 		       sizeof(*key), strcmp)))
-      return key->token; 
+	return key->token; 
   } else {
     ++cptr;
     if (c == '{') return (TEXT);
@@ -307,10 +339,13 @@ int keyword()
   return 0;
 }
 
-void copy_ident()
+void copy_ident(void)
 {
     register int c;
-    register FILE *f = output_file;
+    register FILE *f;
+
+	open_output_files();
+	f = output_file;
 
     if ((c = nextc()) == EOF) unexpected_EOF();
     if (c != '"') syntax_error(lineno, line, cptr);
@@ -384,14 +419,17 @@ register int	c;
 
 #undef OUTC
 
-void copy_text()
+void copy_text(void)
 {
     register int c;
-    register FILE *f = text_file;
+    register FILE *f;
     int need_newline = 0;
     int t_lineno = lineno;
     char *t_line = dup_line();
     char *t_cptr = t_line + (cptr - line - 2);
+
+	open_output_files();
+	f = text_file;
 
     if (*cptr == '\n') {
 	if (get_line() == 0)
@@ -429,7 +467,7 @@ loop:
 	goto loop; }
 }
 
-void copy_union()
+void copy_union(void)
 {
     FILE *dc_file;
     register int c;
@@ -437,6 +475,8 @@ void copy_union()
     int u_lineno = lineno;
     char *u_line = dup_line();
     char *u_cptr = u_line + (cptr - line - 6);
+
+	open_output_files();
 
     if (unionized) over_unionized(cptr - 6);
     unionized = 1;
@@ -490,7 +530,7 @@ int hexval(int c)
     return (-1);
 }
 
-bucket *get_literal()
+bucket *get_literal(void)
 {
     register int c, quote;
     register int i;
@@ -619,7 +659,7 @@ int is_reserved(char *name)
     return (0);
 }
 
-bucket *get_name()
+bucket *get_name(void)
 {
     register int c;
 
@@ -633,7 +673,7 @@ bucket *get_name()
 
 /* Return (possibly negative) integer stored a cptr. On exit, cptr
    points to first character after integer. */
-int get_number() 
+int get_number(void) 
 {
   int n = 0;
   char c, first = *cptr;
@@ -711,7 +751,7 @@ char	*s;
     return s;
 }
 
-char *get_tag()
+char *get_tag(void)
 {
     register int c;
     int t_lineno = lineno;
@@ -743,7 +783,7 @@ static char *scan_id(void)
 char	*b = cptr;
 
     while (isalnum(*cptr) || *cptr == '_' || *cptr == '$') cptr++;
-    return cache_tag(b, cptr-b);
+    return cache_tag(b, (int)(cptr-b));
 }
 
 void declare_tokens(int assoc)
@@ -820,7 +860,7 @@ int	args = 0, c;
 	bp->argnames[args] = 0; }
 }
 
-void declare_types()
+void declare_types(void)
 {
     register int c;
     register bucket *bp=0;
@@ -852,7 +892,7 @@ void declare_types()
 	    bp->tag = tag; } }
 }
 
-void declare_start()
+void declare_start(void)
 {
     register int c;
     register bucket *bp;
@@ -869,9 +909,10 @@ void declare_start()
     goal = bp;
 }
 
-void read_declarations()
+void read_declarations(void)
 {
     register int c, k;
+	char *t_cptr;
 
     cache_size = 256;
     cache = MALLOC(cache_size);
@@ -881,7 +922,10 @@ void read_declarations()
 	c = nextc();
 	if (c == EOF) unexpected_EOF();
 	if (c != '%') syntax_error(lineno, line, cptr);
+	t_cptr = cptr;
 	switch (k = keyword()) {
+	default:
+		break;
 	case MARK:
 	    return;
 	case IDENT:
@@ -904,10 +948,107 @@ void read_declarations()
 	    break;
 	case START:
 	    declare_start();
-	    break; } }
+	    break; 
+	case BISON_NO_LINES:
+	    lflag = 1;
+		break;
+	case BISON_VERBOSE:
+	    vflag = 1;
+		break;
+	case BISON_DEFINES:
+	case BISON_LOCATIONS:
+	case BISON_PURE:
+	case BISON_YACC:
+		/* ignore */
+		break;
+	case BISON_ERR_VERBOSE:
+	case BISON_DEBUG:
+	    tflag = 1;
+		break;
+	case BISON_NAME_PREFIX:
+		{
+			bucket *bp;
+
+			/* = prefix */
+		    c = nextc();
+			if (c != '=') error(lineno, line, cptr, "syntax error: expected '=' following %%name-prefix");
+			cptr++;
+		    c = nextc();
+			if (c == '\'' || c == '"')
+			{
+				bp = get_literal();
+				/* strip quotes */
+				name_prefix = strdup(bp->name + 1);
+				name_prefix[strlen(name_prefix)-1] = 0; 
+			}
+			else
+			{
+				bp = get_name();
+				name_prefix = strdup(bp->name);
+			}
+		}
+		break;
+	case BISON_FILE_PREFIX:
+		{
+			bucket *bp;
+
+			/* = prefix */
+		    c = nextc();
+			if (k != '=') error(lineno, line, cptr, "syntax error: expected '=' following %%file-prefix");
+			cptr++;
+		    c = nextc();
+			if (c == '\'' || c == '"')
+			{
+				bp = get_literal();
+				/* strip quotes */
+				file_prefix = strdup(bp->name + 1);
+				file_prefix[strlen(file_prefix)-1] = 0; 
+			}
+			else
+			{
+				bp = get_name();
+				file_prefix = strdup(bp->name);
+			}
+		}
+		break;
+	case BISON_DEFINE:
+#if 0
+		{ 
+			char **ps;
+			char *var_name = s + 1;
+			extern char *defd_vars[];
+			for (ps = &defd_vars[0]; *ps; ps++) 
+			{
+				if(strcmp(*ps,var_name) == 0) 
+				{
+					error(lineno, line, t_cptr, "Preprocessor variable %s already defined", var_name);
+				}
+			}
+			*ps = MALLOC(strlen(var_name)+1);
+			strcpy(*ps, var_name);
+			*++ps = NULL;
+	    }
+		break;
+#endif
+	case BISON_PREC:
+	case BISON_DPREC:
+	case BISON_MERGE:
+	case BISON_EXPECT:
+	case BISON_GLR_PARSER:
+	case BISON_LEX_PARAM:
+	case BISON_OUTPUT:
+	case BISON_PARSE_PARAM:
+	case BISON_SKELETON:
+	case BISON_TOKEN_TABLE:
+	case BISON_DESTRUCTOR:
+	case BISON_PRINTER:
+	case BISON_NTERM:
+		unsupported_feature(lineno, line, t_cptr);
+		break;
+	} }
 }
 
-void initialize_grammar()
+void initialize_grammar(void)
 {
     nitems = 4;
     maxitems = 300;
@@ -937,14 +1078,14 @@ void initialize_grammar()
     rassoc[2] = TOKEN;
 }
 
-void expand_items()
+void expand_items(void)
 {
     maxitems += 300;
     pitem = RENEW(pitem, maxitems, bucket *);
     if (pitem == 0) no_space();
 }
 
-void expand_rules()
+void expand_rules(void)
 {
     maxrules += 100;
     plhs = RENEW(plhs, maxrules, bucket *);
@@ -1004,7 +1145,7 @@ char	*b;
     b = p;
     while (isalnum(*p) || *p == '_' || *p == '$') p++;
     if (save) {
-	*save = cache_tag(b, p-b); }
+	*save = cache_tag(b, (int)(p-b)); }
     return p;
 }
 
@@ -1180,7 +1321,7 @@ int			i;
 	arg_cache[i] = 0; }
 }
 
-void advance_to_start()
+void advance_to_start(void)
 {
     register int c;
     register bucket *bp;
@@ -1241,7 +1382,7 @@ void start_rule(bucket *bp, int s_lineno)
     rassoc[nrules] = TOKEN;
 }
 
-void end_rule()
+void end_rule(void)
 {
     register int i;
 
@@ -1257,7 +1398,7 @@ void end_rule()
     ++nrules;
 }
 
-void insert_empty_rule()
+void insert_empty_rule(void)
 {
     register bucket *bp, **bpp;
 
@@ -1312,7 +1453,7 @@ FILE	*f = action_file;
     return arg+1;
 }
 
-void add_symbol()
+void add_symbol(void)
 {
     register int c;
     register bucket *bp;
@@ -1369,7 +1510,7 @@ void add_symbol()
     pitem[nitems-1] = bp;
 }
 
-void copy_action()
+void copy_action(void)
 {
     register int c;
     register int i, j, n;
@@ -1377,12 +1518,15 @@ void copy_action()
     int trialaction = 0;
     int haveyyval = 0;
     char *tag;
-    register FILE *f = action_file;
+    register FILE *f;
     int a_lineno = lineno;
     char *a_line = dup_line();
     char *a_cptr = a_line + (cptr - line);
     Yshort *offsets=0, maxoffset;
     bucket **rhs;
+
+	open_output_files();
+	f = action_file;
 
     if (last_was_action)
 	insert_empty_rule();
@@ -1583,7 +1727,7 @@ loop:
 	goto loop; }
 }
 
-int mark_symbol()
+int mark_symbol(void)
 {
     register int c;
     register bucket *bp;
@@ -1622,7 +1766,7 @@ int mark_symbol()
     return (0);
 }
 
-void read_grammar()
+void read_grammar(void)
 {
     register int c;
 
@@ -1650,7 +1794,7 @@ void read_grammar()
 	error(0, 0, 0, "start symbol %s requires arguments", goal->name);
 }
 
-void free_tags()
+void free_tags(void)
 {
     register int i;
 
@@ -1662,14 +1806,14 @@ void free_tags()
     FREE(tag_table);
 }
 
-void pack_names()
+void pack_names(void)
 {
     register bucket *bp;
     register char *p, *s, *t;
 
     name_pool_size = 13;  /* 13 == sizeof("$end") + sizeof("$accept") */
     for (bp = first_symbol; bp; bp = bp->next)
-	name_pool_size += strlen(bp->name) + 1;
+	name_pool_size += (int)strlen(bp->name) + 1;
     name_pool = MALLOC(name_pool_size);
     if (name_pool == 0) no_space();
 
@@ -1684,7 +1828,7 @@ void pack_names()
 	bp->name = p; }
 }
 
-void check_symbols()
+void check_symbols(void)
 {
     register bucket *bp;
 
@@ -1697,7 +1841,7 @@ void check_symbols()
 	    bp->class = TERM; } }
 }
 
-void pack_symbols()
+void pack_symbols(void)
 {
     register bucket *bp;
     register bucket **v;
@@ -1792,7 +1936,7 @@ void pack_symbols()
     FREE(v);
 }
 
-void pack_grammar()
+void pack_grammar(void)
 {
     register int i, j;
     int assoc, prec;
@@ -1852,11 +1996,14 @@ void pack_grammar()
     clean_arg_cache();
 }
 
-void print_grammar()
+void print_grammar(void)
 {
     register int i, j, k;
     int spacing = 0;
-    register FILE *f = verbose_file;
+    register FILE *f;
+
+	open_output_files();
+	f = verbose_file;
 
     if (!vflag) return;
 
@@ -1865,7 +2012,7 @@ void print_grammar()
 	if (rlhs[i] != rlhs[i-1]) {
 	    if (i != 2) fprintf(f, "\n");
 	    fprintf(f, "%4d  %s :", i - 2, symbol_name[rlhs[i]]);
-	    spacing = strlen(symbol_name[rlhs[i]]) + 1; }
+	    spacing = (int)strlen(symbol_name[rlhs[i]]) + 1; }
 	else {
 	    fprintf(f, "%4d  ", i - 2);
 	    j = spacing;
@@ -1880,8 +2027,7 @@ void print_grammar()
 
 extern int read_errs;
 
-void reader() {
-  write_section("banner");
+void reader(void) {
   create_symbol_table();
   read_declarations();
   read_grammar();

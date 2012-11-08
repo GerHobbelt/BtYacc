@@ -6,7 +6,7 @@ This version is derived from BTYACC 3.0 and includes several patches
 
 WIN32:
 
-MSVC6 and MSVC7 (.NET) project files have been included.
+MSVC2005 (.NET) project files have been included.
 
 Note: regenerate the skeleton by running:                     
 

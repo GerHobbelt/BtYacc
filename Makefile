@@ -22,6 +22,8 @@ LINKER	      = gcc
 # LINKER      = cl
 # CC	      = cl
 
+DOCBOOK2MAN   = docbook2man
+
 MAKEFILE      = Makefile
 
 OBJS	      = closure.o error.o lalr.o lr0.o main.o mkpar.o output.o	\
@@ -38,7 +40,7 @@ OTHERS	      = README README.BYACC \
 		Makefile btyaccpa.ske push.skel empty.y skel2c manpage makefile.dos \
 		skeleton.c
 
-all:		$(PROGRAM)
+all:		$(PROGRAM) btyacc.1
 
 $(PROGRAM):     $(OBJS) $(LIBS)
 		$(LINKER) $(LDFLAGS) -o $(PROGRAM) $(OBJS) $(LIBS)
@@ -89,7 +91,7 @@ etags TAGS:
 		etags *.c *.h
 
 btyacc.1:	btyacc.sgml
-		docbook-to-man btyacc.sgml > btyacc.1
+		$(DOCBOOK2MAN) --sgml btyacc.sgml 
 
 
 ###

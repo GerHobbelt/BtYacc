@@ -10,14 +10,15 @@
 #include <sys/stat.h>
 #endif
 
-char dflag;
-char lflag;
-char rflag;
-char tflag;
-char vflag;
+char dflag = 0;
+char lflag = 0;
+char rflag = 0;
+char tflag = 0;
+char vflag = 0;
 int Eflag = 0;
 
 char *file_prefix = "y";
+char *name_prefix = "yy";
 char *myname = "yacc";
 #if defined(__MSDOS__) || defined(WIN32) || defined(__WIN32)
 #define DIR_CHAR '\\'
@@ -28,50 +29,50 @@ char *myname = "yacc";
 #endif
 char *temp_form = "yacc_t_XXXXXX";
 
-int lineno;
-int outline;
+int lineno = 0;
+int outline = 0;
 
-char *action_file_name;
-char *code_file_name;
-char *defines_file_name;
+char *action_file_name = NULL;
+char *code_file_name = NULL;
+char *defines_file_name = NULL;
 char *input_file_name = "";
-char *output_file_name;
-char *text_file_name;
-char *union_file_name;
-char *verbose_file_name;
+char *output_file_name = NULL;
+char *text_file_name = NULL;
+char *union_file_name = NULL;
+char *verbose_file_name = NULL;
 
-FILE *action_file;	/*  a temp file, used to save actions associated    */
+FILE *action_file = NULL;	/*  a temp file, used to save actions associated    */
 			/*  with rules until the parser is written	    */
-FILE *code_file;	/*  y.code.c (used when the -r option is specified) */
-FILE *defines_file;	/*  y.tab.h					    */
-FILE *input_file;	/*  the input file				    */
-FILE *output_file;	/*  y.tab.c					    */
-FILE *text_file;	/*  a temp file, used to save text until all	    */
+FILE *code_file = NULL;	/*  y.code.c (used when the -r option is specified) */
+FILE *defines_file = NULL;	/*  y.tab.h					    */
+FILE *input_file = NULL;	/*  the input file				    */
+FILE *output_file = NULL;	/*  y.tab.c					    */
+FILE *text_file = NULL;	/*  a temp file, used to save text until all	    */
 			/*  symbols have been defined			    */
-FILE *union_file;	/*  a temp file, used to save the union		    */
+FILE *union_file = NULL;	/*  a temp file, used to save the union		    */
 			/*  definition until all symbol have been	    */
 			/*  defined					    */
-FILE *verbose_file;	/*  y.output					    */
+FILE *verbose_file = NULL;	/*  y.output					    */
 
-int nitems;
-int nrules;
-int nsyms;
-int ntokens;
-int nvars;
+int nitems = 0;
+int nrules = 0;
+int nsyms = 0;
+int ntokens = 0;
+int nvars = 0;
 
-int   start_symbol;
-char  **symbol_name;
-Yshort *symbol_value;
-Yshort *symbol_prec;
-char  *symbol_assoc;
+int   start_symbol = 0;
+char  **symbol_name = NULL;
+Yshort *symbol_value = NULL;
+Yshort *symbol_prec = NULL;
+char  *symbol_assoc = NULL;
 
-Yshort *ritem;
-Yshort *rlhs;
-Yshort *rrhs;
-Yshort *rprec;
-char  *rassoc;
-Yshort **derives;
-char *nullable;
+Yshort *ritem = NULL;
+Yshort *rlhs = NULL;
+Yshort *rrhs = NULL;
+Yshort *rprec = NULL;
+char  *rassoc = NULL;
+Yshort **derives = NULL;
+char *nullable = NULL;
 
 
 void done(int k)
@@ -279,8 +280,8 @@ void create_file_names()
     tmpdir = getenv("TMPDIR");
     if (tmpdir == 0) tmpdir = DEFAULT_TMPDIR;
 
-    len = strlen(tmpdir);
-    i = len + strlen(temp_form) + 1;
+    len = (int)strlen(tmpdir);
+    i = len + (int)strlen(temp_form) + 1;
     if (len && tmpdir[len-1] != DIR_CHAR)
 	++i;
 
@@ -324,7 +325,7 @@ void create_file_names()
       exit(1);
     }
 
-    len = strlen(file_prefix);
+    len = (int)strlen(file_prefix);
 
     output_file_name = MALLOC(len + 7);
     if (output_file_name == 0)
@@ -363,54 +364,64 @@ void create_file_names()
 }
 
 
-void open_files()
+void open_input_files()
 {
-    create_file_names();
-
     if (input_file == 0)
     {
 		input_file = fopen(input_file_name, "r");
 		if (input_file == 0)
 			open_error(input_file_name);
     }
+}
 
-    action_file = fopen(action_file_name, "w");
-    if (action_file == 0)
-		open_error(action_file_name);
 
-    text_file = fopen(text_file_name, "w");
-    if (text_file == 0)
-		open_error(text_file_name);
+void open_output_files()
+{
+	/* do this only once, first time is on demand, i.e. as late as possible */
+	if (!action_file && !text_file && !verbose_file && !defines_file && !output_file && !code_file)
+	{
+		create_file_names();
 
-    if (vflag)
-    {
-		verbose_file = fopen(verbose_file_name, "w");
-		if (verbose_file == 0)
-			open_error(verbose_file_name);
-    }
+		action_file = fopen(action_file_name, "w");
+		if (action_file == 0)
+			open_error(action_file_name);
 
-    if (dflag)
-    {
-		defines_file = fopen(defines_file_name, "w");
-		if (defines_file == 0)
-			open_error(defines_file_name);
-		union_file = fopen(union_file_name, "w");
-		if (union_file ==  0)
-			open_error(union_file_name);
-    }
+		text_file = fopen(text_file_name, "w");
+		if (text_file == 0)
+			open_error(text_file_name);
 
-    output_file = fopen(output_file_name, "w");
-    if (output_file == 0)
-	open_error(output_file_name);
+		if (vflag)
+		{
+			verbose_file = fopen(verbose_file_name, "w");
+			if (verbose_file == 0)
+				open_error(verbose_file_name);
+		}
 
-    if (rflag)
-    {
-		code_file = fopen(code_file_name, "w");
-		if (code_file == 0)
-			open_error(code_file_name);
-    }
-    else
-		code_file = output_file;
+		if (dflag)
+		{
+			defines_file = fopen(defines_file_name, "w");
+			if (defines_file == 0)
+				open_error(defines_file_name);
+			union_file = fopen(union_file_name, "w");
+			if (union_file ==  0)
+				open_error(union_file_name);
+		}
+
+		output_file = fopen(output_file_name, "w");
+		if (output_file == 0)
+		open_error(output_file_name);
+
+		if (rflag)
+		{
+			code_file = fopen(code_file_name, "w");
+			if (code_file == 0)
+				open_error(code_file_name);
+		}
+		else
+			code_file = output_file;
+
+		write_section("banner");
+	}
 }
 
 
@@ -418,7 +429,7 @@ int main(int argc, char **argv)
 {
     set_signals();
     getargs(argc, argv);
-    open_files();
+    open_input_files();
     reader();
     lr0();
     lalr();

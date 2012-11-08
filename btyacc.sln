@@ -1,23 +1,59 @@
-Microsoft Visual Studio Solution File, Format Version 7.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "btyacc", "btyacc.vcproj", "{309A1B39-99AC-45F7-B705-4D0E0DE1C9DA}"
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "btyacc", "btyacc.vcproj", "{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Global
-	GlobalSection(DevPartner Solution Properties) = postSolution
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Itanium|Itanium = Debug Itanium|Itanium
+		Debug Itanium|Win32 = Debug Itanium|Win32
+		Debug Itanium|x64 = Debug Itanium|x64
+		Debug x86_x64|Itanium = Debug x86_x64|Itanium
+		Debug x86_x64|Win32 = Debug x86_x64|Win32
+		Debug x86_x64|x64 = Debug x86_x64|x64
+		Debug|Itanium = Debug|Itanium
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release Itanium|Itanium = Release Itanium|Itanium
+		Release Itanium|Win32 = Release Itanium|Win32
+		Release Itanium|x64 = Release Itanium|x64
+		Release x86_x64|Itanium = Release x86_x64|Itanium
+		Release x86_x64|Win32 = Release x86_x64|Win32
+		Release x86_x64|x64 = Release x86_x64|x64
+		Release|Itanium = Release|Itanium
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
 	EndGlobalSection
-	GlobalSection(SolutionConfiguration) = preSolution
-		ConfigName.0 = Debug
-		ConfigName.1 = Release
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug Itanium|Itanium.ActiveCfg = Debug Itanium|Itanium
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug Itanium|Itanium.Build.0 = Debug Itanium|Itanium
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug Itanium|Win32.ActiveCfg = Debug Itanium|Win32
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug Itanium|x64.ActiveCfg = Debug Itanium|x64
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug x86_x64|Itanium.ActiveCfg = Debug x86_x64|Itanium
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug x86_x64|Win32.ActiveCfg = Debug x86_x64|Win32
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug x86_x64|x64.ActiveCfg = Debug x86_x64|x64
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug x86_x64|x64.Build.0 = Debug x86_x64|x64
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug|Itanium.ActiveCfg = Debug|Itanium
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug|Win32.Build.0 = Debug|Win32
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Debug|x64.ActiveCfg = Debug|x64
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release Itanium|Itanium.ActiveCfg = Release Itanium|Itanium
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release Itanium|Itanium.Build.0 = Release Itanium|Itanium
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release Itanium|Win32.ActiveCfg = Release Itanium|Win32
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release Itanium|x64.ActiveCfg = Release Itanium|x64
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release x86_x64|Itanium.ActiveCfg = Release x86_x64|Itanium
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release x86_x64|Win32.ActiveCfg = Release x86_x64|Win32
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release x86_x64|x64.ActiveCfg = Release x86_x64|x64
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release x86_x64|x64.Build.0 = Release x86_x64|x64
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release|Itanium.ActiveCfg = Release|Itanium
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release|Win32.ActiveCfg = Release|Win32
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release|Win32.Build.0 = Release|Win32
+		{B0B0D3C1-169E-4FA1-9BA7-46D10C59B583}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
-	GlobalSection(ProjectDependencies) = postSolution
-	EndGlobalSection
-	GlobalSection(ProjectConfiguration) = postSolution
-		{309A1B39-99AC-45F7-B705-4D0E0DE1C9DA}.Debug.ActiveCfg = Debug|Win32
-		{309A1B39-99AC-45F7-B705-4D0E0DE1C9DA}.Debug.Build.0 = Debug|Win32
-		{309A1B39-99AC-45F7-B705-4D0E0DE1C9DA}.Release.ActiveCfg = Release|Win32
-		{309A1B39-99AC-45F7-B705-4D0E0DE1C9DA}.Release.Build.0 = Release|Win32
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-	EndGlobalSection
-	GlobalSection(ExtensibilityAddIns) = postSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

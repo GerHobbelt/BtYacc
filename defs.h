@@ -1,3 +1,35 @@
+#ifndef __YACC_DEFS_H__
+#define __YACC_DEFS_H__
+
+           
+           
+/* [i_a] */
+#ifndef HAS_MSVC_2005_ISO_RTL
+#if defined(_MSC_VER)
+#if _MSC_VER >= 1400 /* VS.NET 2005 or above: 'fix' those deprecated functions */
+#define HAS_MSVC_2005_ISO_RTL     1
+#endif
+#endif
+
+#ifndef HAS_MSVC_2005_ISO_RTL
+#define HAS_MSVC_2005_ISO_RTL     0
+#endif
+
+#if HAS_MSVC_2005_ISO_RTL
+#pragma warning(disable : 4996)
+// Or just turn off warnings about the newly deprecated CRT functions.
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+#ifndef _CRT_NONSTDC_NO_DEPRECATE
+#define _CRT_NONSTDC_NO_DEPRECATE
+#endif
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES     1
+#endif
+#endif
+/* [/i_a] */
+
+
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -21,6 +53,9 @@
 /*  SETBIT sets the n-th bit starting from r		*/
 
 #define	MAXCHAR		255
+
+
+
 
 #if defined(__MSDOS__) /* || defined(WIN32) || defined(__WIN32) */
 #define BITS_PER_WORD   16
@@ -79,6 +114,32 @@ typedef int Yshort;
 #define START 7
 #define UNION 8
 #define IDENT 9
+
+/* [i_a] bison emulation additions */
+#define BISON_DEBUG			110
+#define BISON_DEFINE		111
+#define BISON_DEFINES		112
+#define BISON_LOCATIONS		113
+#define BISON_PURE			114
+#define BISON_NAME_PREFIX	115
+#define BISON_FILE_PREFIX	116
+#define BISON_ERR_VERBOSE	117
+#define BISON_EXPECT		118
+#define BISON_GLR_PARSER	119
+#define BISON_LEX_PARAM		120
+#define BISON_NO_LINES		121
+#define BISON_OUTPUT		122
+#define BISON_PARSE_PARAM	123
+#define BISON_SKELETON		124
+#define BISON_TOKEN_TABLE	125
+#define BISON_VERBOSE		126
+#define BISON_YACC			127
+#define BISON_DESTRUCTOR	128
+#define BISON_PRINTER		129
+#define BISON_NTERM			130
+#define BISON_DPREC			131
+#define BISON_MERGE			132
+#define BISON_PREC			133
 
 
 /*  symbol classes  */
@@ -214,6 +275,8 @@ extern char tflag;
 extern char vflag;
 
 extern char *myname;
+extern char *file_prefix;
+extern char *name_prefix;
 extern char *cptr;
 extern char *line;
 extern int lineno;
@@ -300,7 +363,9 @@ extern Yshort nunused;
 extern Yshort final_state;
 
 /* system variable */
+#if !HAS_MSVC_2005_ISO_RTL
 extern int errno;
+#endif
 
 /* global functions */
 
@@ -321,6 +386,7 @@ void unexpected_EOF(void);
 void print_pos(char *, char *);
 void error(int, char *, char *, char *, ...);
 void syntax_error(int, char *, char *);
+void unsupported_feature(int, char *, char *);
 void unterminated_comment(int, char *, char *);
 void unterminated_string(int, char *, char *);
 void unterminated_text(int, char *, char *);
@@ -400,7 +466,8 @@ void usage(void);
 void getargs(int, char **);
 char *allocate(unsigned);
 void create_file_names(void);
-void open_files(void);
+void open_output_files(void);
+void open_input_files(void);
 int main(int, char **);
 
 /* mkpar.c */
@@ -517,3 +584,7 @@ void print_gotos(int);
 /* warshall.c */
 void transitive_closure(unsigned *, int);
 void reflexive_transitive_closure(unsigned *, int);
+
+
+
+#endif

@@ -163,7 +163,7 @@ int get_state(int symbol)
 
     isp1 = kernel_base[symbol];
     iend = kernel_end[symbol];
-    n = iend - isp1;
+    n = (int)(iend - isp1);
 
     key = *isp1;
     assert(0 <= key && key < nitems);
@@ -290,7 +290,7 @@ core *new_state(int symbol)
 
     isp1 = kernel_base[symbol];
     iend = kernel_end[symbol];
-    n = iend - isp1;
+    n = (int)(iend - isp1);
 
     p = (core *) allocate((unsigned) (sizeof(core) + (n - 1) * sizeof(Yshort)));
     p->accessing_symbol = symbol;
