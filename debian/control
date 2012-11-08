@@ -2,12 +2,12 @@ Source: btyacc
 Section: devel
 Priority: extra
 Maintainer: Richard Atterer <atterer@debian.org>
-Standards-Version: 3.2.1
-Build-Depends: debhelper (>= 3.0.15)
+Standards-Version: 3.6.2
+Build-Depends: debhelper (>= 5)
 
 Package: btyacc
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Backtracking parser generator based on byacc
  btyacc is a hacked version of the original Berkeley "byacc". The main
  change to byacc is the addition of backtracking code, allowing you to

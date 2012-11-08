@@ -1,3 +1,10 @@
+btyacc (3.0-5) unstable; urgency=low
+
+  * Rebuild: finish /usr/doc transition (Closes: #359373)
+  * Update debhelper compat and standards version
+
+ -- Richard Atterer <atterer@debian.org>  Tue, 28 Mar 2006 11:22:34 +0200
+
 btyacc (3.0-4-i_a-v2)
 
   * Updated my MSVC project files for MSVC2005SP1; now includes 64-bit build settings for Itanium and AMD64
