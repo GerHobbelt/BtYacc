@@ -21,16 +21,19 @@
 /*  SETBIT sets the n-th bit starting from r		*/
 
 #define	MAXCHAR		255
-#define	MAXSHORT	((int)0x7FFFFFFF)
-#define MINSHORT	((int)0x80000000)
-#define MAXTABLE	120000
 
-#ifdef __MSDOS__
+#if defined(__MSDOS__) /* || defined(WIN32) || defined(__WIN32) */
 #define BITS_PER_WORD   16
 #define LOG2_BPW    4
+#define	MAXSHORT	((int)0x7FFF)
+#define MINSHORT	((int)0x8000)
+#define MAXTABLE	4000
 #else    /* Real computers... */
 #define BITS_PER_WORD	32
 #define LOG2_BPW    5
+#define	MAXSHORT	((int)0x7FFFFFFF)
+#define MINSHORT	((int)0x80000000)
+#define MAXTABLE	120000
 #endif
 #define BITS_PER_WORD_1 (BITS_PER_WORD-1)
 
@@ -59,9 +62,9 @@ typedef int Yshort;
 
 /* defines for constructing filenames */
 
-#define DEFINES_SUFFIX  "_tab.h"
-#define OUTPUT_SUFFIX   "_tab.c"
-#define CODE_SUFFIX     "_code.c"
+#define DEFINES_SUFFIX  ".tab.h"
+#define OUTPUT_SUFFIX   ".tab.c"
+#define CODE_SUFFIX     ".code.c"
 #define VERBOSE_SUFFIX  ".output"
 
 /* keyword codes */
@@ -391,7 +394,7 @@ void lr0(void);
 
 /* main.c */
 void done(int);
-void onintr(void);
+void onintr(int dummy);
 void set_signals(void);
 void usage(void);
 void getargs(int, char **);

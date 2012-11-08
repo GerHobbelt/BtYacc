@@ -47,7 +47,7 @@ void output_rule_data()
 
     if (!rflag)
 	fprintf(output_file, "static ");
-    fprintf(output_file, "int yylhs[] = {%42d,",
+    fprintf(output_file, "Yshort yylhs[] = {%42d,",
 	    symbol_value[start_symbol]);
 
     j = 10;
@@ -69,7 +69,7 @@ void output_rule_data()
 
     if (!rflag)
 	fprintf(output_file, "static ");
-    fprintf(output_file, "int yylen[] = {%42d,", 2);
+    fprintf(output_file, "Yshort yylen[] = {%42d,", 2);
 
     j = 10;
     for (i = 3; i < nrules; i++)
@@ -95,8 +95,8 @@ void output_yydefred()
     register int i, j;
 
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "int yydefred[] = {%39d,",
+		fprintf(output_file, "static ");
+    fprintf(output_file, "Yshort yydefred[] = {%39d,",
 	    (defred[0] ? defred[0] - 2 : 0));
 
     j = 10;
@@ -285,7 +285,7 @@ void goto_actions()
     k = default_goto(start_symbol + 1);
     if (!rflag)
 	fprintf(output_file, "static ");
-    fprintf(output_file, "int yydgoto[] = {%40d,", k);
+    fprintf(output_file, "Yshort yydgoto[] = {%40d,", k);
     save_column(start_symbol + 1, k);
 
     j = 10;
@@ -607,7 +607,7 @@ void output_base()
 
     if (!rflag)
 	fprintf(output_file, "static ");
-    fprintf(output_file, "int yysindex[] = {%39d,", base[0]);
+    fprintf(output_file, "Yshort yysindex[] = {%39d,", base[0]);
     j = 10;
     for (i = 1; i < nstates; i++) {
 	if (j >= 10) {
@@ -622,7 +622,7 @@ void output_base()
     fprintf(output_file, "\n};\n");
     if (!rflag)
 	fprintf(output_file, "static ");
-    fprintf(output_file, "int yyrindex[] = {%39d,", base[nstates]);
+    fprintf(output_file, "Yshort yyrindex[] = {%39d,", base[nstates]);
     j = 10;
     for (i = nstates + 1; i < 2*nstates; i++) {
 	if (j >= 10) {
@@ -637,7 +637,7 @@ void output_base()
     fprintf(output_file, "\n};\n");
     if (!rflag)
 	fprintf(output_file, "static ");
-    fprintf(output_file, "int yycindex[] = {%39d,", base[2*nstates]);
+    fprintf(output_file, "Yshort yycindex[] = {%39d,", base[2*nstates]);
     j = 10;
     for (i = 2*nstates + 1; i < 3*nstates; i++) {
 	if (j >= 10) {
@@ -653,7 +653,7 @@ void output_base()
     fprintf(output_file, "\n};\n");
     if (!rflag)
 	fprintf(output_file, "static ");
-    fprintf(output_file, "int yygindex[] = {%39d,",
+    fprintf(output_file, "Yshort yygindex[] = {%39d,",
 	    base[3*nstates]);
     j = 10;
     for (i = 3*nstates + 1; i < nvectors - 1; i++) {
@@ -688,7 +688,7 @@ void output_table()
     fprintf(code_file, "#define YYTABLESIZE %d\n", high);
     if (!rflag)
 	fprintf(output_file, "static ");
-    fprintf(output_file, "int yytable[] = {%40d,", table[0]);
+    fprintf(output_file, "Yshort yytable[] = {%40d,", table[0]);
 
     j = 10;
     for (i = 1; i <= high; i++)
@@ -719,7 +719,7 @@ void output_check()
 
     if (!rflag)
 	fprintf(output_file, "static ");
-    fprintf(output_file, "int yycheck[] = {%40d,", check[0]);
+    fprintf(output_file, "Yshort yycheck[] = {%40d,", check[0]);
 
     j = 10;
     for (i = 1; i <= high; i++)
@@ -748,7 +748,7 @@ void output_ctable()
 
     if (!rflag)
 	fprintf(output_file, "static ");
-    fprintf(output_file, "int yyctable[] = {%39d,", conflicts ?
+    fprintf(output_file, "Yshort yyctable[] = {%39d,", conflicts ?
 	    conflicts[0] : 0);
 
     j = 10;

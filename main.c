@@ -1,7 +1,14 @@
 #include "defs.h"
 #include <signal.h>
 #include <stdio.h>
+#include <stdlib.h>
+#if defined(__MSDOS__) || defined(WIN32) || defined(__WIN32)
+#include <io.h> /* mktemp() */
+#else
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
 
 char dflag;
 char lflag;
@@ -12,7 +19,7 @@ int Eflag = 0;
 
 char *file_prefix = "y";
 char *myname = "yacc";
-#ifdef __MSDOS__
+#if defined(__MSDOS__) || defined(WIN32) || defined(__WIN32)
 #define DIR_CHAR '\\'
 #define DEFAULT_TMPDIR "."
 #else  /* Unix */
@@ -76,7 +83,7 @@ void done(int k)
 }
 
 
-void onintr()
+void onintr(int dummy)
 {
     done(1);
 }
@@ -99,11 +106,20 @@ void set_signals()
 }
 
 
-void usage()
+void usage() 
 {
-    fprintf(stderr, "usage: %s [-dlrtv] [-b file_prefix] [-S skeleton file] "
-		    "filename\n", myname);
-    exit(1);
+  printf("usage: %s [OPTIONS] file\n", myname);
+  puts(
+	    "  -b prefix    Change `y' into `prefix' in all output filenames\n"
+	    "  -d           Generate header file `y.tab.h'\n"
+	    "  -DNAME       Define btyacc preprocessor variable NAME\n"
+	    "  -E           Print preprocessed grammar to stdout\n"
+	    "  -l           Do not insert #line directives into generated code\n"
+	    "  -r           Write tables to `y.tab.c', code to `y.code.c'\n"
+	    "  -S x.skel    Select parser skeleton\n"
+	    "  -t           Include debugging code in generated parser\n"
+	    "  -v           Write description of parser to `y.output'");
+  exit(1);
 }
 
 
@@ -179,11 +195,11 @@ void getargs(int argc, char **argv)
 
 	case 'S':
 	    if (*++s)
-		read_skel(s);
+			read_skel(s);
 	    else if (++i < argc)
-		read_skel(argv[i]);
+			read_skel(argv[i]);
 	    else
-		usage();
+			usage();
 	    continue;
 
 	default:
@@ -264,7 +280,7 @@ void create_file_names()
     if (tmpdir == 0) tmpdir = DEFAULT_TMPDIR;
 
     len = strlen(tmpdir);
-    i = len + 13;
+    i = len + strlen(temp_form) + 1;
     if (len && tmpdir[len-1] != DIR_CHAR)
 	++i;
 
@@ -312,37 +328,37 @@ void create_file_names()
 
     output_file_name = MALLOC(len + 7);
     if (output_file_name == 0)
-	no_space();
+		no_space();
     strcpy(output_file_name, file_prefix);
     strcpy(output_file_name + len, OUTPUT_SUFFIX);
 
     if (rflag)
     {
-	code_file_name = MALLOC(len + 8);
-	if (code_file_name == 0)
-	    no_space();
-	strcpy(code_file_name, file_prefix);
-	strcpy(code_file_name + len, CODE_SUFFIX);
+		code_file_name = MALLOC(len + 8);
+		if (code_file_name == 0)
+			no_space();
+		strcpy(code_file_name, file_prefix);
+		strcpy(code_file_name + len, CODE_SUFFIX);
     }
     else
-	code_file_name = output_file_name;
+		code_file_name = output_file_name;
 
     if (dflag)
     {
-	defines_file_name = MALLOC(len + 7);
-	if (defines_file_name == 0)
-	    no_space();
-	strcpy(defines_file_name, file_prefix);
-	strcpy(defines_file_name + len, DEFINES_SUFFIX);
+		defines_file_name = MALLOC(len + 7);
+		if (defines_file_name == 0)
+			no_space();
+		strcpy(defines_file_name, file_prefix);
+		strcpy(defines_file_name + len, DEFINES_SUFFIX);
     }
 
     if (vflag)
     {
-	verbose_file_name = MALLOC(len + 8);
-	if (verbose_file_name == 0)
-	    no_space();
-	strcpy(verbose_file_name, file_prefix);
-	strcpy(verbose_file_name + len, VERBOSE_SUFFIX);
+		verbose_file_name = MALLOC(len + 8);
+		if (verbose_file_name == 0)
+			no_space();
+		strcpy(verbose_file_name, file_prefix);
+		strcpy(verbose_file_name + len, VERBOSE_SUFFIX);
     }
 }
 
@@ -353,34 +369,34 @@ void open_files()
 
     if (input_file == 0)
     {
-	input_file = fopen(input_file_name, "r");
-	if (input_file == 0)
-	    open_error(input_file_name);
+		input_file = fopen(input_file_name, "r");
+		if (input_file == 0)
+			open_error(input_file_name);
     }
 
     action_file = fopen(action_file_name, "w");
     if (action_file == 0)
-	open_error(action_file_name);
+		open_error(action_file_name);
 
     text_file = fopen(text_file_name, "w");
     if (text_file == 0)
-	open_error(text_file_name);
+		open_error(text_file_name);
 
     if (vflag)
     {
-	verbose_file = fopen(verbose_file_name, "w");
-	if (verbose_file == 0)
-	    open_error(verbose_file_name);
+		verbose_file = fopen(verbose_file_name, "w");
+		if (verbose_file == 0)
+			open_error(verbose_file_name);
     }
 
     if (dflag)
     {
-	defines_file = fopen(defines_file_name, "w");
-	if (defines_file == 0)
-	    open_error(defines_file_name);
-	union_file = fopen(union_file_name, "w");
-	if (union_file ==  0)
-	    open_error(union_file_name);
+		defines_file = fopen(defines_file_name, "w");
+		if (defines_file == 0)
+			open_error(defines_file_name);
+		union_file = fopen(union_file_name, "w");
+		if (union_file ==  0)
+			open_error(union_file_name);
     }
 
     output_file = fopen(output_file_name, "w");
@@ -389,12 +405,12 @@ void open_files()
 
     if (rflag)
     {
-	code_file = fopen(code_file_name, "w");
-	if (code_file == 0)
-	    open_error(code_file_name);
+		code_file = fopen(code_file_name, "w");
+		if (code_file == 0)
+			open_error(code_file_name);
     }
     else
-	code_file = output_file;
+		code_file = output_file;
 }
 
 

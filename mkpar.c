@@ -177,12 +177,13 @@ void unused_rules()
 	if (!rules_used[i]) ++nunused;
 
     if (nunused)
-	if (nunused == 1)
-	    fprintf(stderr, "%s: 1 rule never reduced\n", myname);
-	else
-	    fprintf(stderr, "%s: %d rules never reduced\n", myname, nunused);
+    {
+		if (nunused == 1)
+		    fprintf(stderr, "%s: 1 rule never reduced\n", myname);
+		else
+		    fprintf(stderr, "%s: %d rules never reduced\n", myname, nunused);
+	}
 }
-
 
 void remove_conflicts()
 {

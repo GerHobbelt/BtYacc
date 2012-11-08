@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+if test $1 != "upgrade"; then
+    update-alternatives --remove yacc /usr/bin/btyacc
+fi
+
+#DEBHELPER#
+
+exit 0

@@ -1,0 +1,1096 @@
+   0  $accept : goal $end
+
+   1  goal : initlex sect1 sect1end sect2 initforrule
+
+   2  initlex :
+
+   3  sect1 : sect1 startconddecl namelist1
+   4        | sect1 options
+   5        |
+   6        | error
+
+   7  sect1end : SECTEND
+
+   8  startconddecl : SCDECL
+   9                | XSCDECL
+
+  10  namelist1 : namelist1 NAME
+  11            | NAME
+  12            | error
+
+  13  options : OPTION_OP optionlist
+
+  14  optionlist : optionlist option
+  15             |
+
+  16  option : OPT_OUTFILE '=' NAME
+  17         | OPT_PREFIX '=' NAME
+  18         | OPT_YYCLASS '=' NAME
+
+  19  sect2 : sect2 scon initforrule flexrule '\n'
+  20        | sect2 scon '{' sect2 '}'
+  21        |
+
+  22  initforrule :
+
+  23  flexrule : '^' rule
+  24           | rule
+  25           | EOF_OP
+  26           | error
+
+  27  scon_stk_ptr :
+
+  28  scon : '<' scon_stk_ptr namelist2 '>'
+  29       | '<' '*' '>'
+  30       |
+
+  31  namelist2 : namelist2 ',' sconname
+  32            | sconname
+  33            | error
+
+  34  sconname : NAME
+
+  35  rule : re2 re
+  36       | re2 re '$'
+  37       | re '$'
+  38       | re
+
+  39  re : re '|' series
+  40     | series
+
+  41  re2 : re '/'
+
+  42  series : series singleton
+  43         | singleton
+
+  44  singleton : singleton '*'
+  45            | singleton '+'
+  46            | singleton '?'
+  47            | singleton '{' NUMBER ',' NUMBER '}'
+  48            | singleton '{' NUMBER ',' '}'
+  49            | singleton '{' NUMBER '}'
+  50            | '.'
+  51            | fullccl
+  52            | PREVCCL
+  53            | '"' string '"'
+  54            | '(' re ')'
+  55            | CHAR
+
+  56  fullccl : '[' ccl ']'
+  57          | '[' '^' ccl ']'
+
+  58  ccl : ccl CHAR '-' CHAR
+  59      | ccl CHAR
+  60      | ccl ccl_expr
+  61      |
+
+  62  ccl_expr : CCE_ALNUM
+  63           | CCE_ALPHA
+  64           | CCE_BLANK
+  65           | CCE_CNTRL
+  66           | CCE_DIGIT
+  67           | CCE_GRAPH
+  68           | CCE_LOWER
+  69           | CCE_PRINT
+  70           | CCE_PUNCT
+  71           | CCE_SPACE
+  72           | CCE_UPPER
+  73           | CCE_XDIGIT
+
+  74  string : string CHAR
+  75         |
+
+state 0
+	$accept : . goal $end  (0)
+	initlex : .  (2)
+
+	.  reduce 2
+
+	goal  goto 1
+	initlex  goto 2
+
+
+state 1
+	$accept : goal . $end  (0)
+
+	$end  accept
+
+
+state 2
+	goal : initlex . sect1 sect1end sect2 initforrule  (1)
+	sect1 : .  (5)
+
+	error  shift 3
+	SECTEND  reduce 5
+	SCDECL  reduce 5
+	XSCDECL  reduce 5
+	OPTION_OP  reduce 5
+
+	sect1  goto 4
+
+
+state 3
+	sect1 : error .  (6)
+
+	.  reduce 6
+
+
+state 4
+	goal : initlex sect1 . sect1end sect2 initforrule  (1)
+	sect1 : sect1 . startconddecl namelist1  (3)
+	sect1 : sect1 . options  (4)
+
+	SECTEND  shift 5
+	SCDECL  shift 6
+	XSCDECL  shift 7
+	OPTION_OP  shift 8
+	.  error
+
+	sect1end  goto 9
+	startconddecl  goto 10
+	options  goto 11
+
+
+state 5
+	sect1end : SECTEND .  (7)
+
+	.  reduce 7
+
+
+state 6
+	startconddecl : SCDECL .  (8)
+
+	.  reduce 8
+
+
+state 7
+	startconddecl : XSCDECL .  (9)
+
+	.  reduce 9
+
+
+state 8
+	options : OPTION_OP . optionlist  (13)
+	optionlist : .  (15)
+
+	.  reduce 15
+
+	optionlist  goto 12
+
+
+state 9
+	goal : initlex sect1 sect1end . sect2 initforrule  (1)
+	sect2 : .  (21)
+
+	.  reduce 21
+
+	sect2  goto 13
+
+
+state 10
+	sect1 : sect1 startconddecl . namelist1  (3)
+
+	error  shift 14
+	NAME  shift 15
+	.  error
+
+	namelist1  goto 16
+
+
+state 11
+	sect1 : sect1 options .  (4)
+
+	.  reduce 4
+
+
+state 12
+	options : OPTION_OP optionlist .  (13)
+	optionlist : optionlist . option  (14)
+
+	OPT_OUTFILE  shift 17
+	OPT_PREFIX  shift 18
+	OPT_YYCLASS  shift 19
+	SECTEND  reduce 13
+	SCDECL  reduce 13
+	XSCDECL  reduce 13
+	OPTION_OP  reduce 13
+
+	option  goto 20
+
+
+state 13
+	goal : initlex sect1 sect1end sect2 . initforrule  (1)
+	sect2 : sect2 . scon initforrule flexrule '\n'  (19)
+	sect2 : sect2 . scon '{' sect2 '}'  (20)
+	initforrule : .  (22)
+	scon : .  (30)
+
+	'<'  shift 21
+	$end  reduce 22
+	error  reduce 30
+	CHAR  reduce 30
+	PREVCCL  reduce 30
+	EOF_OP  reduce 30
+	'{'  reduce 30
+	'^'  reduce 30
+	'.'  reduce 30
+	'"'  reduce 30
+	'('  reduce 30
+	'['  reduce 30
+
+	initforrule  goto 22
+	scon  goto 23
+
+
+state 14
+	namelist1 : error .  (12)
+
+	.  reduce 12
+
+
+state 15
+	namelist1 : NAME .  (11)
+
+	.  reduce 11
+
+
+state 16
+	sect1 : sect1 startconddecl namelist1 .  (3)
+	namelist1 : namelist1 . NAME  (10)
+
+	NAME  shift 24
+	SECTEND  reduce 3
+	SCDECL  reduce 3
+	XSCDECL  reduce 3
+	OPTION_OP  reduce 3
+
+
+state 17
+	option : OPT_OUTFILE . '=' NAME  (16)
+
+	'='  shift 25
+	.  error
+
+
+state 18
+	option : OPT_PREFIX . '=' NAME  (17)
+
+	'='  shift 26
+	.  error
+
+
+state 19
+	option : OPT_YYCLASS . '=' NAME  (18)
+
+	'='  shift 27
+	.  error
+
+
+state 20
+	optionlist : optionlist option .  (14)
+
+	.  reduce 14
+
+
+state 21
+	scon : '<' . scon_stk_ptr namelist2 '>'  (28)
+	scon : '<' . '*' '>'  (29)
+	scon_stk_ptr : .  (27)
+
+	'*'  shift 28
+	error  reduce 27
+	NAME  reduce 27
+
+	scon_stk_ptr  goto 29
+
+
+state 22
+	goal : initlex sect1 sect1end sect2 initforrule .  (1)
+
+	.  reduce 1
+
+
+state 23
+	sect2 : sect2 scon . initforrule flexrule '\n'  (19)
+	sect2 : sect2 scon . '{' sect2 '}'  (20)
+	initforrule : .  (22)
+
+	'{'  shift 30
+	error  reduce 22
+	CHAR  reduce 22
+	PREVCCL  reduce 22
+	EOF_OP  reduce 22
+	'^'  reduce 22
+	'.'  reduce 22
+	'"'  reduce 22
+	'('  reduce 22
+	'['  reduce 22
+
+	initforrule  goto 31
+
+
+state 24
+	namelist1 : namelist1 NAME .  (10)
+
+	.  reduce 10
+
+
+state 25
+	option : OPT_OUTFILE '=' . NAME  (16)
+
+	NAME  shift 32
+	.  error
+
+
+state 26
+	option : OPT_PREFIX '=' . NAME  (17)
+
+	NAME  shift 33
+	.  error
+
+
+state 27
+	option : OPT_YYCLASS '=' . NAME  (18)
+
+	NAME  shift 34
+	.  error
+
+
+state 28
+	scon : '<' '*' . '>'  (29)
+
+	'>'  shift 35
+	.  error
+
+
+state 29
+	scon : '<' scon_stk_ptr . namelist2 '>'  (28)
+
+	error  shift 36
+	NAME  shift 37
+	.  error
+
+	namelist2  goto 38
+	sconname  goto 39
+
+
+state 30
+	sect2 : sect2 scon '{' . sect2 '}'  (20)
+	sect2 : .  (21)
+
+	.  reduce 21
+
+	sect2  goto 40
+
+
+state 31
+	sect2 : sect2 scon initforrule . flexrule '\n'  (19)
+
+	error  shift 41
+	CHAR  shift 42
+	PREVCCL  shift 43
+	EOF_OP  shift 44
+	'^'  shift 45
+	'.'  shift 46
+	'"'  shift 47
+	'('  shift 48
+	'['  shift 49
+	.  error
+
+	flexrule  goto 50
+	rule  goto 51
+	re2  goto 52
+	re  goto 53
+	series  goto 54
+	singleton  goto 55
+	fullccl  goto 56
+
+
+state 32
+	option : OPT_OUTFILE '=' NAME .  (16)
+
+	.  reduce 16
+
+
+state 33
+	option : OPT_PREFIX '=' NAME .  (17)
+
+	.  reduce 17
+
+
+state 34
+	option : OPT_YYCLASS '=' NAME .  (18)
+
+	.  reduce 18
+
+
+state 35
+	scon : '<' '*' '>' .  (29)
+
+	.  reduce 29
+
+
+state 36
+	namelist2 : error .  (33)
+
+	.  reduce 33
+
+
+state 37
+	sconname : NAME .  (34)
+
+	.  reduce 34
+
+
+state 38
+	scon : '<' scon_stk_ptr namelist2 . '>'  (28)
+	namelist2 : namelist2 . ',' sconname  (31)
+
+	'>'  shift 57
+	','  shift 58
+	.  error
+
+
+state 39
+	namelist2 : sconname .  (32)
+
+	.  reduce 32
+
+
+state 40
+	sect2 : sect2 . scon initforrule flexrule '\n'  (19)
+	sect2 : sect2 . scon '{' sect2 '}'  (20)
+	sect2 : sect2 scon '{' sect2 . '}'  (20)
+	scon : .  (30)
+
+	'}'  shift 59
+	'<'  shift 21
+	error  reduce 30
+	CHAR  reduce 30
+	PREVCCL  reduce 30
+	EOF_OP  reduce 30
+	'{'  reduce 30
+	'^'  reduce 30
+	'.'  reduce 30
+	'"'  reduce 30
+	'('  reduce 30
+	'['  reduce 30
+
+	scon  goto 23
+
+
+state 41
+	flexrule : error .  (26)
+
+	.  reduce 26
+
+
+state 42
+	singleton : CHAR .  (55)
+
+	.  reduce 55
+
+
+state 43
+	singleton : PREVCCL .  (52)
+
+	.  reduce 52
+
+
+state 44
+	flexrule : EOF_OP .  (25)
+
+	.  reduce 25
+
+
+state 45
+	flexrule : '^' . rule  (23)
+
+	CHAR  shift 42
+	PREVCCL  shift 43
+	'.'  shift 46
+	'"'  shift 47
+	'('  shift 48
+	'['  shift 49
+	.  error
+
+	rule  goto 60
+	re2  goto 52
+	re  goto 53
+	series  goto 54
+	singleton  goto 55
+	fullccl  goto 56
+
+
+state 46
+	singleton : '.' .  (50)
+
+	.  reduce 50
+
+
+state 47
+	singleton : '"' . string '"'  (53)
+	string : .  (75)
+
+	.  reduce 75
+
+	string  goto 61
+
+
+state 48
+	singleton : '(' . re ')'  (54)
+
+	CHAR  shift 42
+	PREVCCL  shift 43
+	'.'  shift 46
+	'"'  shift 47
+	'('  shift 48
+	'['  shift 49
+	.  error
+
+	re  goto 62
+	series  goto 54
+	singleton  goto 55
+	fullccl  goto 56
+
+
+state 49
+	fullccl : '[' . ccl ']'  (56)
+	fullccl : '[' . '^' ccl ']'  (57)
+	ccl : .  (61)
+
+	'^'  shift 63
+	CHAR  reduce 61
+	CCE_ALNUM  reduce 61
+	CCE_ALPHA  reduce 61
+	CCE_BLANK  reduce 61
+	CCE_CNTRL  reduce 61
+	CCE_DIGIT  reduce 61
+	CCE_GRAPH  reduce 61
+	CCE_LOWER  reduce 61
+	CCE_PRINT  reduce 61
+	CCE_PUNCT  reduce 61
+	CCE_SPACE  reduce 61
+	CCE_UPPER  reduce 61
+	CCE_XDIGIT  reduce 61
+	']'  reduce 61
+
+	ccl  goto 64
+
+
+state 50
+	sect2 : sect2 scon initforrule flexrule . '\n'  (19)
+
+	'\n'  shift 65
+	.  error
+
+
+state 51
+	flexrule : rule .  (24)
+
+	.  reduce 24
+
+
+state 52
+	rule : re2 . re  (35)
+	rule : re2 . re '$'  (36)
+
+	CHAR  shift 42
+	PREVCCL  shift 43
+	'.'  shift 46
+	'"'  shift 47
+	'('  shift 48
+	'['  shift 49
+	.  error
+
+	re  goto 66
+	series  goto 54
+	singleton  goto 55
+	fullccl  goto 56
+
+
+state 53
+	rule : re . '$'  (37)
+	rule : re .  (38)
+	re : re . '|' series  (39)
+	re2 : re . '/'  (41)
+
+	'$'  shift 67
+	'|'  shift 68
+	'/'  shift 69
+	'\n'  reduce 38
+
+
+state 54
+	re : series .  (40)
+	series : series . singleton  (42)
+
+	CHAR  shift 42
+	PREVCCL  shift 43
+	'.'  shift 46
+	'"'  shift 47
+	'('  shift 48
+	'['  shift 49
+	'\n'  reduce 40
+	'$'  reduce 40
+	'|'  reduce 40
+	'/'  reduce 40
+	')'  reduce 40
+
+	singleton  goto 70
+	fullccl  goto 56
+
+
+state 55
+	series : singleton .  (43)
+	singleton : singleton . '*'  (44)
+	singleton : singleton . '+'  (45)
+	singleton : singleton . '?'  (46)
+	singleton : singleton . '{' NUMBER ',' NUMBER '}'  (47)
+	singleton : singleton . '{' NUMBER ',' '}'  (48)
+	singleton : singleton . '{' NUMBER '}'  (49)
+
+	'{'  shift 71
+	'*'  shift 72
+	'+'  shift 73
+	'?'  shift 74
+	CHAR  reduce 43
+	PREVCCL  reduce 43
+	'\n'  reduce 43
+	'$'  reduce 43
+	'|'  reduce 43
+	'/'  reduce 43
+	'.'  reduce 43
+	'"'  reduce 43
+	'('  reduce 43
+	')'  reduce 43
+	'['  reduce 43
+
+
+state 56
+	singleton : fullccl .  (51)
+
+	.  reduce 51
+
+
+state 57
+	scon : '<' scon_stk_ptr namelist2 '>' .  (28)
+
+	.  reduce 28
+
+
+state 58
+	namelist2 : namelist2 ',' . sconname  (31)
+
+	NAME  shift 37
+	.  error
+
+	sconname  goto 75
+
+
+state 59
+	sect2 : sect2 scon '{' sect2 '}' .  (20)
+
+	.  reduce 20
+
+
+state 60
+	flexrule : '^' rule .  (23)
+
+	.  reduce 23
+
+
+state 61
+	singleton : '"' string . '"'  (53)
+	string : string . CHAR  (74)
+
+	CHAR  shift 76
+	'"'  shift 77
+	.  error
+
+
+state 62
+	re : re . '|' series  (39)
+	singleton : '(' re . ')'  (54)
+
+	'|'  shift 68
+	')'  shift 78
+	.  error
+
+
+state 63
+	fullccl : '[' '^' . ccl ']'  (57)
+	ccl : .  (61)
+
+	.  reduce 61
+
+	ccl  goto 79
+
+
+state 64
+	fullccl : '[' ccl . ']'  (56)
+	ccl : ccl . CHAR '-' CHAR  (58)
+	ccl : ccl . CHAR  (59)
+	ccl : ccl . ccl_expr  (60)
+
+	CHAR  shift 80
+	CCE_ALNUM  shift 81
+	CCE_ALPHA  shift 82
+	CCE_BLANK  shift 83
+	CCE_CNTRL  shift 84
+	CCE_DIGIT  shift 85
+	CCE_GRAPH  shift 86
+	CCE_LOWER  shift 87
+	CCE_PRINT  shift 88
+	CCE_PUNCT  shift 89
+	CCE_SPACE  shift 90
+	CCE_UPPER  shift 91
+	CCE_XDIGIT  shift 92
+	']'  shift 93
+	.  error
+
+	ccl_expr  goto 94
+
+
+state 65
+	sect2 : sect2 scon initforrule flexrule '\n' .  (19)
+
+	.  reduce 19
+
+
+state 66
+	rule : re2 re .  (35)
+	rule : re2 re . '$'  (36)
+	re : re . '|' series  (39)
+
+	'$'  shift 95
+	'|'  shift 68
+	'\n'  reduce 35
+
+
+state 67
+	rule : re '$' .  (37)
+
+	.  reduce 37
+
+
+state 68
+	re : re '|' . series  (39)
+
+	CHAR  shift 42
+	PREVCCL  shift 43
+	'.'  shift 46
+	'"'  shift 47
+	'('  shift 48
+	'['  shift 49
+	.  error
+
+	series  goto 96
+	singleton  goto 55
+	fullccl  goto 56
+
+
+state 69
+	re2 : re '/' .  (41)
+
+	.  reduce 41
+
+
+state 70
+	series : series singleton .  (42)
+	singleton : singleton . '*'  (44)
+	singleton : singleton . '+'  (45)
+	singleton : singleton . '?'  (46)
+	singleton : singleton . '{' NUMBER ',' NUMBER '}'  (47)
+	singleton : singleton . '{' NUMBER ',' '}'  (48)
+	singleton : singleton . '{' NUMBER '}'  (49)
+
+	'{'  shift 71
+	'*'  shift 72
+	'+'  shift 73
+	'?'  shift 74
+	CHAR  reduce 42
+	PREVCCL  reduce 42
+	'\n'  reduce 42
+	'$'  reduce 42
+	'|'  reduce 42
+	'/'  reduce 42
+	'.'  reduce 42
+	'"'  reduce 42
+	'('  reduce 42
+	')'  reduce 42
+	'['  reduce 42
+
+
+state 71
+	singleton : singleton '{' . NUMBER ',' NUMBER '}'  (47)
+	singleton : singleton '{' . NUMBER ',' '}'  (48)
+	singleton : singleton '{' . NUMBER '}'  (49)
+
+	NUMBER  shift 97
+	.  error
+
+
+state 72
+	singleton : singleton '*' .  (44)
+
+	.  reduce 44
+
+
+state 73
+	singleton : singleton '+' .  (45)
+
+	.  reduce 45
+
+
+state 74
+	singleton : singleton '?' .  (46)
+
+	.  reduce 46
+
+
+state 75
+	namelist2 : namelist2 ',' sconname .  (31)
+
+	.  reduce 31
+
+
+state 76
+	string : string CHAR .  (74)
+
+	.  reduce 74
+
+
+state 77
+	singleton : '"' string '"' .  (53)
+
+	.  reduce 53
+
+
+state 78
+	singleton : '(' re ')' .  (54)
+
+	.  reduce 54
+
+
+state 79
+	fullccl : '[' '^' ccl . ']'  (57)
+	ccl : ccl . CHAR '-' CHAR  (58)
+	ccl : ccl . CHAR  (59)
+	ccl : ccl . ccl_expr  (60)
+
+	CHAR  shift 80
+	CCE_ALNUM  shift 81
+	CCE_ALPHA  shift 82
+	CCE_BLANK  shift 83
+	CCE_CNTRL  shift 84
+	CCE_DIGIT  shift 85
+	CCE_GRAPH  shift 86
+	CCE_LOWER  shift 87
+	CCE_PRINT  shift 88
+	CCE_PUNCT  shift 89
+	CCE_SPACE  shift 90
+	CCE_UPPER  shift 91
+	CCE_XDIGIT  shift 92
+	']'  shift 98
+	.  error
+
+	ccl_expr  goto 94
+
+
+state 80
+	ccl : ccl CHAR . '-' CHAR  (58)
+	ccl : ccl CHAR .  (59)
+
+	'-'  shift 99
+	CHAR  reduce 59
+	CCE_ALNUM  reduce 59
+	CCE_ALPHA  reduce 59
+	CCE_BLANK  reduce 59
+	CCE_CNTRL  reduce 59
+	CCE_DIGIT  reduce 59
+	CCE_GRAPH  reduce 59
+	CCE_LOWER  reduce 59
+	CCE_PRINT  reduce 59
+	CCE_PUNCT  reduce 59
+	CCE_SPACE  reduce 59
+	CCE_UPPER  reduce 59
+	CCE_XDIGIT  reduce 59
+	']'  reduce 59
+
+
+state 81
+	ccl_expr : CCE_ALNUM .  (62)
+
+	.  reduce 62
+
+
+state 82
+	ccl_expr : CCE_ALPHA .  (63)
+
+	.  reduce 63
+
+
+state 83
+	ccl_expr : CCE_BLANK .  (64)
+
+	.  reduce 64
+
+
+state 84
+	ccl_expr : CCE_CNTRL .  (65)
+
+	.  reduce 65
+
+
+state 85
+	ccl_expr : CCE_DIGIT .  (66)
+
+	.  reduce 66
+
+
+state 86
+	ccl_expr : CCE_GRAPH .  (67)
+
+	.  reduce 67
+
+
+state 87
+	ccl_expr : CCE_LOWER .  (68)
+
+	.  reduce 68
+
+
+state 88
+	ccl_expr : CCE_PRINT .  (69)
+
+	.  reduce 69
+
+
+state 89
+	ccl_expr : CCE_PUNCT .  (70)
+
+	.  reduce 70
+
+
+state 90
+	ccl_expr : CCE_SPACE .  (71)
+
+	.  reduce 71
+
+
+state 91
+	ccl_expr : CCE_UPPER .  (72)
+
+	.  reduce 72
+
+
+state 92
+	ccl_expr : CCE_XDIGIT .  (73)
+
+	.  reduce 73
+
+
+state 93
+	fullccl : '[' ccl ']' .  (56)
+
+	.  reduce 56
+
+
+state 94
+	ccl : ccl ccl_expr .  (60)
+
+	.  reduce 60
+
+
+state 95
+	rule : re2 re '$' .  (36)
+
+	.  reduce 36
+
+
+state 96
+	re : re '|' series .  (39)
+	series : series . singleton  (42)
+
+	CHAR  shift 42
+	PREVCCL  shift 43
+	'.'  shift 46
+	'"'  shift 47
+	'('  shift 48
+	'['  shift 49
+	'\n'  reduce 39
+	'$'  reduce 39
+	'|'  reduce 39
+	'/'  reduce 39
+	')'  reduce 39
+
+	singleton  goto 70
+	fullccl  goto 56
+
+
+state 97
+	singleton : singleton '{' NUMBER . ',' NUMBER '}'  (47)
+	singleton : singleton '{' NUMBER . ',' '}'  (48)
+	singleton : singleton '{' NUMBER . '}'  (49)
+
+	'}'  shift 100
+	','  shift 101
+	.  error
+
+
+state 98
+	fullccl : '[' '^' ccl ']' .  (57)
+
+	.  reduce 57
+
+
+state 99
+	ccl : ccl CHAR '-' . CHAR  (58)
+
+	CHAR  shift 102
+	.  error
+
+
+state 100
+	singleton : singleton '{' NUMBER '}' .  (49)
+
+	.  reduce 49
+
+
+state 101
+	singleton : singleton '{' NUMBER ',' . NUMBER '}'  (47)
+	singleton : singleton '{' NUMBER ',' . '}'  (48)
+
+	NUMBER  shift 103
+	'}'  shift 104
+	.  error
+
+
+state 102
+	ccl : ccl CHAR '-' CHAR .  (58)
+
+	.  reduce 58
+
+
+state 103
+	singleton : singleton '{' NUMBER ',' NUMBER . '}'  (47)
+
+	'}'  shift 105
+	.  error
+
+
+state 104
+	singleton : singleton '{' NUMBER ',' '}' .  (48)
+
+	.  reduce 48
+
+
+state 105
+	singleton : singleton '{' NUMBER ',' NUMBER '}' .  (47)
+
+	.  reduce 47
+
+
+47 terminals, 26 nonterminals
+76 grammar rules, 106 states

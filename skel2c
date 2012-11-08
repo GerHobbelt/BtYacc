@@ -21,8 +21,13 @@ BEGIN { havesection = 0;
       }
       { if (havesection) {
 	    gsub(/\\/, "\\\\");
-	    gsub(/\t/, "\\t");
-	    gsub(/\"/, "\\\"");
+	    # Could use 'gsub(/\\/, "\\\\")' instead of the following
+	    # two lines, but there's a bug in mawk and the original
+	    # awk (not in gawk) which is triggered by that.
+	    gsub(/\\/, "\\\1");
+	    gsub(/\1/, "\\");
+ 	    gsub(/\t/, "\\t");
+ 	    gsub(/\"/, "\\\"");
 	    printf "    \"%s\",\n", $0; 
         } else {
 	    print $0; 
