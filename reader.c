@@ -1,5 +1,6 @@
 #include "defs.h"
 #include "mstring.h"
+#include "write.h"
 
 /*  The line size must be a positive integer.  One hundred was chosen	*/
 /*  because few lines in Yacc input grammars exceed 100 characters.	*/
@@ -76,7 +77,12 @@ char *get_line() {
 
     /* VM: end of include file */
     if(inc_file) {
-      fclose(inc_file);
+      if (fclose(inc_file))
+      {
+         perror("get_line: fclose");
+         abort();
+      }
+
       inc_file = NULL;
       lineno = inc_save_lineno;
       goto NextLine;
@@ -179,6 +185,10 @@ char *get_line() {
       }
     }
     *ps = MALLOC(strlen(var_name)+1);
+
+    if (*ps == 0)
+       no_space();
+
     strcpy(*ps, var_name);
     *++ps = NULL;
     goto NextLine;
@@ -356,23 +366,26 @@ void copy_ident(void)
     if ((c = nextc()) == EOF) unexpected_EOF();
     if (c != '"') syntax_error(lineno, line, cptr);
     ++outline;
-    fprintf(f, "#ident \"");
+    BtYacc_puts("#ident \"", f);
+
     for (;;) {
 	c = *++cptr;
 	if (c == '\n') {
-	    fprintf(f, "\"\n");
+	    BtYacc_puts("\"\n", f);
 	    return; }
-	putc(c, f);
+
+	BtYacc_putc(c, f);
+
 	if (c == '"') {
-	    putc('\n', f);
+	    BtYacc_putc('\n', f);
 	    ++cptr;
 	    return; } }
 }
 
 #define OUTC(c)	do { /* output a character on f1 and f2, if non-null */ \
     int _c = (c);							\
-    putc(_c, f1);							\
-    if (f2) putc(_c, f2);						\
+    if (putc(_c, f1) == EOF) { perror("putc"); abort(); }		\
+    if (f2 && (putc(_c, f2) == EOF) ) { perror("putc"); abort(); }	\
     } while(0)
 
 void copy_string(int quote, FILE *f1, FILE *f2)
@@ -440,35 +453,38 @@ void copy_text(void)
     if (*cptr == '\n') {
 	if (get_line() == 0)
 	    unterminated_text(t_lineno, t_line, t_cptr); }
-    if (!lflag) fprintf(f, line_format, lineno, (inc_file?inc_file_name:input_file_name));
+
+    if (!lflag)
+       BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+
 loop:
     switch (c = *cptr++) {
     case '\n':
-	putc('\n', f);
+	BtYacc_putc('\n', f);
 	need_newline = 0;
 	if (get_line()) goto loop;
 	unterminated_text(t_lineno, t_line, t_cptr);
     case '\'':
     case '"':
-	putc(c, f);
+	BtYacc_putc(c, f);
 	copy_string(c, f, 0);
 	need_newline = 1;
 	goto loop;
     case '/':
-	putc(c, f);
+	BtYacc_putc(c, f);
 	copy_comment(f, 0);
 	need_newline = 1;
 	goto loop;
     case '%':
     case '\\':
 	if (*cptr == '}') {
-	    if (need_newline) putc('\n', f);
+	    if (need_newline) BtYacc_putc('\n', f);
 	    ++cptr;
 	    FREE(t_line);
 	    return; }
 	/* fall through */
     default:
-	putc(c, f);
+	BtYacc_putc(c, f);
 	need_newline = 1;
 	goto loop; }
 }
@@ -488,17 +504,18 @@ void copy_union(void)
     unionized = 1;
 
     if (!lflag)
-	fprintf(text_file, line_format, lineno, (inc_file?inc_file_name:input_file_name));
+	BtYacc_printf(text_file, line_format, lineno, (inc_file?inc_file_name:input_file_name));
 
     /* VM: Print to either code file or defines file but not to both */
     dc_file = dflag ? union_file : text_file;
 
-    fprintf(dc_file, "\ntypedef union");
+    BtYacc_puts("\ntypedef union", dc_file);
 
     depth = 0;
 loop:
     c = *cptr++;
-    putc(c, dc_file);
+    BtYacc_putc(c, dc_file);
+
     switch (c) {
     case '\n':
       get_line();
@@ -509,7 +526,7 @@ loop:
       goto loop;
     case '}':
       if (--depth == 0) {
-	fprintf(dc_file, " YYSTYPE;\n");
+	BtYacc_puts(" YYSTYPE;\n", dc_file);
 	FREE(u_line);
 	return; }
       goto loop;
@@ -1445,11 +1462,12 @@ FILE	*f = action_file;
     if (rule<0) {
 	rule = nrules;
 	insert_arg_cache(code, rule);
-	fprintf(f, "case %d:\n", rule - 2);
+	BtYacc_printf(f, "case %d:\n", rule - 2);
+
 	if (!lflag)
-	    fprintf(f, line_format, lineno, (inc_file?inc_file_name:input_file_name));
-	fprintf(f, "%s;\n", code);
-	fprintf(f, "break;\n");
+	    BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+
+	BtYacc_printf(f, "%s;\nbreak;\n", code);
 	insert_empty_rule();
 	plhs[rule]->tag = tag;
 	plhs[rule]->class = ARGUMENT; }
@@ -1540,13 +1558,16 @@ void copy_action(void)
 	insert_empty_rule();
     last_was_action = 1;
 
-    fprintf(f, "case %d:\n", nrules - 2);
+    BtYacc_printf(f, "case %d:\n", nrules - 2);
+
     if (*cptr != '[')
-	fprintf(f, "  if (!yytrial)\n");
+	BtYacc_puts("  if (!yytrial)\n", f);
     else
 	trialaction = 1;
+
     if (!lflag)
-	fprintf(f, line_format, lineno, (inc_file?inc_file_name:input_file_name));
+	BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+
     if (*cptr == '=') ++cptr;
 
     maxoffset = n = 0;
@@ -1575,10 +1596,11 @@ loop:
 	    tag = get_tag();
 	    c = *cptr;
 	    if (c == '$') {
-		fprintf(f, "yyval.%s", tag);
+		BtYacc_printf(f, "yyval.%s", tag);
 		++cptr;
 		FREE(d_line);
 		goto loop; }
+<<<<<<< HEAD
 	    else if (isdigit(c) || (c == '-' && isdigit(cptr[1]))) {
  		i = get_number();
 		if (i <= 0) {
@@ -1590,13 +1612,32 @@ loop:
  		    fprintf(f, "yyvsp[%d].%s", offsets[i], tag);
  		FREE(d_line);
  		goto loop; }
+=======
+	    else if (isdigit(c)) {
+		i = get_number();
+		if (i > maxoffset) {
+		    dollar_warning(d_lineno, i);
+		    BtYacc_printf(f, "yyvsp[%d].%s", i - maxoffset, tag); }
+		else
+		    BtYacc_printf(f, "yyvsp[%d].%s", offsets[i], tag);
+
+		FREE(d_line);
+		goto loop; }
+	    else if (c == '-' && isdigit(cptr[1])) {
+		++cptr;
+		i = -get_number() - n;
+		BtYacc_printf(f, "yyvsp[%d].%s", i, tag);
+		FREE(d_line);
+		goto loop; }
+>>>>>>> e8b4bcf2eadbdb980fce3b03ea465bcab63178a3
 	    else if (isalpha(c) || c == '_') {
 		char *arg = scan_id();
 		for (i=plhs[nrules]->args-1; i>=0; i--)
 		    if (arg == plhs[nrules]->argnames[i]) break;
 		if (i<0)
 		    error(d_lineno,d_line,d_cptr,"unknown argument %s",arg);
-		fprintf(f, "yyvsp[%d].%s", i-plhs[nrules]->args+1-n, tag);
+
+		BtYacc_printf(f, "yyvsp[%d].%s", i-plhs[nrules]->args+1-n, tag);
 		FREE(d_line);
 		goto loop; }
 	    else
@@ -1605,9 +1646,11 @@ loop:
 	    if (havetags) {
 		tag = plhs[nrules]->tag;
 		if (tag == 0) untyped_lhs();
-		fprintf(f, "yyval.%s", tag); }
+
+		BtYacc_printf(f, "yyval.%s", tag); }
 	    else
-		fprintf(f, "yyval");
+		BtYacc_puts("yyval", f);
+
 	    cptr += 2;
 	    haveyyval = 1;
 	    goto loop; }
@@ -1620,20 +1663,22 @@ loop:
 		tag = rhs[offsets[i]]->tag;
 		if (tag == 0)
 		    untyped_rhs(i, rhs[offsets[i]]->name);
-		fprintf(f, "yyvsp[%d].%s", offsets[i], tag); }
+
+		BtYacc_printf(f, "yyvsp[%d].%s", offsets[i], tag); }
 	    else {
 		if (i > n) {
 		    dollar_warning(lineno, i);
-		    fprintf(f, "yyvsp[%d]", i - maxoffset); }
+		    BtYacc_printf(f, "yyvsp[%d]", i - maxoffset); }
 		else
-		    fprintf(f, "yyvsp[%d]", offsets[i]); }
+		    BtYacc_printf(f, "yyvsp[%d]", offsets[i]); }
 	    goto loop; }
 	else if (cptr[1] == '-') {
 	    cptr += 2;
 	    i = get_number();
 	    if (havetags)
 		unknown_rhs(-i);
-	    fprintf(f, "yyvsp[%d]", -i - n);
+
+	    BtYacc_printf(f, "yyvsp[%d]", -i - n);
 	    goto loop; }
 	else if (isalpha(cptr[1]) || cptr[1] == '_') {
 	    char *arg;
@@ -1644,44 +1689,52 @@ loop:
 	    if (i<0)
 		error(lineno, line, cptr, "unknown argument %s", arg);
 	    tag = plhs[nrules]->argtags[i];
-	    fprintf(f, "yyvsp[%d]", i - plhs[nrules]->args + 1 - n);
-	    if (tag) fprintf(f, ".%s", tag);
+	    BtYacc_printf(f, "yyvsp[%d]", i - plhs[nrules]->args + 1 - n);
+
+	    if (tag) BtYacc_printf(f, ".%s", tag);
 	    else if (havetags)
 		error(lineno, 0, 0, "untyped argument $%s", arg);
 	    goto loop; } }
     if (isalpha(c) || c == '_' || c == '$') {
 	do {
-	    putc(c, f);
+	    BtYacc_putc(c, f);
 	    c = *++cptr;
 	} while (isalnum(c) || c == '_' || c == '$');
 	goto loop; }
     ++cptr;
     if (trialaction && c == '[' && depth == 0) {
 	++depth;
-	putc('{', f);
+	BtYacc_putc('{', f);
 	goto loop; }
     if (trialaction && c == ']' && depth == 1) {
 	--depth;
-	putc('}', f);
+	BtYacc_putc('}', f);
 	c = nextc();
 	if (c == '[' && !haveyyval) {
 	    goto loop; }
 	else if (c == '{' && !haveyyval) {
-	    fprintf(f, "\n");
-	    if (!lflag) fprintf(f, "#\n");
-	    fprintf(f, "  if (!yytrial)\n");
+	    BtYacc_puts("\n", f);
+
+	    if (!lflag) BtYacc_puts("#\n", f);
+
+	    BtYacc_puts("  if (!yytrial)\n", f);
+
 	    if (!lflag)
-		fprintf(f, line_format, lineno, (inc_file?inc_file_name:input_file_name));
+		BtYacc_printf(f, line_format, lineno, (inc_file?inc_file_name:input_file_name));
 	    trialaction = 0;
 	    goto loop; }
 	else {
-	    fprintf(f, "\n");
-	    if (!lflag) fprintf(f, "#\n");
-	    fprintf(f, "break;\n");
+	    BtYacc_puts("\n", f);
+
+	    if (!lflag) BtYacc_puts("#\n", f);
+
+	    BtYacc_puts("break;\n", f);
 	    FREE(a_line);
 	    if (maxoffset > 0) FREE(offsets);
 	    return; } }
-    putc(c, f);
+
+    BtYacc_putc(c, f);
+
     switch (c) {
     case '\n':
 	get_line();
@@ -1689,9 +1742,12 @@ loop:
 	unterminated_action(a_lineno, a_line, a_cptr);
     case ';':
 	if (depth > 0) goto loop;
-	fprintf(f, "\n");
-	if (!lflag) fprintf(f, "#\n");
-	fprintf(f, "break;\n");
+
+	BtYacc_puts("\n", f);
+
+	if (!lflag) BtYacc_puts("#\n", f);
+
+	BtYacc_puts("break;\n", f);
 	FREE(a_line);
 	if (maxoffset > 0) FREE(offsets);
 	return;
@@ -1711,16 +1767,22 @@ loop:
 	    trialaction = 1;
 	    goto loop; }
 	else if (c == '{' && !haveyyval) {
-	    fprintf(f, "\n");
-	    if (!lflag) fprintf(f, "#\n");
-	    fprintf(f, "  if (!yytrial)\n");
+	    BtYacc_puts("\n", f);
+
+	    if (!lflag) BtYacc_puts("#\n", f);
+
+	    BtYacc_puts("  if (!yytrial)\n", f);
+
 	    if (!lflag)
-		fprintf(f, line_format, lineno, (inc_file?inc_file_name:input_file_name));
+		BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+
 	    goto loop; }
 	else {
-	    fprintf(f, "\n");
-	    if (!lflag) fprintf(f, "#\n");
-	    fprintf(f, "break;\n");
+	    BtYacc_puts("\n", f);
+
+	    if (!lflag) BtYacc_puts("#\n", f);
+
+	    BtYacc_puts("break;\n", f);
 	    FREE(a_line);
 	    if (maxoffset > 0) FREE(offsets);
 	    return; }
@@ -2018,19 +2080,28 @@ void print_grammar(void)
     k = 1;
     for (i = 2; i < nrules; ++i) {
 	if (rlhs[i] != rlhs[i-1]) {
+<<<<<<< HEAD
 	    if (i != 2) fprintf(f, "\n");
 	    fprintf(f, "%4d  %s :", i - 2, symbol_name[rlhs[i]]);
 	    spacing = (int)strlen(symbol_name[rlhs[i]]) + 1; }
+=======
+	    if (i != 2) BtYacc_puts("\n", f);
+
+	    BtYacc_printf(f, "%4d  %s :", i - 2, symbol_name[rlhs[i]]);
+	    spacing = strlen(symbol_name[rlhs[i]]) + 1; }
+>>>>>>> e8b4bcf2eadbdb980fce3b03ea465bcab63178a3
 	else {
-	    fprintf(f, "%4d  ", i - 2);
+	    BtYacc_printf(f, "%4d  ", i - 2);
 	    j = spacing;
-	    while (--j >= 0) putc(' ', f);
-	    putc('|', f); }
+	    while (--j >= 0) BtYacc_putc(' ', f);
+
+	    BtYacc_putc('|', f); }
+
 	while (ritem[k] >= 0) {
-	    fprintf(f, " %s", symbol_name[ritem[k]]);
+	    BtYacc_printf(f, " %s", symbol_name[ritem[k]]);
 	    ++k; }
 	++k;
-	putc('\n', f); }
+	BtYacc_putc('\n', f); }
 }
 
 extern int read_errs;

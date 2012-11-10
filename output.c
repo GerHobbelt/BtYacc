@@ -1,4 +1,5 @@
 #include "defs.h"
+#include "write.h"
 
 static int nvectors;
 static int nentries;
@@ -48,8 +49,9 @@ void output_rule_data()
 	open_output_files();
 
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "Yshort yylhs[] = {%42d,",
+	BtYacc_puts("static ", output_file);
+
+    BtYacc_printf(output_file, "Yshort yylhs[] = {%42d,",
 	    symbol_value[start_symbol]);
 
     j = 10;
@@ -58,20 +60,23 @@ void output_rule_data()
 	if (j >= 10)
 	{
 	    if (!rflag) ++outline;
-	    putc('\n', output_file);
+
+	    BtYacc_putc('\n', output_file);
 	    j = 1;
 	}
         else
 	    ++j;
 
-        fprintf(output_file, "%5d,", symbol_value[rlhs[i]]);
+        BtYacc_printf(output_file, "%5d,", symbol_value[rlhs[i]]);
     }
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
 
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "Yshort yylen[] = {%42d,", 2);
+	BtYacc_puts("static ", output_file);
+
+    BtYacc_printf(output_file, "Yshort yylen[] = {%42d,", 2);
 
     j = 10;
     for (i = 3; i < nrules; i++)
@@ -79,16 +84,18 @@ void output_rule_data()
 	if (j >= 10)
 	{
 	    if (!rflag) ++outline;
-	    putc('\n', output_file);
+
+	    BtYacc_putc('\n', output_file);
 	    j = 1;
 	}
 	else
 	  j++;
 
-        fprintf(output_file, "%5d,", rrhs[i + 1] - rrhs[i] - 1);
+        BtYacc_printf(output_file, "%5d,", rrhs[i + 1] - rrhs[i] - 1);
     }
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
 }
 
 
@@ -99,8 +106,9 @@ void output_yydefred()
 	open_output_files();
 
     if (!rflag)
-		fprintf(output_file, "static ");
-    fprintf(output_file, "Yshort yydefred[] = {%39d,",
+	BtYacc_puts("static ", output_file);
+
+    BtYacc_printf(output_file, "Yshort yydefred[] = {%39d,",
 	    (defred[0] ? defred[0] - 2 : 0));
 
     j = 10;
@@ -111,15 +119,17 @@ void output_yydefred()
 	else
 	{
 	    if (!rflag) ++outline;
-	    putc('\n', output_file);
+
+	    BtYacc_putc('\n', output_file);
 	    j = 1;
 	}
 
-	fprintf(output_file, "%5d,", (defred[i] ? defred[i] - 2 : 0));
+	BtYacc_printf(output_file, "%5d,", (defred[i] ? defred[i] - 2 : 0));
     }
 
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
 }
 
 static int find_conflict_base(int cbase)
@@ -376,8 +386,9 @@ static void goto_actions(void)
 
     k = default_goto(start_symbol + 1);
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "Yshort yydgoto[] = {%40d,", k);
+	BtYacc_puts("static ", output_file);
+
+    BtYacc_printf(output_file, "Yshort yydgoto[] = {%40d,", k);
     save_column(start_symbol + 1, k);
 
     j = 10;
@@ -386,19 +397,21 @@ static void goto_actions(void)
 	if (j >= 10)
 	{
 	    if (!rflag) ++outline;
-	    putc('\n', output_file);
+
+	    BtYacc_putc('\n', output_file);
 	    j = 1;
 	}
 	else
 	    ++j;
 
 	k = default_goto(i);
-	fprintf(output_file, "%5d,", k);
+	BtYacc_printf(output_file, "%5d,", k);
 	save_column(i, k);
     }
 
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
     FREE(state_count);
 }
 
@@ -610,67 +623,85 @@ void output_base()
 	open_output_files();
 
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "Yshort yysindex[] = {%39d,", base[0]);
+	BtYacc_puts("static ", output_file);
+
+    BtYacc_printf(output_file, "Yshort yysindex[] = {%39d,", base[0]);
     j = 10;
     for (i = 1; i < nstates; i++) {
 	if (j >= 10) {
 	    if (!rflag) ++outline;
-	    putc('\n', output_file);
+
+	    BtYacc_putc('\n', output_file);
 	    j = 1; }
 	else
 	    ++j;
-	fprintf(output_file, "%5d,", base[i]); }
+
+	BtYacc_printf(output_file, "%5d,", base[i]); }
 
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
+
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "Yshort yyrindex[] = {%39d,", base[nstates]);
+		BtYacc_puts("static ", output_file);
+
+    BtYacc_printf(output_file, "Yshort yyrindex[] = {%39d,", base[nstates]);
     j = 10;
     for (i = nstates + 1; i < 2*nstates; i++) {
 	if (j >= 10) {
 	    if (!rflag) ++outline;
-	    putc('\n', output_file);
+
+	    BtYacc_putc('\n', output_file);
 	    j = 1; }
 	else
 	    ++j;
-	fprintf(output_file, "%5d,", base[i]); }
+
+	BtYacc_printf(output_file, "%5d,", base[i]); }
 
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
+
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "Yshort yycindex[] = {%39d,", base[2*nstates]);
+		BtYacc_puts("static ", output_file);
+
+    BtYacc_printf(output_file, "Yshort yycindex[] = {%39d,", base[2*nstates]);
     j = 10;
     for (i = 2*nstates + 1; i < 3*nstates; i++) {
 	if (j >= 10) {
 	    if (!rflag) ++outline;
-	    putc('\n', output_file);
+
+	    BtYacc_putc('\n', output_file);
 	    j = 1; }
 	else
 	    ++j;
-	fprintf(output_file, "%5d,", base[i]); }
+
+	BtYacc_printf(output_file, "%5d,", base[i]); }
 
 
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
+
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "Yshort yygindex[] = {%39d,",
-	    base[3*nstates]);
+		BtYacc_puts("static ", output_file);
+
+    BtYacc_printf(output_file, "Yshort yygindex[] = {%39d,", base[3*nstates]);
     j = 10;
     for (i = 3*nstates + 1; i < nvectors - 1; i++) {
 	if (j >= 10) {
 	    if (!rflag) ++outline;
-	    putc('\n', output_file);
+
+	    BtYacc_putc('\n', output_file);
 	    j = 1; }
 	else
 	    ++j;
-	fprintf(output_file, "%5d,", base[i]); }
+
+	BtYacc_printf(output_file, "%5d,", base[i]); }
 
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
     FREE(base);
 }
 
@@ -686,16 +717,19 @@ void output_table()
     ++outline;
 
     if (tflag)
-	    fprintf(stderr, "YYTABLESIZE: %d\n", high);
+    BtYacc_printf(stderr, "YYTABLESIZE: %d\n", high);
+
     if(high >= MAXSHORT) {
-      fprintf(stderr, "Table is longer than %d elements. It's not gonna fly.\n", MAXSHORT);
+      BtYacc_printf(stderr, "Table is longer than %d elements. It's not gonna fly.\n", MAXSHORT);
       exit(1);
     }
 
-    fprintf(code_file, "#define YYTABLESIZE %d\n", high);
+    BtYacc_printf(code_file, "#define YYTABLESIZE %d\n", high);
+
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "Yshort yytable[] = {%40d,", table[0]);
+		BtYacc_puts("static ", output_file);
+
+    BtYacc_printf(output_file, "Yshort yytable[] = {%40d,", table[0]);
 
     j = 10;
     for (i = 1; i <= high; i++)
@@ -703,17 +737,19 @@ void output_table()
 	if (j >= 10)
 	{
 	    if (!rflag) ++outline;
-	    putc('\n', output_file);
+
+	    BtYacc_putc('\n', output_file);
 	    j = 1;
 	}
 	else
 	    ++j;
 
-	fprintf(output_file, "%5d,", table[i]);
+	BtYacc_printf(output_file, "%5d,", table[i]);
     }
 
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
     FREE(table);
 }
 
@@ -727,8 +763,9 @@ void output_check()
 	open_output_files();
 
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "Yshort yycheck[] = {%40d,", check[0]);
+	BtYacc_puts("static ", output_file);
+
+    BtYacc_printf(output_file, "Yshort yycheck[] = {%40d,", check[0]);
 
     j = 10;
     for (i = 1; i <= high; i++)
@@ -736,17 +773,19 @@ void output_check()
 	if (j >= 10)
 	{
 	    if (!rflag) ++outline;
-	    putc('\n', output_file);
+
+	    BtYacc_putc('\n', output_file);
 	    j = 1;
 	}
 	else
 	    ++j;
 
-	fprintf(output_file, "%5d,", check[i]);
+	BtYacc_printf(output_file, "%5d,", check[i]);
     }
 
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
     FREE(check);
 }
 
@@ -758,9 +797,9 @@ void output_ctable()
 	open_output_files();
 
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "Yshort yyctable[] = {%39d,", conflicts ?
-	    conflicts[0] : 0);
+	BtYacc_puts("static ", output_file);
+
+    BtYacc_printf(output_file, "Yshort yyctable[] = {%39d,", conflicts ? conflicts[0] : 0);
 
     j = 10;
     for (i = 1; i < nconflicts; i++)
@@ -768,16 +807,19 @@ void output_ctable()
 	if (j >= 10)
 	{
 	    if (!rflag) ++outline;
-	    putc('\n', output_file);
+
+	    BtYacc_putc('\n', output_file);
 	    j = 1;
 	}
 	else
 	    ++j;
 
-	fprintf(output_file, "%5d,", conflicts[i]);
+	BtYacc_printf(output_file, "%5d,", conflicts[i]);
     }
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
+
     if (conflicts)
 	FREE(conflicts);
 }
@@ -823,8 +865,8 @@ void output_defines()
 	open_output_files();
 
     if(dflag) {
-      fprintf(defines_file, "#ifndef _yacc_defines_h_\n");
-      fprintf(defines_file, "#define _yacc_defines_h_\n\n");
+      BtYacc_puts("#ifndef _yacc_defines_h_\n", defines_file);
+      BtYacc_puts("#define _yacc_defines_h_\n\n", defines_file);
     }
 
     /* VM: Print to either code file or defines file but not to both */
@@ -835,44 +877,50 @@ void output_defines()
 	s = symbol_name[i];
 	if (is_C_identifier(s))
 	{
-	    fprintf(dc_file, "#define ");
+	    BtYacc_puts("#define ", dc_file);
 	    c = *s;
 	    if (c == '"')
 	    {
 		while ((c = *++s) != '"')
 		{
-		    putc(c, dc_file);
+		    BtYacc_putc(c, dc_file);
 		}
 	    }
 	    else
 	    {
 		do
 		{
-		    putc(c, dc_file);
+		    BtYacc_putc(c, dc_file);
 		}
 		while ((c = *++s));
 	    }
 	    ++outline;
-	    fprintf(dc_file, " %d\n", symbol_value[i]);
+	    BtYacc_printf(dc_file, " %d\n", symbol_value[i]);
 	}
     }
 
     ++outline;
-    fprintf(dc_file, "#define YYERRCODE %d\n", symbol_value[1]);
+    BtYacc_printf(dc_file, "#define YYERRCODE %d\n", symbol_value[1]);
 
     if (dflag && unionized)
     {
-	fclose(union_file);
+	if (fclose(union_file))
+        {
+           perror("output_defines: fclose");
+           abort();
+        }
+
 	union_file = fopen(union_file_name, "r");
 	if (union_file == NULL) open_error(union_file_name);
 	while ((c = getc(union_file)) != EOF) {
-	  putc(c, defines_file);
+	  BtYacc_putc(c, defines_file);
 	}
-	fprintf(defines_file, "extern YYSTYPE yylval;\n");
+
+	BtYacc_puts("extern YYSTYPE yylval;\n", defines_file);
     }
 
     if(dflag) {
-      fprintf(defines_file, "\n#endif\n");
+      BtYacc_puts("\n#endif\n", defines_file);
     }
 }
 
@@ -886,7 +934,13 @@ void output_stored_text()
 	open_output_files();
 
     state = 1;
-    fclose(text_file);
+
+    if (fclose(text_file))
+    {
+       perror("output_stored_text: fclose");
+       abort();
+    }
+
     text_file = fopen(text_file_name, "r");
     if (text_file == NULL)
 	open_error(text_file_name);
@@ -898,7 +952,7 @@ void output_stored_text()
 	if (c == '\n') {
 	    ++outline;
 	    if (state == 2) {
-		fprintf(out, line_format+1, outline + 1, code_file_name);
+		BtYacc_printf(out, line_format+1, outline + 1, code_file_name);
 		state = 1;
 		continue; }
 	    state = 1; }
@@ -906,10 +960,11 @@ void output_stored_text()
 	    state = 2;
 	else
 	    state = 0;
-	putc(c, out);
+
+	BtYacc_putc(c, out);
     } while ((c = getc(in)) != EOF);
     if (!lflag)
-	fprintf(out, line_format, ++outline + 1, code_file_name);
+	BtYacc_printf(out, line_format, ++outline + 1, code_file_name);
 }
 
 
@@ -921,12 +976,12 @@ void output_debug()
 	open_output_files();
 
     ++outline;
-    fprintf(code_file, "#define YYFINAL %d\n", final_state);
     outline += 3;
-    fprintf(code_file, "#ifndef YYDEBUG\n#define YYDEBUG %d\n#endif\n",
-	    tflag);
+    BtYacc_printf(code_file, "#define YYFINAL %d\n#ifndef YYDEBUG\n#define YYDEBUG %d\n#endif\n",
+	    final_state, tflag);
+
     if (rflag)
-	fprintf(output_file, "#ifndef YYDEBUG\n#define YYDEBUG %d\n#endif\n",
+	BtYacc_printf(output_file, "#ifndef YYDEBUG\n#define YYDEBUG %d\n#endif\n",
 		tflag);
 
     max = 0;
@@ -934,7 +989,7 @@ void output_debug()
 	if (symbol_value[i] > max)
 	    max = symbol_value[i];
     ++outline;
-    fprintf(code_file, "#define YYMAXTOKEN %d\n", max);
+    BtYacc_printf(code_file, "#define YYMAXTOKEN %d\n", max);
 
     symnam = (char **) MALLOC((max+1)*sizeof(char *));
     if (symnam == 0) no_space();
@@ -948,10 +1003,13 @@ void output_debug()
     symnam[0] = "end-of-file";
 
     if (!rflag) ++outline;
-    fprintf(output_file, "#if YYDEBUG\n");
+
+    BtYacc_puts("#if YYDEBUG\n", output_file);
+
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "char *yyname[] = {");
+	BtYacc_puts("static ", output_file);
+
+    BtYacc_puts("char *yyname[] = {", output_file);
     j = 80;
     for (i = 0; i <= max; ++i)
     {
@@ -974,25 +1032,29 @@ void output_debug()
 		if (j > 80)
 		{
 		    if (!rflag) ++outline;
-		    putc('\n', output_file);
+
+		    BtYacc_putc('\n', output_file);
 		    j = k;
 		}
-		fprintf(output_file, "\"\\\"");
+
+		BtYacc_puts("\"\\\"", output_file);
 		s = symnam[i];
 		while (*++s != '"')
 		{
 		    if (*s == '\\')
 		    {
-			fprintf(output_file, "\\\\");
+			BtYacc_puts("\\\\", output_file);
+
 			if (*++s == '\\')
-			    fprintf(output_file, "\\\\");
+			    BtYacc_puts("\\\\", output_file);
 			else
-			    putc(*s, output_file);
+			    BtYacc_putc(*s, output_file);
 		    }
 		    else
-			putc(*s, output_file);
+			BtYacc_putc(*s, output_file);
 		}
-		fprintf(output_file, "\\\"\",");
+
+		BtYacc_puts("\\\"\",", output_file);
 	    }
 	    else if (s[0] == '\'')
 	    {
@@ -1002,10 +1064,12 @@ void output_debug()
 		    if (j > 80)
 		    {
 			if (!rflag) ++outline;
-			putc('\n', output_file);
+
+			BtYacc_putc('\n', output_file);
 			j = 7;
 		    }
-		    fprintf(output_file, "\"'\\\"'\",");
+
+		    BtYacc_puts("\"'\\\"'\",", output_file);
 		}
 		else
 		{
@@ -1024,25 +1088,29 @@ void output_debug()
 		    if (j > 80)
 		    {
 			if (!rflag) ++outline;
-			putc('\n', output_file);
+
+			BtYacc_putc('\n', output_file);
 			j = k;
 		    }
-		    fprintf(output_file, "\"'");
+
+		    BtYacc_puts("\"'", output_file);
 		    s = symnam[i];
 		    while (*++s != '\'')
 		    {
 			if (*s == '\\')
 			{
-			    fprintf(output_file, "\\\\");
+			    BtYacc_puts("\\\\", output_file);
+
 			    if (*++s == '\\')
-				fprintf(output_file, "\\\\");
+				BtYacc_puts("\\\\", output_file);
 			    else
-				putc(*s, output_file);
+				BtYacc_putc(*s, output_file);
 			}
 			else
-			    putc(*s, output_file);
+			    BtYacc_putc(*s, output_file);
 		    }
-		    fprintf(output_file, "'\",");
+
+		    BtYacc_puts("'\",", output_file);
 		}
 	    }
 	    else
@@ -1052,12 +1120,16 @@ void output_debug()
 		if (j > 80)
 		{
 		    if (!rflag) ++outline;
-		    putc('\n', output_file);
+
+		    BtYacc_putc('\n', output_file);
 		    j = k;
 		}
-		putc('"', output_file);
-		do { putc(*s, output_file); } while (*++s);
-		fprintf(output_file, "\",");
+
+		BtYacc_putc('"', output_file);
+
+		do { BtYacc_putc(*s, output_file); } while (*++s);
+
+		BtYacc_puts("\",", output_file);
 	    }
 	}
 	else
@@ -1066,71 +1138,83 @@ void output_debug()
 	    if (j > 80)
 	    {
 		if (!rflag) ++outline;
-		putc('\n', output_file);
+
+		BtYacc_putc('\n', output_file);
 		j = 2;
 	    }
-	    fprintf(output_file, "0,");
+
+	    BtYacc_puts("0,", output_file);
 	}
     }
     if (!rflag) outline += 2;
-    fprintf(output_file, "\n};\n");
+
+    BtYacc_puts("\n};\n", output_file);
     FREE(symnam);
 
     if (!rflag) ++outline;
     if (!rflag)
-	fprintf(output_file, "static ");
-    fprintf(output_file, "char *yyrule[] = {\n");
+	BtYacc_puts("static ", output_file);
+
+    BtYacc_puts("char *yyrule[] = {\n", output_file);
+
     for (i = 2; i < nrules; ++i)
     {
-	fprintf(output_file, "\"%s :", symbol_name[rlhs[i]]);
+	BtYacc_printf(output_file, "\"%s :", symbol_name[rlhs[i]]);
+
 	for (j = rrhs[i]; ritem[j] > 0; ++j)
 	{
 	    s = symbol_name[ritem[j]];
 	    if (s[0] == '"')
 	    {
-		fprintf(output_file, " \\\"");
+		BtYacc_puts(" \\\"", output_file);
+
 		while (*++s != '"')
 		{
 		    if (*s == '\\')
 		    {
 			if (s[1] == '\\')
-			    fprintf(output_file, "\\\\\\\\");
+			    BtYacc_puts("\\\\\\\\", output_file);
 			else
-			    fprintf(output_file, "\\\\%c", s[1]);
+			    BtYacc_printf(output_file, "\\\\%c", s[1]);
 			++s;
 		    }
 		    else
-			putc(*s, output_file);
+			BtYacc_putc(*s, output_file);
 		}
-		fprintf(output_file, "\\\"");
+
+		BtYacc_puts("\\\"", output_file);
 	    }
 	    else if (s[0] == '\'')
 	    {
 		if (s[1] == '"')
-		    fprintf(output_file, " '\\\"'");
+		    BtYacc_puts(" '\\\"'", output_file);
 		else if (s[1] == '\\')
 		{
 		    if (s[2] == '\\')
-			fprintf(output_file, " '\\\\\\\\");
+			BtYacc_puts(" '\\\\\\\\", output_file);
 		    else
-			fprintf(output_file, " '\\\\%c", s[2]);
+			BtYacc_printf(output_file, " '\\\\%c", s[2]);
+
 		    s += 2;
 		    while (*++s != '\'')
-			putc(*s, output_file);
-		    putc('\'', output_file);
+			BtYacc_putc(*s, output_file);
+
+		    BtYacc_putc('\'', output_file);
 		}
 		else
-		    fprintf(output_file, " '%c'", s[1]);
+		    BtYacc_printf(output_file, " '%c'", s[1]);
 	    }
 	    else
-		fprintf(output_file, " %s", s);
+		BtYacc_printf(output_file, " %s", s);
 	}
 	if (!rflag) ++outline;
-	fprintf(output_file, "\",\n");
+
+	BtYacc_puts("\",\n", output_file);
     }
 
     if (!rflag) outline += 2;
-    fprintf(output_file, "};\n#endif\n");
+
+    BtYacc_puts("};\n#endif\n", output_file);
 }
 
 
@@ -1141,7 +1225,7 @@ void output_stype()
     if (!unionized && ntags == 0)
     {
 	outline += 3;
-	fprintf(code_file, "#ifndef YYSTYPE\ntypedef int YYSTYPE;\n#endif\n");
+	BtYacc_puts("#ifndef YYSTYPE\ntypedef int YYSTYPE;\n#endif\n", code_file);
     }
 }
 
@@ -1167,11 +1251,12 @@ void output_trailing_text()
 	if (!lflag)
 	{
 	    ++outline;
-	    fprintf(out, line_format, lineno, (inc_file?inc_file_name:input_file_name));
+	    BtYacc_printf(out, line_format, lineno, (inc_file?inc_file_name:input_file_name));
 	}
 	if (c == '\n')
 	    ++outline;
-	putc(c, out);
+
+	BtYacc_putc(c, out);
 	last = c;
     }
     else
@@ -1179,11 +1264,11 @@ void output_trailing_text()
 	if (!lflag)
 	{
 	    ++outline;
-	    fprintf(out, line_format, lineno, (inc_file?inc_file_name:input_file_name));
+	    BtYacc_printf(out, line_format, lineno, (inc_file?inc_file_name:input_file_name));
 	}
-	do { putc(c, out); } while ((c = *++cptr) != '\n');
+	do { BtYacc_putc(c, out); } while ((c = *++cptr) != '\n');
 	++outline;
-	putc('\n', out);
+	BtYacc_putc('\n', out);
 	last = '\n';
     }
 
@@ -1191,17 +1276,18 @@ void output_trailing_text()
     {
 	if (c == '\n')
 	    ++outline;
-	putc(c, out);
+
+	BtYacc_putc(c, out);
 	last = c;
     }
 
     if (last != '\n')
     {
 	++outline;
-	putc('\n', out);
+	BtYacc_putc('\n', out);
     }
     if (!lflag)
-	fprintf(out, line_format, ++outline + 1, code_file_name);
+	BtYacc_printf(out, line_format, ++outline + 1, code_file_name);
 }
 
 
@@ -1214,7 +1300,13 @@ void output_semantic_actions()
 	open_output_files();
 
     state = 1;
-    fclose(action_file);
+
+    if (fclose(action_file))
+      {
+         perror("output_semantic_actions: fclose");
+         abort();
+      }
+
     action_file = fopen(action_file_name, "r");
     if (action_file == NULL)
 		open_error(action_file_name);
@@ -1228,7 +1320,7 @@ void output_semantic_actions()
 	if (c == '\n') {
 	    ++outline;
 	    if (state == 2) {
-		fprintf(out, line_format+1, outline + 1, code_file_name);
+		BtYacc_printf(out, line_format+1, outline + 1, code_file_name);
 		state = 1;
 		continue; }
 	    state = 1; }
@@ -1236,17 +1328,18 @@ void output_semantic_actions()
 	    state = 2;
 	else
 	    state = 0;
-	putc(c, out);
+
+	BtYacc_putc(c, out);
     } while ((c = getc(action_file)) != EOF);
 
     if (last != '\n')
     {
 	++outline;
-	putc('\n', out);
+	BtYacc_putc('\n', out);
     }
 
     if (!lflag)
-	fprintf(out, line_format, ++outline + 1, code_file_name);
+	BtYacc_printf(out, line_format, ++outline + 1, code_file_name);
 }
 
 
@@ -1306,7 +1399,7 @@ void write_section(char const * section_name)
       }
     }
     if(sl->name==0) {
-      fprintf(stderr, "Cannot find section '%s' in your skeleton file\n", section_name);
+      BtYacc_printf(stderr, "Cannot find section '%s' in your skeleton file\n", section_name);
       exit(1);
     }
 
@@ -1315,6 +1408,6 @@ void write_section(char const * section_name)
     for (i = lflag ? 1 : 0; section[i]; ++i)
     {
 	++outline;
-	fprintf(fp, "%s\n", section[i]);
+	BtYacc_printf(fp, "%s\n", section[i]);
     }
 }
