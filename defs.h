@@ -102,53 +102,54 @@ typedef int Yshort;
 #define CODE_SUFFIX     ".code.c"
 #define VERBOSE_SUFFIX  ".output"
 
-/* keyword codes */
-
-#define TOKEN 0
-#define LEFT 1
-#define RIGHT 2
-#define NONASSOC 3
-#define MARK 4
-#define TEXT 5
-#define TYPE 6
-#define START 7
-#define UNION 8
-#define IDENT 9
+typedef enum keyword_code_enumeration
+{
+TOKEN = 0,
+LEFT = 1,
+RIGHT = 2,
+NONASSOC = 3,
+MARK = 4,
+TEXT = 5,
+TYPE = 6,
+START = 7,
+UNION = 8,
+IDENT = 9,
 
 /* [i_a] bison emulation additions */
-#define BISON_DEBUG			110
-#define BISON_DEFINE		111
-#define BISON_DEFINES		112
-#define BISON_LOCATIONS		113
-#define BISON_PURE			114
-#define BISON_NAME_PREFIX	115
-#define BISON_FILE_PREFIX	116
-#define BISON_ERR_VERBOSE	117
-#define BISON_EXPECT		118
-#define BISON_GLR_PARSER	119
-#define BISON_LEX_PARAM		120
-#define BISON_NO_LINES		121
-#define BISON_OUTPUT		122
-#define BISON_PARSE_PARAM	123
-#define BISON_SKELETON		124
-#define BISON_TOKEN_TABLE	125
-#define BISON_VERBOSE		126
-#define BISON_YACC			127
-#define BISON_DESTRUCTOR	128
-#define BISON_PRINTER		129
-#define BISON_NTERM			130
-#define BISON_DPREC			131
-#define BISON_MERGE			132
-#define BISON_PREC			133
+BISON_DEBUG		= 110,
+BISON_DEFINE	= 111,
+BISON_DEFINES	= 112,
+BISON_LOCATIONS	= 113,
+BISON_PURE		= 114,
+BISON_NAME_PREFIX = 115,
+BISON_FILE_PREFIX = 116,
+BISON_ERR_VERBOSE = 117,
+BISON_EXPECT	= 118,
+BISON_GLR_PARSER = 119,
+BISON_LEX_PARAM	= 120,
+BISON_NO_LINES	= 121,
+BISON_OUTPUT	= 122,
+BISON_PARSE_PARAM = 123,
+BISON_SKELETON	= 124,
+BISON_TOKEN_TABLE = 125,
+BISON_VERBOSE	= 126,
+BISON_YACC		= 127,
+BISON_DESTRUCTOR = 128,
+BISON_PRINTER	= 129,
+BISON_NTERM		= 130,
+BISON_DPREC		= 131,
+BISON_MERGE		= 132,
+BISON_PREC		= 133
+} BtYacc_keyword_code;
 
-
-/*  symbol classes  */
-
-#define UNKNOWN 0
-#define TERM 1
-#define NONTERM 2
-#define ACTION 3
-#define ARGUMENT 4
+typedef enum symbol_class_enumeration
+{
+UNKNOWN = 0,
+TERM = 1,
+NONTERM = 2,
+ACTION = 3,
+ARGUMENT = 4
+} BtYacc_symbol_class;
 
 
 /*  the undefined value  */
@@ -156,10 +157,11 @@ typedef int Yshort;
 #define UNDEFINED (-1)
 
 
-/*  action codes  */
-
-#define SHIFT 1
-#define REDUCE 2
+typedef enum action_code_enumeration
+{
+SHIFT = 1,
+REDUCE = 2
+} BtYacc_action_code;
 
 
 /*  character macros  */
