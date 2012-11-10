@@ -18,7 +18,7 @@ BEGIN {
         nsec = nsec + 1;
         fname = FILENAME;
         
-        printf "char *%s[] =\n{\n", $2;
+        printf "char const * const %s[] =\n{\n", $2;
 
         # Could use 'gsub(/\\/, "\\\\")' instead of the following
         # two lines, but there's a bug in mawk and the original
