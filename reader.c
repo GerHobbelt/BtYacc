@@ -25,7 +25,7 @@ int linesize;
 
 FILE *inc_file = NULL;
 char  inc_file_name[LINESIZE];
-int   inc_save_lineno;
+int unsigned inc_save_lineno;
 
 int in_ifdef = 0;
 int ifdef_skip;
@@ -66,7 +66,7 @@ char *get_line() {
   extern int Eflag;
   FILE *f;
   int c;
-  int i;
+  size_t i;
 
   /* VM: input from main or include file */
  NextLine:;
@@ -88,12 +88,12 @@ char *get_line() {
       goto NextLine;
     }
 
-    if (line) FREE(line);
+    FREE(line);
     saw_eof = 1;
     return line = cptr = 0; 
   }
   if (line == 0 || linesize != (LINESIZE + 1)) {
-    if (line) FREE(line);
+    FREE(line);
     linesize = LINESIZE + 1;
     if (!(line = MALLOC(linesize))) no_space(); 
   }
@@ -112,9 +112,10 @@ char *get_line() {
   /* VM: process %ifdef line */
   if(strncmp(&line[0], "%ifdef ", 7)==0) {
     char var_name[80];
-    int ii=0;
+    size_t ii = 0;
     char **ps;
-    for(i=7; line[i]!='\n' && line[i]!=' '; i++, ii++) {
+
+    for (i = 7; line[i] != '\n' && line[i] != ' '; ++i, ++ii) {
       var_name[ii] = line[i];
     }
     var_name[ii] = 0;
@@ -122,7 +123,7 @@ char *get_line() {
       error(lineno, 0, 0, "Cannot have nested %%ifdef");
     }
     /* Find the preprocessor variable */
-    for(ps=&defd_vars[0]; *ps; ps++) {
+    for (ps = &defd_vars[0]; *ps; ++ps) {
       if(strcmp(*ps,var_name)==0) {
 	break;
       }
@@ -152,8 +153,9 @@ char *get_line() {
 
   /* VM: Process %include line */
   if(strncmp(&line[0], "%include ", 9)==0) {
-    int ii=0;
-    for(i=9; line[i]!='\n' && line[i]!=' '; i++, ii++) {
+    size_t ii = 0;
+
+    for (i = 9; line[i] != '\n' && line[i] != ' '; ++i, ++ii) {
       inc_file_name[ii] = line[i];
     }
     inc_file_name[ii] = 0;
@@ -172,14 +174,14 @@ char *get_line() {
   /* VM: process %define line */
   if(strncmp(&line[0], "%define ", 8)==0) {
     char var_name[80];
-    int ii=0;
+    size_t ii = 0;
     char **ps;
-    for(i=8; line[i]!='\n' && line[i]!=' '; i++, ii++) {
+    for (i = 8; line[i] != '\n' && line[i] != ' '; ++i, ++ii) {
       var_name[ii] = line[i];
     }
     var_name[ii] = 0;
     /* Find the preprocessor variable */
-    for(ps=&defd_vars[0]; *ps; ps++) {
+    for (ps = &defd_vars[0]; *ps; ++ps) {
       if(strcmp(*ps,var_name)==0) {
 	error(lineno, 0, 0, "Preprocessor variable %s already defined", var_name);
       }
@@ -219,7 +221,7 @@ char *skip_comment()
 {
     register char *s;
 
-    int st_lineno = lineno;
+    int unsigned st_lineno = lineno;
     char *st_line = dup_line();
     char *st_cptr = st_line + (cptr - line);
 
@@ -391,7 +393,7 @@ void copy_ident(void)
 void copy_string(int quote, FILE *f1, FILE *f2)
 {
 register int	c;
-int		s_lineno = lineno;
+int unsigned	s_lineno = lineno;
 char		*s_line = dup_line();
 char		*s_cptr = s_line + (cptr - line - 1);
 
@@ -421,7 +423,7 @@ register int	c;
 		OUTC(' '); }
 	OUTC('*'); OUTC('/'); }
     else if (c == '*') {
-	int c_lineno = lineno;
+	int unsigned c_lineno = lineno;
 	char *c_line = dup_line();
 	char *c_cptr = c_line + (cptr - line - 1);
 	OUTC(c);
@@ -443,7 +445,7 @@ void copy_text(void)
     register int c;
     register FILE *f;
     int need_newline = 0;
-    int t_lineno = lineno;
+    int unsigned t_lineno = lineno;
     char *t_line = dup_line();
     char *t_cptr = t_line + (cptr - line - 2);
 
@@ -494,7 +496,7 @@ void copy_union(void)
     FILE *dc_file;
     register int c;
     int depth;
-    int u_lineno = lineno;
+    int unsigned u_lineno = lineno;
     char *u_line = dup_line();
     char *u_cptr = u_line + (cptr - line - 6);
 
@@ -556,11 +558,11 @@ int hexval(int c)
 bucket *get_literal(void)
 {
     register int c, quote;
-    register int i;
+    register size_t i;
     register int n;
     register char *s;
     register bucket *bp;
-    int s_lineno = lineno;
+    int unsigned s_lineno = lineno;
     char *s_line = dup_line();
     char *s_cptr = s_line + (cptr - line);
 
@@ -753,9 +755,9 @@ int get_number(void)
 //  
 // b: A {$$=$1;}
 // 
-static char *cache_tag(char *tag, int len)
+static char* cache_tag(char* tag, size_t len)
 {
-int	i;
+size_t	i;
 char	*s;
 
     for (i = 0; i < ntags; ++i) {
@@ -779,7 +781,7 @@ char	*s;
 char *get_tag(void)
 {
     register int c;
-    int t_lineno = lineno;
+    int unsigned t_lineno = lineno;
     char *t_line = dup_line();
     char *t_cptr = t_line + (cptr - line);
 
@@ -807,7 +809,8 @@ static char *scan_id(void)
 {
 char	*b = cptr;
 
-    while (isalnum(*cptr) || *cptr == '_' || *cptr == '$') cptr++;
+    while (isalnum(*cptr) || *cptr == '_' || *cptr == '$') ++cptr;
+
     return cache_tag(b, (int)(cptr-b));
 }
 
@@ -867,7 +870,9 @@ char	*tags[MAXARGS];
 int	args = 0, c;
 
     if (bp->args >= 0) retyped_warning(bp->name);
-    cptr++; /* skip open paren */
+
+    ++cptr; /* skip open paren */
+
     for (;;) {
 	c = nextc();
 	if (c == EOF) unexpected_EOF();
@@ -876,7 +881,8 @@ int	args = 0, c;
 	c = nextc();
 	if (c == ')') break;
 	if (c == EOF) unexpected_EOF(); }
-    cptr++; /* skip close paren */
+
+    ++cptr; /* skip close paren */
     bp->args = args;
     if (!(bp->argnames = NEW2(args, char *))) no_space();
     if (!(bp->argtags = NEW2(args, char *))) no_space();
@@ -1123,21 +1129,21 @@ void expand_rules(void)
 
 /* set in copy_args and incremented by the various routines that will rescan
 ** the argument list as appropriate */
-static int rescan_lineno;
+static int unsigned rescan_lineno;
 
 static char *copy_args(int *alen)
 {
 struct mstring	*s = msnew();
 int		depth = 0, len = 1, c;
 char		quote = 0;
-int		a_lineno = lineno;
+int unsigned	a_lineno = lineno;
 char		*a_line = dup_line();
 char		*a_cptr = a_line + (cptr - line - 1);
 
     rescan_lineno = lineno;
     while ((c = *cptr++) != ')' || depth || quote) {
 	if (c == ',' && !quote && !depth) {
-	    len++;
+	    ++len;
 	    mputc(s, 0);
 	    continue; }
 	mputc(s, c);
@@ -1153,8 +1159,8 @@ char		*a_cptr = a_line + (cptr - line - 1);
 	    else if (c == '\\') {
 		if (*cptr != '\n') mputc(s, *cptr++); } }
 	else {
-	    if (c == '(') depth++;
-	    else if (c == ')') depth--;
+	    if (c == '(') ++depth;
+	    else if (c == ')') --depth;
 	    else if (c == '\"' || c == '\'') quote = c; } }
     if (alen) *alen = len;
     FREE(a_line);
@@ -1165,10 +1171,12 @@ static char *parse_id(char *p, char **save)
 {
 char	*b;
 
-    while (isspace(*p)) if (*p++ == '\n') rescan_lineno++;
+    while (isspace(*p)) if (*p++ == '\n') ++rescan_lineno;
+
     if (!isalpha(*p) && *p != '_') return 0;
     b = p;
-    while (isalnum(*p) || *p == '_' || *p == '$') p++;
+    while (isalnum(*p) || *p == '_' || *p == '$') ++p;
+
     if (save) {
 	*save = cache_tag(b, (int)(p-b)); }
     return p;
@@ -1178,10 +1186,12 @@ static char *parse_int(char *p, int *save)
 {
 int	neg=0, val=0;
 
-    while (isspace(*p)) if (*p++ == '\n') rescan_lineno++;
+    while (isspace(*p)) if (*p++ == '\n') ++rescan_lineno;
+
     if (*p == '-') {
 	neg=1;
-	p++; }
+	++p; }
+
     if (!isdigit(*p)) return 0;
     while (isdigit(*p))
 	val = val*10 + *p++ - '0';
@@ -1193,7 +1203,7 @@ int	neg=0, val=0;
 static void parse_arginfo(bucket *a, char *args, int argslen)
 {
 char	*p=args, *tmp;
-int	i, redec=0;
+size_t	i, redec = 0;
 
     if (a->args >= 0) {
 	if (a->args != argslen)
@@ -1206,14 +1216,20 @@ int	i, redec=0;
 	    !(a->argtags = NEW2(argslen, char *)))
 	    no_space(); }
     if (!args) return;
-    for (i=0; i<argslen; i++) {
-	while (isspace(*p)) if (*p++ == '\n') rescan_lineno++;
+
+    for (i = 0; i < argslen; ++i) {
+	while (isspace(*p)) if (*p++ == '\n') ++rescan_lineno;
+
 	if (*p++ != '$') bad_formals();
-	while (isspace(*p)) if (*p++ == '\n') rescan_lineno++;
+
+	while (isspace(*p)) if (*p++ == '\n') ++rescan_lineno;
+
 	if (*p == '<') {
 	    havetags = 1;
 	    if (!(p = parse_id(p+1, &tmp))) bad_formals();
-	    while (isspace(*p)) if (*p++ == '\n') rescan_lineno++;
+
+	    while (isspace(*p)) if (*p++ == '\n') ++rescan_lineno;
+
 	    if (*p++ != '>') bad_formals();
 	    if (redec) {
 		if (a->argtags[i] != tmp)
@@ -1225,7 +1241,9 @@ int	i, redec=0;
 	else if (!redec)
 	    a->argtags[i] = 0;
 	if (!(p = parse_id(p, &a->argnames[i]))) bad_formals();
-	while (isspace(*p)) if (*p++ == '\n') rescan_lineno++;
+
+	while (isspace(*p)) if (*p++ == '\n') ++rescan_lineno;
+
 	if (*p++) bad_formals(); }
     free(args);
 }
@@ -1234,19 +1252,22 @@ static char *compile_arg(char **theptr, char *yyvaltag)
 {
 char		*p = *theptr;
 struct mstring	*c = msnew();
-int		i, j, n;
+size_t		i, j, n;
 Yshort		*offsets=0, maxoffset;
 bucket		**rhs;
 
     maxoffset = n = 0;
     for (i = nitems - 1; pitem[i]; --i) {
-	n++;
+	++n;
+
 	if (pitem[i]->class != ARGUMENT)
-	    maxoffset++; }
+	   ++maxoffset; }
+
     if (maxoffset > 0) {
 	offsets = NEW2(maxoffset+1, Yshort);
 	if (offsets == 0) no_space(); }
-    for (j=0, i++; i<nitems; i++)
+
+    for (j = 0, ++i; i < nitems; ++i)
 	if (pitem[i]->class != ARGUMENT)
 	    offsets[++j] = i - nitems + 1;
     rhs = pitem + nitems - 1;
@@ -1282,7 +1303,8 @@ bucket		**rhs;
 	  char	*arg;
 	  if (!(p = parse_id(p, &arg)))
 	    dollar_error(rescan_lineno, 0, 0);
-	  for (i=plhs[nrules]->args-1; i>=0; i--)
+
+	  for (i = plhs[nrules]->args - 1; i >= 0; --i)
 	    if (arg == plhs[nrules]->argnames[i]) break;
 	  if (i<0)
 	    error(rescan_lineno, 0, 0, "unknown argument $%s", arg);
@@ -1295,7 +1317,8 @@ bucket		**rhs;
 	else
 	  dollar_error(rescan_lineno, 0, 0); 
       } else {
-	if (*p == '\n') rescan_lineno++;
+	if (*p == '\n') ++rescan_lineno;
+
 	mputc(c, *p++); 
       } 
     }
@@ -1325,7 +1348,7 @@ struct arg_cache	*entry;
 static void insert_arg_cache(char *code, int rule)
 {
 struct arg_cache	*entry = NEW(struct arg_cache);
-int			i;
+size_t			i;
 
     if (!entry) no_space();
     i = strnshash(code) % ARG_CACHE_SIZE;
@@ -1338,9 +1361,9 @@ int			i;
 static void clean_arg_cache(void)
 {
 struct arg_cache	*e, *t;
-int			i;
+size_t			i;
 
-    for (i=0; i<ARG_CACHE_SIZE; i++) {
+    for (i = 0; i < ARG_CACHE_SIZE; ++i) {
 	for (e=arg_cache[i]; (t=e); e=e->next, FREE(t))
 	    free(e->code);
 	arg_cache[i] = 0; }
@@ -1351,7 +1374,7 @@ void advance_to_start(void)
     register int c;
     register bucket *bp;
     char *s_cptr;
-    int s_lineno;
+    int unsigned s_lineno;
     char	*args = 0;
     int		argslen = 0;
 
@@ -1409,7 +1432,7 @@ void start_rule(bucket *bp, int s_lineno)
 
 void end_rule(void)
 {
-    register int i;
+    register size_t i;
 
     if (!last_was_action && plhs[nrules]->tag) {
 	for (i = nitems - 1; pitem[i]; --i) continue;
@@ -1454,7 +1477,7 @@ void insert_empty_rule(void)
 
 static char *insert_arg_rule(char *arg, char *tag)
 {
-int	lineno = rescan_lineno;
+int unsigned lineno = rescan_lineno;
 char	*code = compile_arg(&arg, tag);
 int	rule = lookup_arg_cache(code);
 FILE	*f = action_file;
@@ -1483,7 +1506,7 @@ void add_symbol(void)
 {
     register int c;
     register bucket *bp;
-    int s_lineno = lineno;
+    int unsigned s_lineno = lineno;
     char *args = 0;
     int argslen = 0;
 
@@ -1513,11 +1536,12 @@ void add_symbol(void)
     if (bp->args < 0)
 	bp->args = argslen;
     if (argslen == 0 && bp->args > 0 && pitem[nitems-1] == 0) {
-	int	i;
+	size_t i;
 	if (plhs[nrules]->args != bp->args)
 	    error(lineno, line, cptr, "Wrong number of default arguments "
 		  "for %s", bp->name);
-	for (i=bp->args-1; i>=0; i--)
+
+	for (i = bp->args - 1; i >= 0; --i)
 	    if (plhs[nrules]->argtags[i] != bp->argtags[i])
 		error(lineno, line, cptr, "Wrong type for default argument "
 		      "%d to %s", i+1, bp->name); }
@@ -1526,8 +1550,9 @@ void add_symbol(void)
 				  bp->name);
     if (args != 0) {
 	char	*ap;
-	int	i;
-	for (ap=args, i=0; i<argslen; i++)
+	size_t	i;
+
+	for (ap = args, i = 0; i < argslen; ++i)
 	    ap = insert_arg_rule(ap, bp->argtags[i]);
 	free(args); }
 
@@ -1539,13 +1564,13 @@ void add_symbol(void)
 void copy_action(void)
 {
     register int c;
-    register int i, j, n;
+    register size_t i, j, n;
     int depth;
     int trialaction = 0;
     int haveyyval = 0;
     char *tag;
     register FILE *f;
-    int a_lineno = lineno;
+    int unsigned a_lineno = lineno;
     char *a_line = dup_line();
     char *a_cptr = a_line + (cptr - line);
     Yshort *offsets=0, maxoffset;
@@ -1558,7 +1583,7 @@ void copy_action(void)
 	insert_empty_rule();
     last_was_action = 1;
 
-    BtYacc_printf(f, "case %d:\n", nrules - 2);
+    BtYacc_printf(f, "case %u:\n", nrules - 2);
 
     if (*cptr != '[')
 	BtYacc_puts("  if (!yytrial)\n", f);
@@ -1572,13 +1597,16 @@ void copy_action(void)
 
     maxoffset = n = 0;
     for (i = nitems - 1; pitem[i]; --i) {
-	n++;
+	++n;
+
 	if (pitem[i]->class != ARGUMENT)
-	    maxoffset++; }
+	   ++maxoffset; }
+
     if (maxoffset > 0) {
 	offsets = NEW2(maxoffset+1, Yshort);
 	if (offsets == 0) no_space(); }
-    for (j=0, i++; i<nitems; i++)
+
+    for (j = 0, ++i; i < nitems; ++i)
 	if (pitem[i]->class != ARGUMENT)
 	    offsets[++j] = i - nitems + 1;
     rhs = pitem + nitems - 1;
@@ -1588,7 +1616,7 @@ loop:
     c = *cptr;
     if (c == '$') {
 	if (cptr[1] == '<') {
-	    int d_lineno = lineno;
+	    int unsigned d_lineno = lineno;
 	    char *d_line = dup_line();
 	    char *d_cptr = d_line + (cptr - line);
 
@@ -1632,7 +1660,8 @@ loop:
 >>>>>>> e8b4bcf2eadbdb980fce3b03ea465bcab63178a3
 	    else if (isalpha(c) || c == '_') {
 		char *arg = scan_id();
-		for (i=plhs[nrules]->args-1; i>=0; i--)
+
+		for (i = plhs[nrules]->args - 1; i >= 0; --i)
 		    if (arg == plhs[nrules]->argnames[i]) break;
 		if (i<0)
 		    error(d_lineno,d_line,d_cptr,"unknown argument %s",arg);
@@ -1684,7 +1713,8 @@ loop:
 	    char *arg;
 	    ++cptr;
 	    arg = scan_id();
-	    for (i=plhs[nrules]->args-1; i>=0; i--)
+
+	    for (i = plhs[nrules]->args - 1; i >= 0; --i)
 		if (arg == plhs[nrules]->argnames[i]) break;
 	    if (i<0)
 		error(lineno, line, cptr, "unknown argument %s", arg);
@@ -1866,12 +1896,11 @@ void read_grammar(void)
 
 void free_tags(void)
 {
-    register int i;
+    register size_t i;
 
     if (tag_table == 0) return;
 
     for (i = 0; i < ntags; ++i) {
-	assert(tag_table[i]);
 	FREE(tag_table[i]); }
     FREE(tag_table);
 }
@@ -1915,7 +1944,7 @@ void pack_symbols(void)
 {
     register bucket *bp;
     register bucket **v;
-    register int i, j, k, n;
+    register size_t i, j, k, n;
 
     nsyms = 2;
     ntokens = 1;
@@ -2008,7 +2037,7 @@ void pack_symbols(void)
 
 void pack_grammar(void)
 {
-    register int i, j;
+    register size_t i, j;
     int assoc, prec;
 
     ritem = NEW2(nitems, Yshort);
@@ -2068,7 +2097,7 @@ void pack_grammar(void)
 
 void print_grammar(void)
 {
-    register int i, j, k;
+    register size_t i, j, k;
     int spacing = 0;
     register FILE *f;
 
@@ -2080,16 +2109,10 @@ void print_grammar(void)
     k = 1;
     for (i = 2; i < nrules; ++i) {
 	if (rlhs[i] != rlhs[i-1]) {
-<<<<<<< HEAD
-	    if (i != 2) fprintf(f, "\n");
-	    fprintf(f, "%4d  %s :", i - 2, symbol_name[rlhs[i]]);
-	    spacing = (int)strlen(symbol_name[rlhs[i]]) + 1; }
-=======
 	    if (i != 2) BtYacc_puts("\n", f);
 
 	    BtYacc_printf(f, "%4d  %s :", i - 2, symbol_name[rlhs[i]]);
-	    spacing = strlen(symbol_name[rlhs[i]]) + 1; }
->>>>>>> e8b4bcf2eadbdb980fce3b03ea465bcab63178a3
+	    spacing = (int)strlen(symbol_name[rlhs[i]]) + 1; }
 	else {
 	    BtYacc_printf(f, "%4d  ", i - 2);
 	    j = spacing;

@@ -30,7 +30,7 @@ char *myname = "yacc";
 #endif
 static char const temp_form[] = "yacc_t_XXXXXX";
 
-int lineno = 0;
+int unsigned lineno = 0;
 int outline = 0;
 
 char *action_file_name = NULL;
@@ -55,11 +55,11 @@ FILE *union_file = NULL;	/*  a temp file, used to save the union		    */
 			/*  defined					    */
 FILE *verbose_file = NULL;	/*  y.output					    */
 
-int nitems = 0;
-int nrules = 0;
-int nsyms = 0;
-int ntokens = 0;
-int nvars = 0;
+int unsigned nitems = 0;
+int unsigned nrules = 0;
+int unsigned nsyms = 0;
+int unsigned ntokens = 0;
+int unsigned nvars = 0;
 
 int   start_symbol = 0;
 char  **symbol_name = NULL;
@@ -158,7 +158,7 @@ static void signal_setup(void)
 #endif
 
 
-static void usage(void)
+static SPLINT_NO_RETURN void usage(void)
 {
   BtYacc_logf("usage: %s [OPTIONS] file\n", myname);
   BtYacc_logf(
@@ -177,7 +177,7 @@ static void usage(void)
 
 static void getargs(int argc, char **argv)
 {
-    register int i;
+    register size_t i;
     register char *s;
 
     if (argc > 0) myname = argv[0];
@@ -214,7 +214,8 @@ static void getargs(int argc, char **argv)
 	    { char **ps;
 	      char *var_name = s + 1;
 	      extern char *defd_vars[];
-	      for(ps=&defd_vars[0]; *ps; ps++) {
+
+	      for (ps = &defd_vars[0]; *ps; ++ps) {
 		if(strcmp(*ps,var_name)==0) {
 		  error(lineno, 0, 0, "Preprocessor variable %s already defined", var_name);
 		}
@@ -545,5 +546,4 @@ int main(int argc, char **argv)
     output();
     BTYACC_INTERRUPTION_CHECK
     done(0);
-    return 0;
 }

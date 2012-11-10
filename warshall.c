@@ -2,7 +2,7 @@
 
 void transitive_closure(unsigned *R, int n)
 {
-    register int rowsize;
+    register size_t rowsize;
     register unsigned mask;
     register unsigned *rowj;
     register unsigned *rp;
@@ -44,7 +44,7 @@ void transitive_closure(unsigned *R, int n)
 	if (mask == 0)
 	{
 	    mask = 1;
-	    cword++;
+	    ++cword;
 	}
 
 	rowi += rowsize;
@@ -53,7 +53,7 @@ void transitive_closure(unsigned *R, int n)
 
 void reflexive_transitive_closure(unsigned *R, int n)
 {
-    register int rowsize;
+    register size_t rowsize;
     register unsigned mask;
     register unsigned *rp;
     register unsigned *relend;
@@ -72,7 +72,7 @@ void reflexive_transitive_closure(unsigned *R, int n)
 	if (mask == 0)
 	{
 	    mask = 1;
-	    rp++;
+	    ++rp;
 	}
 
 	rp += rowsize;

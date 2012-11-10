@@ -64,8 +64,8 @@ END   {
     if (nsec > 0) 
     {
         printf "struct section section_list[] = {\n";
-        for (i=0; i<nsec; i++)
-        printf "\t{ \"%s\", &%s[0] },\n", seclist[i], seclist[i];
+        for (i=0; i<nsec; ++i)
+            printf "\t{ \"%s\", &%s[0] },\n", seclist[i], seclist[i];
         printf "\t{ 0, 0 } };\n"
     }
 }

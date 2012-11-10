@@ -12,7 +12,7 @@ static char const * * ap_end;
 static void add_ptr(char const * const p)
 {
     if (ap == ap_end) {
-	int size = CHUNK;
+	size_t size = CHUNK;
 	char const * * nap;
 
 	while ((ap-ap_start) * sizeof(char *) >= size)
@@ -29,10 +29,10 @@ static void add_ptr(char const * const p)
 
 static void add_string(char const * s)
 {
-int	len = (int)strlen(s)+1;
+    size_t len = strlen(s) + 1;
 
     if (len > cp_end - cp) {
-	int size = len > CHUNK ? len : CHUNK;
+	size_t size = len > CHUNK ? len : CHUNK;
 	if (!(cp = malloc(size)))
 	    no_space();
 	cp_end = cp + size; }
@@ -66,15 +66,16 @@ void read_skel(char const * name)
 {
 char	buf[256];
 int	section = -2;
-int	line = 0, sline = 1, eline = 1;
-int	i;
+size_t	line = 0, sline = 1, eline = 1;
+size_t	i;
 FILE	*fp;
 
     if (!(fp = fopen(name, "r")))
 	open_error(name);
     while(fgets(buf, 255, fp)) {
 	if ((sline = eline))
-	    line++;
+	    ++line;
+
 	if ((i = (int)strlen(buf)) == 0)
 	    continue;
 	if (buf[i-1] == '\n') {
@@ -91,17 +92,20 @@ FILE	*fp;
 	      section_list[section].ptr = fin_section();
 	    }
 	    section = -1;
-	    while(*p && isspace(*p)) p++;
+
+	    while(*p && isspace(*p)) ++p;
+
 	    if (isalpha(*p)) {
 	      char *e = p;
 	      while(isalnum(*++e));
 	      *e = 0;
-	      for (i=0; section_list[i].name; i++)
+
+	      for (i = 0; section_list[i].name; ++i)
 		if (!strcmp(section_list[i].name, p))
 		  section = i; 
 	    }
 	    if (section >= 0)
-	      add_fmt("#line %d \"%s\"", line+1, name);
+	      add_fmt("#line %u \"%s\"", line+1, name);
 	    else if (*p)
 	      error(0, buf, p, "line %d of \"%s\", bad section name",
 		    line, name); 

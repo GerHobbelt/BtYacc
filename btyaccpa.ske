@@ -289,7 +289,8 @@ static void yyFreeState(YYParseState **p);
  */
 int yyparse()
 {
-  int yym, yyn, yystate, yychar, yynewerrflag;
+  int yym, yyn, yychar, yynewerrflag;
+  int unsigned yystate;
   YYParseState *yyerrctx = 0;
   int reduce_posn;
 
@@ -341,7 +342,7 @@ yyloop:
         yys = yyname[yychar];
       if (!yys)
         yys = "illegal-symbol";
-      fprintf(stderr, "btyacc[%3d,%2d%s]: read token %d (%s)",
+      fprintf(stderr, "btyacc[%3u,%2d%s]: read token %d (%s)",
               yystate, yydepth, (yytrial ? ",trial" : ""), yychar, yys);
 #ifdef YYDBPR
       fputc('<', stderr);
@@ -366,7 +367,7 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        fprintf(stderr, "btyacc[%3d,%2d%s]: CONFLICT: following successful "
+        fprintf(stderr, "btyacc[%3u,%2d%s]: CONFLICT: following successful "
                 "trial parse\n", yystate, yydepth, (yytrial ? ",trial" :""));
       }
 #endif
@@ -385,7 +386,7 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        fprintf(stderr, "btyacc[%3d,%2d%s]: CONFLICT. ",
+        fprintf(stderr, "btyacc[%3u,%2d%s]: CONFLICT. ",
                 yystate, yydepth, (yytrial ? ",trial" : ""));
         if(yyps->save)
           fputs("ALREADY in conflict, continuing trial parse.\n", stderr);
@@ -410,7 +411,8 @@ yyloop:
         if (yydebug && yychar >= 0)
           fprintf(stderr, "btyacc[%s]: backtracking 1 token\n", (yytrial ? "trial" : "---"));
 #       endif
-        ctry++;
+
+        ++ctry;
       }
       save->ctry = ctry;
       if (yyps->save == 0)
@@ -448,7 +450,7 @@ yyloop:
       }
       if (yychar >= 0)
       {
-        yylvp--, yylpp--, yylexp--;
+        --yylvp--; --yylpp; --yylexp;
         yychar = YYEMPTY;
       }
       save->lexeme = yylvp - yylvals;
@@ -459,12 +461,12 @@ yyloop:
     {
 #if YYDEBUG
       if (yydebug)
-        fprintf(stderr, "btyacc[%3d,%2d%s]: shifting to state %d\n",
+        fprintf(stderr, "btyacc[%3u,%2d%s]: shifting to state %d\n",
                 yystate, yydepth, (yytrial ? ",trial" : ""), yyctable[ctry]);
 #endif
       if (yychar < 0)
       {
-        yylvp++; yylpp++; yylexp++;
+        ++yylvp; ++yylpp; ++yylexp;
       }
       yychar = YYEMPTY;
       if (yyps->errflag > 0)
@@ -487,7 +489,7 @@ yyloop:
   {
 #if YYDEBUG
     if (yydebug)
-      fprintf(stderr, "btyacc[%3d,%2d%s]: shifting to state %d\n",
+      fprintf(stderr, "btyacc[%3u,%2d%s]: shifting to state %d\n",
               yystate, yydepth, (yytrial ? ",trial" : ""), yytable[yyn]);
 #endif
     yychar = YYEMPTY;
@@ -530,7 +532,7 @@ yyerrhandler:
     YYParseState *save = yyps->save;
 #if YYDEBUG
     if (yydebug)
-      fprintf(stderr, "btyacc[%3d,%2d%s]: ERROR, "
+      fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR, "
               "CONFLICT BACKTRACKING to state %d, %d tokens\n",
               yystate, yydepth, (yytrial ? ",trial" : ""),
               yyps->save->state, yylvp - yylvals - yyps->save->lexeme);
@@ -675,7 +677,7 @@ yyinrecovery:
         yys = yyname[yychar];
       if (!yys)
         yys = "illegal-symbol";
-      fprintf(stderr, "btyacc[%3d,%2d%s]: ERROR recovery discards token "
+      fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR recovery discards token "
               "%d (%s)\n",
               yystate, yydepth, (yytrial ? ",trial" : ""), yychar, yys);
     }
@@ -695,16 +697,16 @@ yyreduce:
 #if YYDEBUG
   if (yydebug)
   {
-    fprintf(stderr, "btyacc[%3d,%2d%s]: reducing by rule %d (%s)",
+    fprintf(stderr, "btyacc[%3u,%2d%s]: reducing by rule %d (%s)",
             yystate, yydepth, (yytrial ? ",trial" : ""), yyn, yyrule[yyn]);
 #ifdef YYDBPR
     if (yym)
     {
       int i;
       fputc('<', stderr);
-      for (i=yym; i>0; i--)
+      for (i = yym; i > 0; --i)
       {
-        if (i!=yym)
+        if (i != yym)
           printf(", ");
         YYDBPR((yyps->vsp)[1-i]);
       }
@@ -818,7 +820,7 @@ yyreduce:
   }
 #if YYDEBUG
   if (yydebug)
-    fprintf(stderr, "btyacc[%3d,%2d%s]: reduced, shifting to state %d\n",
+    fprintf(stderr, "btyacc[%3u,%2d%s]: reduced, shifting to state %u\n",
             *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""), yystate);
 #endif
   if (yyps->ssp >= yyps->ss + yyps->stacksize - 1)
@@ -880,12 +882,12 @@ yyabort:
       yyFreeState(&yyerrctx);
     }
 
-    for(pv=yyps->vs; pv<yyps->vsp; pv++)
+    for(pv=yyps->vs; pv<yyps->vsp; ++pv)
     {
       YYDELETEVAL(*pv,2);
     }
 
-    for(pp=yyps->ps; pp<yyps->psp; pp++)
+    for(pp=yyps->ps; pp<yyps->psp; ++pp)
     {
       YYDELETEPOSN(*pp,2);
     }
@@ -945,9 +947,9 @@ static int yyLex1(void)
       yyExpand();
     *yylexp = yylex();
     *yylvp++ = yylval;
-    yylve++;
+    ++yylve;
     *yylpp++ = yyposn;
-    yylpe++;
+    ++yylpe;
     return *yylexp++;
   }
   else
@@ -1000,7 +1002,7 @@ static int yyExpand(void)
 static void yySCopy(YYSTYPE *to, YYSTYPE *from, int size)
 {
   int i;
-  for (i = size-1; i >= 0; i--)
+  for (i = size-1; i >= 0; --i)
   {
     to[i] = from[i];
   }
@@ -1009,7 +1011,7 @@ static void yySCopy(YYSTYPE *to, YYSTYPE *from, int size)
 static void yyPCopy(YYPOSN *to, YYPOSN *from, int size)
 {
   int i;
-  for (i = size-1; i >= 0; i--)
+  for (i = size-1; i >= 0; --i)
   {
     to[i] = from[i];
   }

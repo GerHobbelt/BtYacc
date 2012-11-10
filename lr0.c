@@ -9,7 +9,7 @@ extern Yshort *itemset;
 extern Yshort *itemsetend;
 extern unsigned *ruleset;
 
-int nstates;
+int unsigned nstates;
 core *first_state;
 shifts *first_shift;
 reductions *first_reduction;
@@ -36,7 +36,7 @@ static void allocate_itemsets(void)
     register Yshort *itemp;
     register Yshort *item_end;
     register int symbol;
-    register int i;
+    register size_t i;
     register int count;
     register int max;
     register Yshort *symbol_count;
@@ -45,13 +45,14 @@ static void allocate_itemsets(void)
     symbol_count = NEW2(nsyms, Yshort);
 
     item_end = ritem + nitems;
-    for (itemp = ritem; itemp < item_end; itemp++)
+
+    for (itemp = ritem; itemp < item_end; ++itemp)
     {
 	symbol = *itemp;
 	if (symbol >= 0)
 	{
-	    count++;
-	    symbol_count[symbol]++;
+	    ++count;
+	    ++(symbol_count[symbol]);
 	}
     }
 
@@ -60,7 +61,8 @@ static void allocate_itemsets(void)
 
     count = 0;
     max = 0;
-    for (i = 0; i < nsyms; i++)
+
+    for (i = 0; i < nsyms; ++i)
     {
 	kernel_base[i] = kernel_items + count;
 	count += symbol_count[i];
@@ -84,7 +86,7 @@ static void allocate_storage(void)
 
 static core* new_state(int symbol)
 {
-    register int n;
+    register size_t n;
     register core *p;
     register Yshort *isp1;
     register Yshort *isp2;
@@ -113,7 +115,7 @@ static core* new_state(int symbol)
     last_state->next = p;
     last_state = p;
 
-    nstates++;
+    ++nstates;
 
     return (p);
 }
@@ -127,7 +129,7 @@ static int get_state(int symbol)
     register Yshort *iend;
     register core *sp;
     register int found;
-    register int n;
+    register size_t n;
 
 #ifdef	TRACE
     BtYacc_logf("Entering get_state(%d)\n", symbol);
@@ -183,26 +185,26 @@ static int get_state(int symbol)
 
 static void append_states(void)
 {
-    register int i;
-    register int j;
+    register size_t i;
+    register size_t j;
     register int symbol;
 
 #ifdef	TRACE
     BtYacc_logs("Entering append_states()\n");
 #endif
-    for (i = 1; i < nshifts; i++)
+    for (i = 1; i < nshifts; ++i)
     {
 	symbol = shift_symbol[i];
 	j = i;
 	while (j > 0 && shift_symbol[j - 1] > symbol)
 	{
 	    shift_symbol[j] = shift_symbol[j - 1];
-	    j--;
+	    --j;
 	}
 	shift_symbol[j] = symbol;
     }
 
-    for (i = 0; i < nshifts; i++)
+    for (i = 0; i < nshifts; ++i)
     {
 	symbol = shift_symbol[i];
 	shiftset[i] = get_state(symbol);
@@ -224,7 +226,7 @@ static void free_storage(void)
 
 static void initialize_states(void)
 {
-    register int i;
+    register size_t i;
     register Yshort *start_derives;
     register core *p;
 
@@ -251,13 +253,13 @@ static void initialize_states(void)
 
 static void new_itemsets(void)
 {
-    register int i;
+    register size_t i;
     register int shiftcount;
     register Yshort *isp;
     register Yshort *ksp;
     register int symbol;
 
-    for (i = 0; i < nsyms; i++)
+    for (i = 0; i < nsyms; ++i)
 	kernel_end[i] = 0;
 
     shiftcount = 0;
@@ -295,7 +297,8 @@ static void save_reductions(void)
     register Yshort *rend;
 
     count = 0;
-    for (isp = itemset; isp < itemsetend; isp++)
+
+    for (isp = itemset; isp < itemsetend; ++isp)
     {
 	item = ritem[*isp];
 	if (item < 0)
@@ -397,20 +400,20 @@ static void generate_states(void)
 void show_cores()
 {
     core *p;
-    int i, j, k, n;
-    int itemno;
+    int unsigned i, j, k, n;
+    int unsigned itemno;
 
     k = 0;
     for (p = first_state; p; ++k, p = p->next)
     {
 	if (k) printf("\n");
-	printf("state %d, number = %d, accessing symbol = %s\n",
+	printf("state %u, number = %d, accessing symbol = %s\n",
 		k, p->number, symbol_name[p->accessing_symbol]);
 	n = p->nitems;
 	for (i = 0; i < n; ++i)
 	{
 	    itemno = p->items[i];
-	    printf("%4d  ", itemno);
+	    printf("%4u  ", itemno);
 	    j = itemno;
 	    while (ritem[j] >= 0) ++j;
 	    printf("%s :", symbol_name[rlhs[-ritem[j]]]);
@@ -431,20 +434,20 @@ void show_cores()
 
 void show_ritems()
 {
-    int i;
+    int unsigned i;
 
     for (i = 0; i < nitems; ++i)
-	printf("ritem[%d] = %d\n", i, ritem[i]);
+	printf("ritem[%u] = %d\n", i, ritem[i]);
 }
 
 
 /* show_rrhs is used for debugging */
 void show_rrhs()
 {
-    int i;
+    int unsigned i;
 
     for (i = 0; i < nrules; ++i)
-	printf("rrhs[%d] = %d\n", i, rrhs[i]);
+	printf("rrhs[%u] = %d\n", i, rrhs[i]);
 }
 
 
@@ -453,13 +456,13 @@ void show_rrhs()
 void show_shifts()
 {
     shifts *p;
-    int i, j, k;
+    int unsigned i, j, k;
 
     k = 0;
     for (p = first_shift; p; ++k, p = p->next)
     {
 	if (k) printf("\n");
-	printf("shift %d, number = %d, nshifts = %d\n", k, p->number,
+	printf("shift %u, number = %d, nshifts = %d\n", k, p->number,
 		p->nshifts);
 	j = p->nshifts;
 	for (i = 0; i < j; ++i)
@@ -471,15 +474,16 @@ void show_shifts()
 #ifdef	DEBUG
 static void print_derives(void)
 {
-    register int i;
+    register size_t i;
     register Yshort *sp;
 
     printf("\nDERIVES\n\n");
 
-    for (i = start_symbol; i < nsyms; i++)
+    for (i = start_symbol; i < nsyms; ++i)
     {
 	printf("%s derives ", symbol_name[i]);
-	for (sp = derives[i]; *sp >= 0; sp++)
+
+	for (sp = derives[i]; *sp >= 0; ++sp)
 	{
 	    printf("  %d", *sp);
 	}
@@ -493,18 +497,20 @@ static void print_derives(void)
 
 static void set_derives(void)
 {
-    register int i, k;
-    register int lhs;
+    register size_t i, k;
+    register size_t lhs;
     register Yshort *rules;
 
     derives = NEW2(nsyms, Yshort *);
     rules = NEW2(nvars + nrules, Yshort);
 
     k = 0;
-    for (lhs = start_symbol; lhs < nsyms; lhs++)
+
+    for (lhs = start_symbol; lhs < nsyms; ++lhs)
     {
 	derives[lhs] = rules + k;
-	for (i = 0; i < nrules; i++)
+
+	for (i = 0; i < nrules; ++i)
 	{
 	    if (rlhs[i] == lhs)
 	    {
@@ -530,7 +536,7 @@ void free_derives()
 
 static void set_nullable(void)
 {
-    register int i, j;
+    register size_t i, j;
     register int empty;
     int done;
 
@@ -544,7 +550,8 @@ static void set_nullable(void)
     while (!done)
     {
 	done = 1;
-	for (i = 1; i < nitems; i++)
+
+	for (i = 1; i < nitems; ++i)
 	{
 	    empty = 1;
 	    while ((j = ritem[i]) >= 0)
@@ -566,7 +573,7 @@ static void set_nullable(void)
     }
 
 #ifdef DEBUG
-    for (i = 0; i < nsyms; i++)
+    for (i = 0; i < nsyms; ++i)
     {
 	if (nullable[i])
 	    printf("%s is nullable\n", symbol_name[i]);

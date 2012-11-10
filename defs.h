@@ -281,7 +281,7 @@ extern char *file_prefix;
 extern char *name_prefix;
 extern char *cptr;
 extern char *line;
-extern int lineno;
+extern int unsigned lineno;
 extern int outline;
 
 extern char const * const banner[];
@@ -311,11 +311,11 @@ extern FILE *text_file;
 extern FILE *union_file;
 extern FILE *verbose_file;
 
-extern int nitems;
-extern int nrules;
-extern int nsyms;
-extern int ntokens;
-extern int nvars;
+extern int unsigned nitems;
+extern int unsigned nrules;
+extern int unsigned nsyms;
+extern int unsigned ntokens;
+extern int unsigned nvars;
 extern int ntags;
 
 extern char unionized;
@@ -339,7 +339,7 @@ extern char *nullable;
 extern bucket *first_symbol;
 extern bucket *last_symbol;
 
-extern int nstates;
+extern int unsigned nstates;
 extern core *first_state;
 extern shifts *first_shift;
 extern reductions *first_reduction;
@@ -355,8 +355,8 @@ extern Yshort *from_state;
 extern Yshort *to_state;
 
 extern action **parser;
-extern int SRtotal;
-extern int RRtotal;
+extern int unsigned SRtotal;
+extern int unsigned RRtotal;
 extern Yshort *SRconflicts;
 extern Yshort *RRconflicts;
 extern Yshort *defred;
@@ -369,6 +369,29 @@ extern Yshort final_state;
 #include <errno.h>
 #endif
 
+#if defined(__GNUC__)
+#  if defined(__ICC)
+#    define ATTRIBUTE(x)
+#  else
+#    if ((__GNUC__ > 3) || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4))
+#      define ATTRIBUTE(x) __attribute__(x)
+#      define CAN_USE_ATTRIBUTE 1
+#    else
+#      define ATTRIBUTE(x)
+#    endif
+#  endif
+#else
+#  define ATTRIBUTE(x)
+#endif
+
+#define GCC_NO_RETURN ATTRIBUTE((noreturn))
+
+#ifndef S_SPLINT_S
+#  define SPLINT_NO_RETURN
+#else
+#  define SPLINT_NO_RETURN /*@noreturn@*/
+#endif
+
 /* global functions */
 
 /* closure.c */
@@ -377,19 +400,19 @@ void closure(Yshort *, int);
 void finalize_closure(void);
 
 /* error.c */
-void fatal(char const * msg);
-void no_space(void);
-void open_error(char const * filename);
-void unexpected_EOF(void);
+SPLINT_NO_RETURN void fatal(char const * msg) GCC_NO_RETURN;
+SPLINT_NO_RETURN void no_space(void) GCC_NO_RETURN;
+SPLINT_NO_RETURN void open_error(char const * filename) GCC_NO_RETURN;
+SPLINT_NO_RETURN void unexpected_EOF(void) GCC_NO_RETURN;
 void print_pos(char const * st_line, char const * st_cptr);
 void error(int unsigned lineno, char const * line, char const * cptr, char const * msg, ...);
-void syntax_error(int unsigned lineno, char const * line, char const * cptr);
-void unsupported_feature(int unsigned lineno, char const * line, char const * cptr);
-void unterminated_comment(int unsigned lineno, char const * line, char const * cptr);
-void unterminated_string(int unsigned lineno, char const * line, char const * cptr);
-void unterminated_text(int unsigned lineno, char const * line, char const * cptr);
-void unterminated_union(int unsigned lineno, char const * line, char const * cptr);
-void over_unionized(char const * cptr);
+SPLINT_NO_RETURN void syntax_error(int unsigned lineno, char const * line, char const * cptr) GCC_NO_RETURN;
+SPLINT_NO_RETURN void unsupported_feature(int unsigned lineno, char const * line, char const * cptr) GCC_NO_RETURN;
+SPLINT_NO_RETURN void unterminated_comment(int unsigned lineno, char const * line, char const * cptr) GCC_NO_RETURN;
+SPLINT_NO_RETURN void unterminated_string(int unsigned lineno, char const * line, char const * cptr) GCC_NO_RETURN;
+SPLINT_NO_RETURN void unterminated_text(int unsigned lineno, char const * line, char const * cptr) GCC_NO_RETURN;
+SPLINT_NO_RETURN void unterminated_union(int unsigned lineno, char const * line, char const * cptr) GCC_NO_RETURN;
+SPLINT_NO_RETURN void over_unionized(char const * cptr) GCC_NO_RETURN;
 void illegal_tag(int unsigned lineno, char const * line, char const * cptr);
 void illegal_character(char const * cptr);
 void used_reserved(char const * s);
@@ -405,7 +428,7 @@ void prec_redeclared(void);
 void unterminated_action(int unsigned lineno, char const * line, char const * cptr);
 void unterminated_arglist(int unsigned lineno, char const * line, char const * cptr);
 void bad_formals(void);
-void dollar_warning(int, int);
+void dollar_warning(int unsigned, int);
 void dollar_error(int unsigned lineno, char const * line, char const * cptr);
 void untyped_lhs(void);
 void untyped_rhs(int i, char const * s);
@@ -427,7 +450,7 @@ void free_nullable(void);
 void lr0(void);
 
 /* main.c */
-void done(int);
+SPLINT_NO_RETURN void done(int) GCC_NO_RETURN;
 
 #if defined(SIGINT) || defined(SIGTERM) || defined(SIGHUP)
 #define BTYACC_USE_SIGNAL_HANDLING
@@ -442,11 +465,11 @@ int main(int, char **);
 
 /* mkpar.c */
 void make_parser(void);
-action *parse_actions(int);
-action *get_shifts(int);
-action *add_reductions(int, action *);
-action *add_reduce(action *, int, int);
-int sole_reduction(int);
+action* parse_actions(int unsigned);
+action* get_shifts(int unsigned);
+action* add_reductions(int unsigned, action*);
+action* add_reduce(action*, int unsigned, int);
+int unsigned sole_reduction(int unsigned);
 void free_action_row(action *);
 void free_parser(void);
 
@@ -455,8 +478,8 @@ void output(void);
 void output_rule_data(void);
 void output_yydefred(void);
 void output_actions(void);
-int matching_vector(int);
-int pack_vector(int);
+int matching_vector(size_t);
+int pack_vector(size_t);
 void output_base(void);
 void output_table(void);
 void output_check(void);
@@ -529,11 +552,11 @@ void free_symbols(void);
 void verbose(void);
 void log_unused(void);
 void log_conflicts(void);
-void print_state(int);
-void print_conflicts(int);
-void print_core(int);
-void print_nulls(int);
-void print_actions(int);
+void print_state(int unsigned);
+void print_conflicts(int unsigned);
+void print_core(int unsigned);
+void print_nulls(int unsigned);
+void print_actions(int unsigned);
 void print_shifts(action const * p);
 void print_reductions(action const * p, int defred);
 void print_gotos(int);

@@ -23,28 +23,29 @@ static void print_closure(int n)
   register Yshort *isp;
 
   printf("\n\nn = %d\n\n", n);
-  for (isp = itemset; isp < itemsetend; isp++)
+
+  for (isp = itemset; isp < itemsetend; ++isp)
     printf("   %d\n", *isp);
 }
 
 
 static void print_EFF(void)
 {
-    register int i, j;
+    register size_t i, j;
     register unsigned *rowp;
     register unsigned word;
     register unsigned mask;
 
     printf("\n\nEpsilon Free Firsts\n");
 
-    for (i = start_symbol; i < nsyms; i++)
+    for (i = start_symbol; i < nsyms; ++i)
     {
 	printf("\n%s", symbol_name[i]);
 	rowp = EFF + ((i - start_symbol) * WORDSIZE(nvars));
 	word = *rowp++;
 
 	mask = 1;
-	for (j = 0; j < nvars; j++)
+	for (j = 0; j < nvars; ++j)
 	{
 	    if (word & mask)
 		printf("  %s", symbol_name[start_symbol + j]);
@@ -62,24 +63,25 @@ static void print_EFF(void)
 
 static void print_first_derives(void)
 {
-  register int i;
-  register int j;
+  register size_t i;
+  register size_t j;
   register unsigned *rp;
   register unsigned cword;
   register unsigned mask;
 
   printf("\n\n\nFirst Derives\n");
 
-  for (i = start_symbol; i < nsyms; i++)
+  for (i = start_symbol; i < nsyms; ++i)
     {
       printf("\n%s derives\n", symbol_name[i]);
       rp = first_derives + i * WORDSIZE(nrules);
       cword = *rp++;
       mask = 1;
-      for (j = 0; j <= nrules; j++)
+
+      for (j = 0; j <= nrules; ++j)
         {
 	  if (cword & mask)
-	    printf("   %d\n", j);
+	    printf("   %u\n", j);
 
 	  mask <<= 1;
 	  if (mask == 0)
@@ -101,15 +103,16 @@ static void set_EFF(void)
     register unsigned *row;
     register int symbol;
     register Yshort *sp;
-    register int rowsize;
+    register size_t rowsize;
     register int i;
-    register int rule;
+    register size_t rule;
 
     rowsize = WORDSIZE(nvars);
     EFF = NEW2(nvars * rowsize, unsigned);
 
     row = EFF;
-    for (i = start_symbol; i < nsyms; i++)
+
+    for (i = start_symbol; i < nsyms; ++i)
     {
 	sp = derives[i];
 	for (rule = *sp; rule > 0; rule = *++sp)
@@ -136,15 +139,15 @@ void set_first_derives()
 {
   register unsigned *rrow;
   register unsigned *vrow;
-  register int j;
+  register size_t j;
   register unsigned mask;
   register unsigned cword;
   register Yshort *rp;
 
   int rule;
   int i;
-  int rulesetsize;
-  int varsetsize;
+  size_t rulesetsize;
+  size_t varsetsize;
 
   rulesetsize = WORDSIZE(nrules);
   varsetsize = WORDSIZE(nvars);
@@ -153,12 +156,14 @@ void set_first_derives()
   set_EFF();
 
   rrow = first_derives + ntokens * rulesetsize;
-  for (i = start_symbol; i < nsyms; i++)
+
+  for (i = start_symbol; i < nsyms; ++i)
     {
       vrow = EFF + ((i - ntokens) * varsetsize);
       cword = *vrow++;
       mask = 1;
-      for (j = start_symbol; j < nsyms; j++)
+
+      for (j = start_symbol; j < nsyms; ++j)
 	{
 	  if (cword & mask)
 	    {
@@ -191,13 +196,13 @@ void set_first_derives()
 
 void closure(Yshort* nucleus, int n)
 {
-    register int ruleno;
+    register size_t ruleno;
     register unsigned word;
     register unsigned mask;
     register Yshort *csp;
     register unsigned *dsp;
     register unsigned *rsp;
-    register int rulesetsize;
+    register size_t rulesetsize;
 
     Yshort *csend;
     unsigned *rsend;
@@ -207,7 +212,8 @@ void closure(Yshort* nucleus, int n)
     rulesetsize = WORDSIZE(nrules);
     rsp = ruleset;
     rsend = ruleset + rulesetsize;
-    for (rsp = ruleset; rsp < rsend; rsp++)
+
+    for (rsp = ruleset; rsp < rsend; ++rsp)
 	*rsp = 0;
 
     csend = nucleus + n;
