@@ -27,7 +27,7 @@ char *myname = "yacc";
 #define DIR_CHAR '/'
 #define DEFAULT_TMPDIR "/tmp"
 #endif
-char *temp_form = "yacc_t_XXXXXX";
+static char const temp_form[] = "yacc_t_XXXXXX";
 
 int lineno = 0;
 int outline = 0;
@@ -90,7 +90,7 @@ void onintr(int dummy)
 }
 
 
-void set_signals()
+static void set_signals(void)
 {
 #ifdef SIGINT
     if (signal(SIGINT, SIG_IGN) != SIG_IGN)
@@ -107,7 +107,7 @@ void set_signals()
 }
 
 
-void usage() 
+static void usage(void)
 {
   printf("usage: %s [OPTIONS] file\n", myname);
   puts(
@@ -124,7 +124,7 @@ void usage()
 }
 
 
-void getargs(int argc, char **argv)
+static void getargs(int argc, char **argv)
 {
     register int i;
     register char *s;
@@ -271,59 +271,107 @@ char *allocate(unsigned n)
     return (p);
 }
 
-
-void create_file_names()
+static FILE* create_temporary_file(char* template)
 {
-    int i, len;
-    char *tmpdir;
+    int descriptor = mkstemp(template);
 
-    tmpdir = getenv("TMPDIR");
-    if (tmpdir == 0) tmpdir = DEFAULT_TMPDIR;
+    if (mkstemp(template) == -1)
+    {
+       perror("btyacc: Cannot create temporary file");
+       (void) fprintf(stderr, "name template: %s\n", template);
+       done(EXIT_FAILURE);
+    }
+    else
+    {
+       FILE* pointer = fdopen(descriptor, "w");
+
+       if (pointer)
+       {
+          return pointer;
+       }
+       else
+       {
+          perror("btyacc: A stream can not be associated with an existing file descriptor.");
+          done(EXIT_FAILURE);
+       }
+    }
+}
+
+static char const TEMPORARY_DIR_ENV_VAR[] = "TMPDIR";
+
+static void create_union_file(void)
+{
+    size_t i, len;
+    char* tmpdir = getenv(TEMPORARY_DIR_ENV_VAR);
+
+    if (tmpdir == 0)
+       tmpdir = DEFAULT_TMPDIR;
+
+    len = strlen(tmpdir);
+    i = len + (sizeof(temp_form) - 1);
+
+    if (len && tmpdir[len - 1] != DIR_CHAR)
+	++i;
+
+    union_file_name = MALLOC(i);
+
+    if (union_file_name == 0)
+       no_space();
+
+    strcpy(union_file_name, tmpdir);
+
+    if (len && tmpdir[len - 1] != DIR_CHAR)
+    {
+	union_file_name[len] = DIR_CHAR;
+	++len;
+    }
+
+    strcpy(union_file_name + len, temp_form);
+    union_file_name[len + 5] = 'u';
+    union_file = create_temporary_file(union_file_name);
+}
+
+static void create_files(void)
+{
+    size_t i, len;
+    char* tmpdir = getenv(TEMPORARY_DIR_ENV_VAR);
+
+    if (tmpdir == 0)
+       tmpdir = DEFAULT_TMPDIR;
 
     len = (int)strlen(tmpdir);
     i = len + (int)strlen(temp_form) + 1;
-    if (len && tmpdir[len-1] != DIR_CHAR)
+    if (len && tmpdir[len - 1] != DIR_CHAR)
 	++i;
 
     action_file_name = MALLOC(i);
-    if (action_file_name == 0) no_space();
+
+    if (action_file_name == 0)
+       no_space();
+
     text_file_name = MALLOC(i);
-    if (text_file_name == 0) no_space();
-    union_file_name = MALLOC(i);
-    if (union_file_name == 0) no_space();
+
+    if (text_file_name == 0)
+       no_space();
 
     strcpy(action_file_name, tmpdir);
     strcpy(text_file_name, tmpdir);
-    strcpy(union_file_name, tmpdir);
 
     if (len && tmpdir[len - 1] != DIR_CHAR)
     {
 	action_file_name[len] = DIR_CHAR;
 	text_file_name[len] = DIR_CHAR;
-	union_file_name[len] = DIR_CHAR;
 	++len;
     }
 
     strcpy(action_file_name + len, temp_form);
     strcpy(text_file_name + len, temp_form);
-    strcpy(union_file_name + len, temp_form);
 
     action_file_name[len + 5] = 'a';
     text_file_name[len + 5] = 't';
-    union_file_name[len + 5] = 'u';
 
-    if(mktemp(action_file_name)==NULL) {
-      fprintf(stderr, "btyacc: Cannot create temporary file\n");
-      exit(1);
-    }
-    if(mktemp(text_file_name)==NULL) {
-      fprintf(stderr, "btyacc: Cannot create temporary file\n");
-      exit(1);
-    }
-    if(mktemp(union_file_name)==NULL) {
-      fprintf(stderr, "btyacc: Cannot create temporary file\n");
-      exit(1);
-    }
+    action_file = create_temporary_file(action_file_name);
+    text_file = create_temporary_file(text_file_name);
 
     len = (int)strlen(file_prefix);
 
@@ -364,7 +412,7 @@ void create_file_names()
 }
 
 
-void open_input_files()
+static void open_input_files(void)
 {
     if (input_file == 0)
     {
@@ -375,20 +423,12 @@ void open_input_files()
 }
 
 
-void open_output_files()
+static void open_output_files(void)
 {
 	/* do this only once, first time is on demand, i.e. as late as possible */
 	if (!action_file && !text_file && !verbose_file && !defines_file && !output_file && !code_file)
 	{
 		create_file_names();
-
-		action_file = fopen(action_file_name, "w");
-		if (action_file == 0)
-			open_error(action_file_name);
-
-		text_file = fopen(text_file_name, "w");
-		if (text_file == 0)
-			open_error(text_file_name);
 
 		if (vflag)
 		{
@@ -402,9 +442,8 @@ void open_output_files()
 			defines_file = fopen(defines_file_name, "w");
 			if (defines_file == 0)
 				open_error(defines_file_name);
-			union_file = fopen(union_file_name, "w");
-			if (union_file ==  0)
-				open_error(union_file_name);
+
+			create_union_file();
 		}
 
 		output_file = fopen(output_file_name, "w");

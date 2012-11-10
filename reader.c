@@ -308,6 +308,11 @@ static struct keyword { char name[20]; int token; } keywords[] = {
 	{ "yacc", BISON_YACC },                           /* [i_a] bison emulation additions */
 };
 
+static int search_strcmp(void const * key, void const * element)
+{
+  return strcmp(key, element);
+}
+
 int keyword(void)
 {
   register int	c;
@@ -322,8 +327,9 @@ int keyword(void)
       c = *++cptr; 
     }
     cachec(NUL);
+
     if ((key = bsearch(cache, keywords, sizeof(keywords)/sizeof(keywords[0]),
-		       sizeof(*key), strcmp)))
+		       sizeof(*key), search_strcmp)))
 	return key->token; 
   } else {
     ++cptr;
