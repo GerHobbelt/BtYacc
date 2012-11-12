@@ -1632,7 +1632,6 @@ loop:
 		++cptr;
 		FREE(d_line);
 		goto loop; }
-<<<<<<< HEAD
 	    else if (isdigit(c) || (c == '-' && isdigit(cptr[1]))) {
  		i = get_number();
 		if (i <= 0) {
@@ -1644,24 +1643,6 @@ loop:
  		    fprintf(f, "yyvsp[%d].%s", offsets[i], tag);
  		FREE(d_line);
  		goto loop; }
-=======
-	    else if (isdigit(c)) {
-		i = get_number();
-		if (i > maxoffset) {
-		    dollar_warning(d_lineno, i);
-		    BtYacc_printf(f, "yyvsp[%d].%s", i - maxoffset, tag); }
-		else
-		    BtYacc_printf(f, "yyvsp[%d].%s", offsets[i], tag);
-
-		FREE(d_line);
-		goto loop; }
-	    else if (c == '-' && isdigit(cptr[1])) {
-		++cptr;
-		i = -get_number() - n;
-		BtYacc_printf(f, "yyvsp[%d].%s", i, tag);
-		FREE(d_line);
-		goto loop; }
->>>>>>> e8b4bcf2eadbdb980fce3b03ea465bcab63178a3
 	    else if (isalpha(c) || c == '_') {
 		char *arg = scan_id();
 

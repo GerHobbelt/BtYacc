@@ -11,9 +11,9 @@
    If the skeleton is changed, the banner should be changed so that
    the altered version can easily be distinguished from the original.  */
 
-char *banner[] =
+char const * const banner[] =
 {
-    "#line 10 \"p:\\prj\\3actual\\btyacc\\btyaccpa.ske\"",
+    "#line 10 \"btyaccpa.ske\"",
     "/* -*- C -*-",
     "",
     "    @(#)btyaccpar, based on byacc 1.8 (Berkeley)",
@@ -70,9 +70,9 @@ char *banner[] =
     0
 };
 
-char *tables[] =
+char const * const tables[] =
 {
-    "#line 64 \"p:\\prj\\3actual\\btyacc\\btyaccpa.ske\"",
+    "#line 64 \"btyaccpa.ske\"",
     "",
     "#ifdef __cplusplus",
     "#ifndef _YACC_EXTERN_",
@@ -114,9 +114,9 @@ char *tables[] =
     0
 };
 
-char *header[] =
+char const * const header[] =
 {
-    "#line 103 \"p:\\prj\\3actual\\btyacc\\btyaccpa.ske\"",
+    "#line 103 \"btyaccpa.ske\"",
     "",
     "#ifndef YYERRCODE",
     "#error Make sure you '#include' the generated yacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.",
@@ -273,9 +273,9 @@ char *header[] =
     0
 };
 
-char *body[] =
+char const * const body[] =
 {
-    "#line 257 \"p:\\prj\\3actual\\btyacc\\btyaccpa.ske\"",
+    "#line 257 \"btyaccpa.ske\"",
     "",
     "",
     "/*",
@@ -311,7 +311,8 @@ char *body[] =
     " */",
     "int yyparse()",
     "{",
-    "  int yym, yyn, yystate, yychar, yynewerrflag;",
+    "  int yym, yyn, yychar, yynewerrflag;",
+    "  int unsigned yystate;",
     "  YYParseState *yyerrctx = 0;",
     "  int reduce_posn;",
     "",
@@ -363,7 +364,7 @@ char *body[] =
     "        yys = yyname[yychar];",
     "      if (!yys)",
     "        yys = \"illegal-symbol\";",
-    "      fprintf(stderr, \"btyacc[%3d,%2d%s]: read token %d (%s)\",",
+    "      fprintf(stderr, \"btyacc[%3u,%2d%s]: read token %d (%s)\",",
     "              yystate, yydepth, (yytrial ? \",trial\" : \"\"), yychar, yys);",
     "#ifdef YYDBPR",
     "      fputc('<', stderr);",
@@ -388,7 +389,7 @@ char *body[] =
     "#if YYDEBUG",
     "      if (yydebug)",
     "      {",
-    "        fprintf(stderr, \"btyacc[%3d,%2d%s]: CONFLICT: following successful \"",
+    "        fprintf(stderr, \"btyacc[%3u,%2d%s]: CONFLICT: following successful \"",
     "                \"trial parse\\n\", yystate, yydepth, (yytrial ? \",trial\" :\"\"));",
     "      }",
     "#endif",
@@ -407,7 +408,7 @@ char *body[] =
     "#if YYDEBUG",
     "      if (yydebug)",
     "      {",
-    "        fprintf(stderr, \"btyacc[%3d,%2d%s]: CONFLICT. \",",
+    "        fprintf(stderr, \"btyacc[%3u,%2d%s]: CONFLICT. \",",
     "                yystate, yydepth, (yytrial ? \",trial\" : \"\"));",
     "        if(yyps->save)",
     "          fputs(\"ALREADY in conflict, continuing trial parse.\\n\", stderr);",
@@ -432,7 +433,8 @@ char *body[] =
     "        if (yydebug && yychar >= 0)",
     "          fprintf(stderr, \"btyacc[%s]: backtracking 1 token\\n\", (yytrial ? \"trial\" : \"---\"));",
     "#       endif",
-    "        ctry++;",
+    "",
+    "        ++ctry;",
     "      }",
     "      save->ctry = ctry;",
     "      if (yyps->save == 0)",
@@ -470,7 +472,7 @@ char *body[] =
     "      }",
     "      if (yychar >= 0)",
     "      {",
-    "        yylvp--, yylpp--, yylexp--;",
+    "        --yylvp--; --yylpp; --yylexp;",
     "        yychar = YYEMPTY;",
     "      }",
     "      save->lexeme = yylvp - yylvals;",
@@ -481,12 +483,12 @@ char *body[] =
     "    {",
     "#if YYDEBUG",
     "      if (yydebug)",
-    "        fprintf(stderr, \"btyacc[%3d,%2d%s]: shifting to state %d\\n\",",
+    "        fprintf(stderr, \"btyacc[%3u,%2d%s]: shifting to state %d\\n\",",
     "                yystate, yydepth, (yytrial ? \",trial\" : \"\"), yyctable[ctry]);",
     "#endif",
     "      if (yychar < 0)",
     "      {",
-    "        yylvp++; yylpp++; yylexp++;",
+    "        ++yylvp; ++yylpp; ++yylexp;",
     "      }",
     "      yychar = YYEMPTY;",
     "      if (yyps->errflag > 0)",
@@ -509,7 +511,7 @@ char *body[] =
     "  {",
     "#if YYDEBUG",
     "    if (yydebug)",
-    "      fprintf(stderr, \"btyacc[%3d,%2d%s]: shifting to state %d\\n\",",
+    "      fprintf(stderr, \"btyacc[%3u,%2d%s]: shifting to state %d\\n\",",
     "              yystate, yydepth, (yytrial ? \",trial\" : \"\"), yytable[yyn]);",
     "#endif",
     "    yychar = YYEMPTY;",
@@ -552,7 +554,7 @@ char *body[] =
     "    YYParseState *save = yyps->save;",
     "#if YYDEBUG",
     "    if (yydebug)",
-    "      fprintf(stderr, \"btyacc[%3d,%2d%s]: ERROR, \"",
+    "      fprintf(stderr, \"btyacc[%3u,%2d%s]: ERROR, \"",
     "              \"CONFLICT BACKTRACKING to state %d, %d tokens\\n\",",
     "              yystate, yydepth, (yytrial ? \",trial\" : \"\"),",
     "              yyps->save->state, yylvp - yylvals - yyps->save->lexeme);",
@@ -697,7 +699,7 @@ char *body[] =
     "        yys = yyname[yychar];",
     "      if (!yys)",
     "        yys = \"illegal-symbol\";",
-    "      fprintf(stderr, \"btyacc[%3d,%2d%s]: ERROR recovery discards token \"",
+    "      fprintf(stderr, \"btyacc[%3u,%2d%s]: ERROR recovery discards token \"",
     "              \"%d (%s)\\n\",",
     "              yystate, yydepth, (yytrial ? \",trial\" : \"\"), yychar, yys);",
     "    }",
@@ -717,16 +719,16 @@ char *body[] =
     "#if YYDEBUG",
     "  if (yydebug)",
     "  {",
-    "    fprintf(stderr, \"btyacc[%3d,%2d%s]: reducing by rule %d (%s)\",",
+    "    fprintf(stderr, \"btyacc[%3u,%2d%s]: reducing by rule %d (%s)\",",
     "            yystate, yydepth, (yytrial ? \",trial\" : \"\"), yyn, yyrule[yyn]);",
     "#ifdef YYDBPR",
     "    if (yym)",
     "    {",
     "      int i;",
     "      fputc('<', stderr);",
-    "      for (i=yym; i>0; i--)",
+    "      for (i = yym; i > 0; --i)",
     "      {",
-    "        if (i!=yym)",
+    "        if (i != yym)",
     "          printf(\", \");",
     "        YYDBPR((yyps->vsp)[1-i]);",
     "      }",
@@ -763,9 +765,9 @@ char *body[] =
     0
 };
 
-char *trailer[] =
+char const * const trailer[] =
 {
-    "#line 742 \"p:\\prj\\3actual\\btyacc\\btyaccpa.ske\"",
+    "#line 744 \"btyaccpa.ske\"",
     "",
     "  default:",
     "    break;",
@@ -845,7 +847,7 @@ char *trailer[] =
     "  }",
     "#if YYDEBUG",
     "  if (yydebug)",
-    "    fprintf(stderr, \"btyacc[%3d,%2d%s]: reduced, shifting to state %d\\n\",",
+    "    fprintf(stderr, \"btyacc[%3u,%2d%s]: reduced, shifting to state %u\\n\",",
     "            *(yyps->ssp), yydepth, (yytrial ? \",trial\" : \"\"), yystate);",
     "#endif",
     "  if (yyps->ssp >= yyps->ss + yyps->stacksize - 1)",
@@ -907,12 +909,12 @@ char *trailer[] =
     "      yyFreeState(&yyerrctx);",
     "    }",
     "",
-    "    for(pv=yyps->vs; pv<yyps->vsp; pv++)",
+    "    for(pv=yyps->vs; pv<yyps->vsp; ++pv)",
     "    {",
     "      YYDELETEVAL(*pv,2);",
     "    }",
     "",
-    "    for(pp=yyps->ps; pp<yyps->psp; pp++)",
+    "    for(pp=yyps->ps; pp<yyps->psp; ++pp)",
     "    {",
     "      YYDELETEPOSN(*pp,2);",
     "    }",
@@ -972,9 +974,9 @@ char *trailer[] =
     "      yyExpand();",
     "    *yylexp = yylex();",
     "    *yylvp++ = yylval;",
-    "    yylve++;",
+    "    ++yylve;",
     "    *yylpp++ = yyposn;",
-    "    yylpe++;",
+    "    ++yylpe;",
     "    return *yylexp++;",
     "  }",
     "  else",
@@ -1027,7 +1029,7 @@ char *trailer[] =
     "static void yySCopy(YYSTYPE *to, YYSTYPE *from, int size)",
     "{",
     "  int i;",
-    "  for (i = size-1; i >= 0; i--)",
+    "  for (i = size-1; i >= 0; --i)",
     "  {",
     "    to[i] = from[i];",
     "  }",
@@ -1036,7 +1038,7 @@ char *trailer[] =
     "static void yyPCopy(YYPOSN *to, YYPOSN *from, int size)",
     "{",
     "  int i;",
-    "  for (i = size-1; i >= 0; i--)",
+    "  for (i = size-1; i >= 0; --i)",
     "  {",
     "    to[i] = from[i];",
     "  }",
