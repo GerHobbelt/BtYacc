@@ -9,10 +9,12 @@
 #include <stdlib.h>
 #if defined(__MSDOS__) || defined(WIN32) || defined(__WIN32)
 #include <io.h> /* mktemp() */
+#undef HAVE_MKSTEMP
 #else
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#define HAVE_MKSTEMP 1
 #endif
 
 char dflag = 0;
@@ -233,7 +235,7 @@ static void getargs(int argc, char **argv)
 	      *++ps = NULL;
 	    }
 	    continue;
-	      
+
 	case 'E':
 	    Eflag = 1;
 	    break;
@@ -312,9 +314,9 @@ no_more_options:;
 	if (!file_prefix) no_space();
 
 	if ((s = strrchr(file_prefix, '.')))
-	  *s = 0; 
+	  *s = 0;
       } else {
-	file_prefix = "y"; 
+	file_prefix = "y";
       }
     }
 }
@@ -326,7 +328,7 @@ char *allocate(unsigned n)
     p = NULL;
     if (n)
     {
-        /* VM: add a few bytes here, cause 
+        /* VM: add a few bytes here, cause
          * Linux calloc does not like sizes like 32768 */
 	p = CALLOC(1, n+10);
 	if (!p) no_space();
@@ -336,9 +338,10 @@ char *allocate(unsigned n)
 
 static FILE* create_temporary_file(char* template)
 {
+#if defined(HAVE_MKSTEMP)
     int descriptor = mkstemp(template);
 
-    if (mkstemp(template) == -1)
+    if (descriptor == -1)
     {
        perror("btyacc: Cannot create temporary file");
        (void) fprintf(stderr, "name template: %s\n", template);
@@ -358,6 +361,18 @@ static FILE* create_temporary_file(char* template)
           done(EXIT_FAILURE);
        }
     }
+#else
+    char *fn = mktemp(template);
+    FILE *fh = (fn ? fopen(fn, "w") : NULL);
+
+    if (!fh)
+    {
+       perror("btyacc: Cannot create temporary file");
+       (void) fprintf(stderr, "name template: %s\n", template);
+       done(EXIT_FAILURE);
+    }
+    return fh;
+#endif
 }
 
 static char const TEMPORARY_DIR_ENV_VAR[] = "TMPDIR";
@@ -394,7 +409,7 @@ static void create_union_file(void)
     union_file = create_temporary_file(union_file_name);
 }
 
-static void create_files(void)
+void create_files(void)
 {
     size_t i, len;
     char* tmpdir = getenv(TEMPORARY_DIR_ENV_VAR);
@@ -486,12 +501,12 @@ static void open_input_files(void)
 }
 
 
-static void open_output_files(void)
+void open_output_files(void)
 {
 	/* do this only once, first time is on demand, i.e. as late as possible */
 	if (!action_file && !text_file && !verbose_file && !defines_file && !output_file && !code_file)
 	{
-		create_file_names();
+		create_files();
 
 		if (vflag)
 		{

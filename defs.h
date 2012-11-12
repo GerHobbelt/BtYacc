@@ -1,8 +1,8 @@
 #ifndef __YACC_DEFS_H__
 #define __YACC_DEFS_H__
 
-           
-           
+
+
 /* [i_a] */
 #ifndef HAS_MSVC_2005_ISO_RTL
 #if defined(_MSC_VER)
@@ -461,6 +461,8 @@ void BtYacc_stop_test(void);
 #endif
 
 char *allocate(unsigned);
+void create_files(void);
+void open_output_files(void);
 int main(int, char **);
 
 /* mkpar.c */
