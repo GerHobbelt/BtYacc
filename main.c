@@ -186,7 +186,20 @@ static void getargs(int argc, char **argv)
     register size_t i;
     register char *s;
 
-    if (argc > 0) myname = argv[0];
+    if (argc > 0) {
+    	char *ds1, *ds2;
+        myname = argv[0];
+        // skip MSDOS and UNIX path elements: executable NAME only!
+        ds1 = strrchr(myname, ':');
+        if (!ds1) ds1 = myname; else ++ds1;
+        ds2 = strrchr(ds1, '/');
+        if (!ds2) ds2 = ds1; else ++ds2;
+       	ds1 = strrchr(ds2, '\\');
+        if (!ds1) ds1 = ds2; else ++ds1;
+        myname = ds1;
+        ds1 = strrchr(myname, '.');
+        if (ds1) *ds1 = 0; // nuke '.exe' or similar filename extension
+    }
     for (i = 1; i < argc; ++i)
     {
 	s = argv[i];
