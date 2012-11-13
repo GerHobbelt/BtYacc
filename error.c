@@ -7,6 +7,7 @@
 #endif
 
 #include "defs.h"
+#include "write.h"
 #include <stdarg.h>
 
 extern FILE *inc_file;
@@ -86,16 +87,6 @@ void unexpected_EOF()
 }
 
 
-static void BtYacc_putc(char c)
-{
-    if (putc(c, stderr) == EOF)
-    {
-       perror("BtYacc_putc");
-       abort();
-    }
-}
-
-
 void print_pos(char const * st_line, char const * st_cptr)
 {
     register char const * s;
@@ -104,23 +95,23 @@ void print_pos(char const * st_line, char const * st_cptr)
     for (s = st_line; *s != '\n'; ++s)
     {
 	if (isprint(*s) || *s == '\t')
-	   BtYacc_putc(*s);
+	   BtYacc_putc(*s, verbose_file);
 	else
-	   BtYacc_putc('?');
+	   BtYacc_putc('?', verbose_file);
     }
 
-    BtYacc_putc('\n');
+    BtYacc_putc('\n', verbose_file);
 
     for (s = st_line; s < st_cptr; ++s)
     {
 	if (*s == '\t')
-	   BtYacc_putc('\t');
+	   BtYacc_putc('\t', verbose_file);
 	else
-	   BtYacc_putc(' ');
+	   BtYacc_putc(' ', verbose_file);
     }
 
-    BtYacc_putc('^');
-    BtYacc_putc('\n');
+    BtYacc_putc('^', verbose_file);
+    BtYacc_putc('\n', verbose_file);
 }
 
 int unsigned read_errs = 0;

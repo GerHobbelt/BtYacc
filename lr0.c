@@ -539,7 +539,8 @@ void free_derives()
 
 static void set_nullable(void)
 {
-    register size_t i, j;
+    register size_t i;
+    register Yshort j;
     register int empty;
     int done;
 
@@ -547,7 +548,7 @@ static void set_nullable(void)
     if (nullable == 0) no_space();
 
     for (i = 0; i < nsyms; ++i)
-	nullable[i] = 0;
+		nullable[i] = 0;
 
     done = 0;
     while (!done)

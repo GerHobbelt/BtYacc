@@ -16,18 +16,19 @@ static char const * * ap_end;
 static void add_ptr(char const * const p)
 {
     if (ap == ap_end) {
-	size_t size = CHUNK;
-	char const * * nap;
+		size_t size = CHUNK;
+		char * * nap;
 
-	while ((ap-ap_start) * sizeof(char *) >= size)
-	    size = size * 2;
-	if (!(nap = malloc(size)))
-	    no_space();
-	if (ap > ap_start)
-	    memcpy(nap, ap_start, (ap-ap_start) * sizeof(char *));
-	ap = nap + (ap - ap_start); 
-	ap_start = nap;
-	ap_end = nap + size/sizeof(char *); }
+		while ((ap - ap_start) * sizeof(*nap) >= size)
+			size = size * 2;
+		if (!(nap = (char **)malloc(size)))
+			no_space();
+		if (ap > ap_start)
+			memcpy(nap, ap_start, (ap-ap_start) * sizeof(*nap));
+		ap = nap + (ap - ap_start); 
+		ap_start = nap;
+		ap_end = nap + size/sizeof(*nap); 
+	}
     *ap++ = p;
 }
 
@@ -36,10 +37,11 @@ static void add_string(char const * s)
     size_t len = strlen(s) + 1;
 
     if (len > cp_end - cp) {
-	size_t size = len > CHUNK ? len : CHUNK;
-	if (!(cp = malloc(size)))
-	    no_space();
-	cp_end = cp + size; }
+		size_t size = len > CHUNK ? len : CHUNK;
+		if (!(cp = malloc(size)))
+			no_space();
+		cp_end = cp + size; 
+	}
     memcpy(cp, s, len);
     add_ptr(cp);
     cp += len;

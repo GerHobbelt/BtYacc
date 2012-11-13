@@ -46,7 +46,7 @@ bucket* make_bucket(char const * name)
     bp->value = UNDEFINED;
     bp->index = 0;
     bp->prec = 0;
-    bp->class = UNKNOWN;
+    bp->classc = UNKNOWN;
     bp->assoc = TOKEN;
     bp->args = -1;
     bp->argnames = 0;
@@ -94,7 +94,7 @@ void create_symbol_table()
 
     bp = make_bucket("error");
     bp->index = 1;
-    bp->class = TERM;
+    bp->classc = TERM;
 
     first_symbol = bp;
     last_symbol = bp;

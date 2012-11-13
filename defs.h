@@ -203,7 +203,7 @@ struct bucket
     Yshort value;
     Yshort index;
     Yshort prec;
-    char class;
+    char classc;
     char assoc;
 };
 

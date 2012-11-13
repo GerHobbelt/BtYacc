@@ -3,9 +3,9 @@
 */
 
 #include "defs.h"
-char *banner[] =
+char const * const banner[] =
 {
-    "#line 2 \"p:\\prj\\3actual\\btyacc\\push.skel\"",
+    "#line 2 \"D:\\h\\prj\\1original\\visyond\\visygit\\util\\btyacc\\push.skel\"",
     "/*",
     "**    \"@(#)push.skel, based on byacc 1.8 (Berkeley) 01/20/91\";",
     "*/",
@@ -44,9 +44,9 @@ char *banner[] =
     0
 };
 
-char *header[] =
+char const * const header[] =
 {
-    "#line 38 \"p:\\prj\\3actual\\btyacc\\push.skel\"",
+    "#line 38 \"D:\\h\\prj\\1original\\visyond\\visygit\\util\\btyacc\\push.skel\"",
     "#define yyclearin (yychar=(-1))",
     "#define yyerrok (yyerrflag=0)",
     "/*",
@@ -152,9 +152,9 @@ char *header[] =
     0
 };
 
-char *body[] =
+char const * const body[] =
 {
-    "#line 141 \"p:\\prj\\3actual\\btyacc\\push.skel\"",
+    "#line 141 \"D:\\h\\prj\\1original\\visyond\\visygit\\util\\btyacc\\push.skel\"",
     "",
     "#ifndef YYNEWSTATE",
     "#ifdef __oldc",
@@ -565,9 +565,9 @@ char *body[] =
     0
 };
 
-char *trailer[] =
+char const * const trailer[] =
 {
-    "#line 549 \"p:\\prj\\3actual\\btyacc\\push.skel\"",
+    "#line 549 \"D:\\h\\prj\\1original\\visyond\\visygit\\util\\btyacc\\push.skel\"",
     "",
     "    }",
     "",
