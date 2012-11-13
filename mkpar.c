@@ -6,8 +6,8 @@
 #include "log.h"
 
 action **parser;
-int unsigned SRtotal;
-int unsigned RRtotal;
+int SRtotal;
+int RRtotal;
 Yshort *SRconflicts;
 Yshort *RRconflicts;
 Yshort *defred;
@@ -15,13 +15,12 @@ Yshort *rules_used;
 Yshort nunused;
 Yshort final_state;
 
-static int unsigned SRcount;
-static int unsigned RRcount;
+static int SRcount;
+static int RRcount;
 
 static void find_final_state(void)
 {
-    register int goal;
-    register size_t i;
+    register int goal, i;
     register Yshort *to_state;
     register shifts *p;
 
@@ -37,7 +36,7 @@ static void find_final_state(void)
 
 static void unused_rules(void)
 {
-    register size_t i;
+    register int i;
     register action *p;
 
     rules_used = (Yshort *) MALLOC(nrules*sizeof(Yshort));
@@ -70,7 +69,7 @@ static void unused_rules(void)
 
 static void remove_conflicts(void)
 {
-    register size_t i;
+    register int i;
     register int symbol;
     register action *p, *pref;
 
@@ -146,7 +145,7 @@ static void total_conflicts(void)
 
 static void defreds(void)
 {
-    register int unsigned i;
+    register int i;
 
     defred = NEW2(nstates, Yshort);
     for (i = 0; i < nstates; ++i)
@@ -155,7 +154,7 @@ static void defreds(void)
 
 void make_parser()
 {
-    register int unsigned i;
+    register int i;
 
     parser = NEW2(nstates, action *);
     for (i = 0; i < nstates; ++i)
@@ -168,7 +167,7 @@ void make_parser()
     defreds();
 }
 
-action* parse_actions(int unsigned stateno)
+action *parse_actions(int stateno)
 {
     register action *actions;
 
@@ -177,12 +176,12 @@ action* parse_actions(int unsigned stateno)
     return (actions);
 }
 
-action* get_shifts(int unsigned stateno)
+action *get_shifts(int stateno)
 {
     register action *actions, *temp;
     register shifts *sp;
     register Yshort *to_state;
-    register size_t i, k;
+    register int i, k;
     register int symbol;
 
     actions = 0;
@@ -211,9 +210,9 @@ action* get_shifts(int unsigned stateno)
     return (actions);
 }
 
-action* add_reductions(int unsigned stateno, action* actions)
+action *add_reductions(int stateno, action *actions)
 {
-    register size_t i, j, m, n;
+    register int i, j, m, n;
     register int ruleno, tokensetsize;
     register unsigned *rowp;
 
@@ -233,7 +232,7 @@ action* add_reductions(int unsigned stateno, action* actions)
     return (actions);
 }
 
-action* add_reduce(action* actions, int unsigned ruleno, int symbol)
+action *add_reduce(action *actions, int ruleno, int symbol)
 {
     register action *temp, *prev, *next;
 
@@ -271,9 +270,9 @@ action* add_reduce(action* actions, int unsigned ruleno, int symbol)
 }
 
 
-int unsigned sole_reduction(int unsigned stateno)
+int sole_reduction(int stateno)
 {
-    register int unsigned count, ruleno;
+    register int count, ruleno;
     register action *p;
 
     count = 0;
@@ -311,7 +310,7 @@ void free_action_row(action *p)
 
 void free_parser()
 {
-  register size_t i;
+  register int i;
 
   for (i = 0; i < nstates; ++i)
     free_action_row(parser[i]);

@@ -12,7 +12,7 @@ extern Yshort *itemset;
 extern Yshort *itemsetend;
 extern unsigned *ruleset;
 
-int unsigned nstates;
+int nstates;
 core *first_state;
 shifts *first_shift;
 reductions *first_reduction;
@@ -39,7 +39,7 @@ static void allocate_itemsets(void)
     register Yshort *itemp;
     register Yshort *item_end;
     register int symbol;
-    register size_t i;
+    register int i;
     register int count;
     register int max;
     register Yshort *symbol_count;
@@ -89,7 +89,7 @@ static void allocate_storage(void)
 
 static core* new_state(int symbol)
 {
-    register size_t n;
+    register int n;
     register core *p;
     register Yshort *isp1;
     register Yshort *isp2;
@@ -132,7 +132,7 @@ static int get_state(int symbol)
     register Yshort *iend;
     register core *sp;
     register int found;
-    register size_t n;
+    register int n;
 
 #ifdef	TRACE
     BtYacc_logf("Entering get_state(%d)\n", symbol);
@@ -188,8 +188,8 @@ static int get_state(int symbol)
 
 static void append_states(void)
 {
-    register size_t i;
-    register size_t j;
+    register int i;
+    register int j;
     register int symbol;
 
 #ifdef	TRACE
@@ -229,7 +229,7 @@ static void free_storage(void)
 
 static void initialize_states(void)
 {
-    register size_t i;
+    register int i;
     register Yshort *start_derives;
     register core *p;
 
@@ -256,7 +256,7 @@ static void initialize_states(void)
 
 static void new_itemsets(void)
 {
-    register size_t i;
+    register int i;
     register int shiftcount;
     register Yshort *isp;
     register Yshort *ksp;
@@ -403,20 +403,20 @@ static void generate_states(void)
 void show_cores()
 {
     core *p;
-    int unsigned i, j, k, n;
-    int unsigned itemno;
+    int i, j, k, n;
+    int itemno;
 
     k = 0;
     for (p = first_state; p; ++k, p = p->next)
     {
 	if (k) printf("\n");
-	printf("state %u, number = %d, accessing symbol = %s\n",
+	printf("state %d, number = %d, accessing symbol = %s\n",
 		k, p->number, symbol_name[p->accessing_symbol]);
 	n = p->nitems;
 	for (i = 0; i < n; ++i)
 	{
 	    itemno = p->items[i];
-	    printf("%4u  ", itemno);
+	    printf("%4d  ", itemno);
 	    j = itemno;
 	    while (ritem[j] >= 0) ++j;
 	    printf("%s :", symbol_name[rlhs[-ritem[j]]]);
@@ -437,20 +437,20 @@ void show_cores()
 
 void show_ritems()
 {
-    int unsigned i;
+    int i;
 
     for (i = 0; i < nitems; ++i)
-	printf("ritem[%u] = %d\n", i, ritem[i]);
+	printf("ritem[%d] = %d\n", i, ritem[i]);
 }
 
 
 /* show_rrhs is used for debugging */
 void show_rrhs()
 {
-    int unsigned i;
+    int i;
 
     for (i = 0; i < nrules; ++i)
-	printf("rrhs[%u] = %d\n", i, rrhs[i]);
+	printf("rrhs[%d] = %d\n", i, rrhs[i]);
 }
 
 
@@ -459,13 +459,13 @@ void show_rrhs()
 void show_shifts()
 {
     shifts *p;
-    int unsigned i, j, k;
+    int i, j, k;
 
     k = 0;
     for (p = first_shift; p; ++k, p = p->next)
     {
 	if (k) printf("\n");
-	printf("shift %u, number = %d, nshifts = %d\n", k, p->number,
+	printf("shift %d, number = %d, nshifts = %d\n", k, p->number,
 		p->nshifts);
 	j = p->nshifts;
 	for (i = 0; i < j; ++i)
@@ -477,7 +477,7 @@ void show_shifts()
 #ifdef	DEBUG
 static void print_derives(void)
 {
-    register size_t i;
+    register int i;
     register Yshort *sp;
 
     printf("\nDERIVES\n\n");
@@ -500,8 +500,8 @@ static void print_derives(void)
 
 static void set_derives(void)
 {
-    register size_t i, k;
-    register size_t lhs;
+    register int i, k;
+    register int lhs;
     register Yshort *rules;
 
     derives = NEW2(nsyms, Yshort *);
@@ -539,8 +539,7 @@ void free_derives()
 
 static void set_nullable(void)
 {
-    register size_t i;
-    register Yshort j;
+    register int i, j;
     register int empty;
     int done;
 

@@ -36,7 +36,7 @@ char *myname = "yacc";
 #endif
 static char const temp_form[] = "yacc_t_XXXXXX";
 
-int unsigned lineno = 0;
+int lineno = 0;
 int outline = 0;
 
 char *action_file_name = NULL;
@@ -61,11 +61,11 @@ FILE *union_file = NULL;	/*  a temp file, used to save the union		    */
 			/*  defined					    */
 FILE *verbose_file = NULL;	/*  y.output					    */
 
-int unsigned nitems = 0;
-int unsigned nrules = 0;
-int unsigned nsyms = 0;
-int unsigned ntokens = 0;
-int unsigned nvars = 0;
+int nitems = 0;
+int nrules = 0;
+int nsyms = 0;
+int ntokens = 0;
+int nvars = 0;
 
 int   start_symbol = 0;
 char  **symbol_name = NULL;
@@ -183,7 +183,7 @@ static SPLINT_NO_RETURN void usage(void)
 
 static void getargs(int argc, char **argv)
 {
-    register size_t i;
+    register int i;
     register char *s;
 
     if (argc > 0) {

@@ -16,7 +16,7 @@ static char const * * ap_end;
 static void add_ptr(char const * const p)
 {
     if (ap == ap_end) {
-		size_t size = CHUNK;
+		int size = CHUNK;
 		char * * nap;
 
 		while ((ap - ap_start) * sizeof(*nap) >= size)
@@ -34,10 +34,10 @@ static void add_ptr(char const * const p)
 
 static void add_string(char const * s)
 {
-    size_t len = strlen(s) + 1;
+int	len = strlen(s)+1;
 
     if (len > cp_end - cp) {
-		size_t size = len > CHUNK ? len : CHUNK;
+		int size = len > CHUNK ? len : CHUNK;
 		if (!(cp = malloc(size)))
 			no_space();
 		cp_end = cp + size; 
@@ -72,8 +72,8 @@ void read_skel(char const * name)
 {
 char	buf[256];
 int	section = -2;
-size_t	line = 0, sline = 1, eline = 1;
-size_t	i;
+int	line = 0, sline = 1, eline = 1;
+int	i;
 FILE	*fp;
 
     if (!(fp = fopen(name, "r")))
@@ -111,7 +111,7 @@ FILE	*fp;
 		  section = i; 
 	    }
 	    if (section >= 0)
-	      add_fmt("#line %u \"%s\"", line+1, name);
+	      add_fmt("#line %d \"%s\"", line+1, name);
 	    else if (*p)
 	      error(0, buf, p, "line %d of \"%s\", bad section name",
 		    line, name); 

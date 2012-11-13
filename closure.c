@@ -35,7 +35,7 @@ static void print_closure(int n)
 
 static void print_EFF(void)
 {
-    register size_t i, j;
+    register int i, j;
     register unsigned *rowp;
     register unsigned word;
     register unsigned mask;
@@ -67,8 +67,8 @@ static void print_EFF(void)
 
 static void print_first_derives(void)
 {
-  register size_t i;
-  register size_t j;
+  register int i;
+  register int j;
   register unsigned *rp;
   register unsigned cword;
   register unsigned mask;
@@ -85,7 +85,7 @@ static void print_first_derives(void)
       for (j = 0; j <= nrules; ++j)
         {
 	  if (cword & mask)
-	    printf("   %u\n", j);
+	    printf("   %d\n", j);
 
 	  mask <<= 1;
 	  if (mask == 0)
@@ -107,9 +107,9 @@ static void set_EFF(void)
     register unsigned *row;
     register int symbol;
     register Yshort *sp;
-    register size_t rowsize;
+    register int rowsize;
     register int i;
-    register size_t rule;
+    register int rule;
 
     rowsize = WORDSIZE(nvars);
     EFF = NEW2(nvars * rowsize, unsigned);
@@ -143,15 +143,15 @@ void set_first_derives()
 {
   register unsigned *rrow;
   register unsigned *vrow;
-  register size_t j;
+  register int j;
   register unsigned mask;
   register unsigned cword;
   register Yshort *rp;
 
   int rule;
   int i;
-  size_t rulesetsize;
-  size_t varsetsize;
+  int rulesetsize;
+  int varsetsize;
 
   rulesetsize = WORDSIZE(nrules);
   varsetsize = WORDSIZE(nvars);
@@ -200,13 +200,13 @@ void set_first_derives()
 
 void closure(Yshort* nucleus, int n)
 {
-    register size_t ruleno;
+    register int ruleno;
     register unsigned word;
     register unsigned mask;
     register Yshort *csp;
     register unsigned *dsp;
     register unsigned *rsp;
-    register size_t rulesetsize;
+    register int rulesetsize;
 
     Yshort *csend;
     unsigned *rsend;

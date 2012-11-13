@@ -48,7 +48,7 @@ void BtYacc_putc(char c, FILE *f)
 
 void verbose(void)
 {
-    register int unsigned i;
+    register int i;
 
     if (!vflag) return;
 
@@ -66,14 +66,14 @@ void verbose(void)
     if (SRtotal || RRtotal)
 	log_conflicts();
 
-    BtYacc_printf(verbose_file, "\n\n%u terminals, %u nonterminals\n%u grammar rules, %u states\n",
+    BtYacc_printf(verbose_file, "\n\n%d terminals, %d nonterminals\n%d grammar rules, %d states\n",
                   ntokens, nvars, nrules - 2, nstates);
 }
 
 
 void log_unused(void)
 {
-    register size_t i;
+    register int i;
     register Yshort *p;
 
     BtYacc_puts("\n\nRules never reduced:\n", verbose_file);
@@ -95,7 +95,7 @@ void log_unused(void)
 
 void log_conflicts(void)
 {
-    register size_t i;
+    register int i;
 
     BtYacc_puts("\n\n", verbose_file);
 
@@ -124,7 +124,7 @@ void log_conflicts(void)
 }
 
 
-void print_state(int unsigned state)
+void print_state(int state)
 {
     if (state)
 	BtYacc_puts("\n\n", verbose_file);
@@ -139,7 +139,7 @@ void print_state(int unsigned state)
 }
 
 
-void print_conflicts(int unsigned state)
+void print_conflicts(int state)
 {
     register int symbol, act, number;
     register action *p;
@@ -184,11 +184,11 @@ void print_conflicts(int unsigned state)
 }
 
 
-void print_core(int unsigned state)
+void print_core(int state)
 {
-    register size_t i;
+    register int i;
     register int k;
-    register size_t rule;
+    register int rule;
     register core *statep;
     register Yshort *sp;
     register Yshort *sp1;
@@ -220,10 +220,10 @@ void print_core(int unsigned state)
 }
 
 
-void print_nulls(int unsigned state)
+void print_nulls(int state)
 {
     register action *p;
-    register size_t i, j, k, nnulls;
+    register int i, j, k, nnulls;
 
     nnulls = 0;
     for (p = parser[state]; p; p = p->next)
@@ -264,7 +264,7 @@ void print_nulls(int unsigned state)
 }
 
 
-void print_actions(int unsigned stateno)
+void print_actions(int stateno)
 {
     register action *p;
     register shifts *sp;
@@ -352,7 +352,7 @@ void print_reductions(action const * p, int defred)
 
 void print_gotos(int stateno)
 {
-    register size_t i, k;
+    register int i, k;
     register int as;
     register Yshort *to_state;
     register shifts *sp;
