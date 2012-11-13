@@ -400,6 +400,8 @@ void closure(Yshort *, int);
 void finalize_closure(void);
 
 /* error.c */
+extern int read_errs;
+
 SPLINT_NO_RETURN void fatal(char const * msg) GCC_NO_RETURN;
 SPLINT_NO_RETURN void no_space(void) GCC_NO_RETURN;
 SPLINT_NO_RETURN void open_error(char const * filename) GCC_NO_RETURN;

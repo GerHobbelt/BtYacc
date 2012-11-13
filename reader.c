@@ -2112,8 +2112,6 @@ void print_grammar(void)
 	BtYacc_putc('\n', f); }
 }
 
-extern unsigned int read_errs;
-
 void reader(void) {
   create_symbol_table();
   read_declarations();
