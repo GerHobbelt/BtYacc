@@ -1,5 +1,5 @@
-/* 
- * routines for printing error messages  
+/*
+ * routines for printing error messages
  */
 
 #ifdef BTYACC_BUILD_USE_CONFIGURATION_HEADER
@@ -94,20 +94,20 @@ void print_pos(char const * st_line, char const * st_cptr)
     if (st_line == 0) return;
     for (s = st_line; *s != '\n'; ++s)
     {
-	if (isprint(*s) || *s == '\t')
-	   BtYacc_putc(*s, verbose_file);
-	else
-	   BtYacc_putc('?', verbose_file);
+        if (isprint(*s) || *s == '\t')
+           BtYacc_putc(*s, verbose_file);
+        else
+           BtYacc_putc('?', verbose_file);
     }
 
     BtYacc_putc('\n', verbose_file);
 
     for (s = st_line; s < st_cptr; ++s)
     {
-	if (*s == '\t')
-	   BtYacc_putc('\t', verbose_file);
-	else
-	   BtYacc_putc(' ', verbose_file);
+        if (*s == '\t')
+           BtYacc_putc('\t', verbose_file);
+        else
+           BtYacc_putc(' ', verbose_file);
     }
 
     BtYacc_putc('^', verbose_file);
@@ -153,55 +153,55 @@ void error(int unsigned lineno, char const * line, char const * cptr, char const
   ++read_errs;
 }
 
-void unsupported_feature(int unsigned lineno, char const * line, char const * cptr) { 
-  error(lineno, line, cptr, "unsupported feature: %%%s", cptr); 
+void unsupported_feature(int unsigned lineno, char const * line, char const * cptr) {
+  error(lineno, line, cptr, "unsupported feature: %%%s", cptr);
   exit(1);
 }
 
 void syntax_error(int unsigned lineno, char const * line, char const * cptr) {
-  error(lineno, line, cptr, "syntax error"); 
+  error(lineno, line, cptr, "syntax error");
   exit(1);
 }
 
 void unterminated_comment(int unsigned lineno, char const * line, char const * cptr) {
-  error(lineno, line, cptr, "unmatched /*"); 
+  error(lineno, line, cptr, "unmatched /*");
   exit(1);
 }
 
 void unterminated_string(int unsigned lineno, char const * line, char const * cptr) {
-  error(lineno, line, cptr, "unterminated string"); 
+  error(lineno, line, cptr, "unterminated string");
   exit(1);
 }
 
 void unterminated_text(int unsigned lineno, char const * line, char const * cptr) {
-  error(lineno, line, cptr, "unmatched %%{"); 
+  error(lineno, line, cptr, "unmatched %%{");
   exit(1);
 }
 
 void unterminated_union(int unsigned lineno, char const * line, char const * cptr) {
-  error(lineno, line, cptr, "unterminated %%union"); 
+  error(lineno, line, cptr, "unterminated %%union");
   exit(1);
 }
 
 void over_unionized(char const * cptr) {
-  error(lineno, line, cptr, "too many %%union declarations"); 
+  error(lineno, line, cptr, "too many %%union declarations");
   exit(1);
 }
 
 void illegal_tag(int unsigned lineno, char const * line, char const * cptr) {
-  error(lineno, line, cptr, "illegal tag"); 
+  error(lineno, line, cptr, "illegal tag");
 }
 
 void illegal_character(char const * cptr) {
-  error(lineno, line, cptr, "illegal character"); 
+  error(lineno, line, cptr, "illegal character");
 }
 
 void used_reserved(char const * s) {
-  error(lineno, 0, 0, "illegal use of reserved symbol %s", s); 
+  error(lineno, 0, 0, "illegal use of reserved symbol %s", s);
 }
 
 void tokenized_start(char const * s) {
-  error(lineno, 0, 0, "the start symbol %s cannot be declared to be a token", s); 
+  error(lineno, 0, 0, "the start symbol %s cannot be declared to be a token", s);
 }
 
 void retyped_warning(char const * s) {
@@ -217,35 +217,35 @@ void revalued_warning(char const * s) {
 }
 
 void terminal_start(char const * s) {
-  error(lineno, 0, 0, "the start symbol %s is a token", s); 
+  error(lineno, 0, 0, "the start symbol %s is a token", s);
 }
 
 void restarted_warning() {
   FileError("the start symbol has been redeclared");
 }
 
-void no_grammar() { 
-  error(lineno, 0, 0, "no grammar has been specified"); 
+void no_grammar() {
+  error(lineno, 0, 0, "no grammar has been specified");
 }
 
-void terminal_lhs(int lineno) { 
-  error(lineno, 0, 0, "a token appears on the lhs of a production"); 
+void terminal_lhs(int lineno) {
+  error(lineno, 0, 0, "a token appears on the lhs of a production");
 }
 
-void prec_redeclared() { 
-  error(lineno, 0, 0, "conflicting %%prec specifiers"); 
+void prec_redeclared() {
+  error(lineno, 0, 0, "conflicting %%prec specifiers");
 }
 
 void unterminated_action(int unsigned lineno, char const * line, char const * cptr) {
-  error(lineno, line, cptr, "unterminated action"); 
+  error(lineno, line, cptr, "unterminated action");
 }
 
 void unterminated_arglist(int unsigned lineno, char const * line, char const * cptr) {
-  error(lineno, line, cptr, "unterminated argument list"); 
+  error(lineno, line, cptr, "unterminated argument list");
 }
 
-void bad_formals() { 
-  error(lineno, 0, 0, "bad formal argument list"); 
+void bad_formals() {
+  error(lineno, 0, 0, "bad formal argument list");
 }
 
 void dollar_warning(int a_lineno, int i) {
@@ -256,19 +256,19 @@ void dollar_warning(int a_lineno, int i) {
 }
 
 void dollar_error(int unsigned lineno, char const * line, char const * cptr) {
-  error(lineno, line, cptr, "illegal $-name"); 
+  error(lineno, line, cptr, "illegal $-name");
 }
 
-void untyped_lhs() { 
-  error(lineno, 0, 0, "$$ is untyped"); 
+void untyped_lhs() {
+  error(lineno, 0, 0, "$$ is untyped");
 }
 
 void untyped_rhs(int i, char const * s) {
-  error(lineno, 0, 0, "$%d (%s) is untyped", i, s); 
+  error(lineno, 0, 0, "$%d (%s) is untyped", i, s);
 }
 
-void unknown_rhs(int i) { 
-  error(lineno, 0, 0, "$%d is untyped (out of range)", i); 
+void unknown_rhs(int i) {
+  error(lineno, 0, 0, "$%d is untyped (out of range)", i);
 }
 
 void default_action_warning() {
@@ -276,7 +276,7 @@ void default_action_warning() {
 }
 
 void undefined_goal(char const * s) {
-  error(lineno, 0, 0, "the start symbol %s is undefined", s); 
+  error(lineno, 0, 0, "the start symbol %s is undefined", s);
 }
 
 void undefined_symbol_warning(char const * s) {

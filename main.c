@@ -48,18 +48,18 @@ char *text_file_name = NULL;
 char *union_file_name = NULL;
 char *verbose_file_name = NULL;
 
-FILE *action_file = NULL;	/*  a temp file, used to save actions associated    */
-			/*  with rules until the parser is written	    */
-FILE *code_file = NULL;	/*  y.code.c (used when the -r option is specified) */
-FILE *defines_file = NULL;	/*  y.tab.h					    */
-FILE *input_file = NULL;	/*  the input file				    */
-FILE *output_file = NULL;	/*  y.tab.c					    */
-FILE *text_file = NULL;	/*  a temp file, used to save text until all	    */
-			/*  symbols have been defined			    */
-FILE *union_file = NULL;	/*  a temp file, used to save the union		    */
-			/*  definition until all symbol have been	    */
-			/*  defined					    */
-FILE *verbose_file = NULL;	/*  y.output					    */
+FILE *action_file = NULL;       /*  a temp file, used to save actions associated    */
+                        /*  with rules until the parser is written          */
+FILE *code_file = NULL; /*  y.code.c (used when the -r option is specified) */
+FILE *defines_file = NULL;      /*  y.tab.h                                         */
+FILE *input_file = NULL;        /*  the input file                                  */
+FILE *output_file = NULL;       /*  y.tab.c                                         */
+FILE *text_file = NULL; /*  a temp file, used to save text until all        */
+                        /*  symbols have been defined                       */
+FILE *union_file = NULL;        /*  a temp file, used to save the union             */
+                        /*  definition until all symbol have been           */
+                        /*  defined                                         */
+FILE *verbose_file = NULL;      /*  y.output                                        */
 
 int nitems = 0;
 int nrules = 0;
@@ -168,15 +168,15 @@ static SPLINT_NO_RETURN void usage(void)
 {
   BtYacc_logf("usage: %s [OPTIONS] file\n", myname);
   BtYacc_logf(
-	    "  -b prefix    Change `y' into `prefix' in all output filenames\n"
-	    "  -d           Generate header file `y.tab.h'\n"
-	    "  -DNAME       Define btyacc preprocessor variable NAME\n"
-	    "  -E           Print preprocessed grammar to stdout\n"
-	    "  -l           Do not insert #line directives into generated code\n"
-	    "  -r           Write tables to `y.tab.c', code to `y.code.c'\n"
-	    "  -S x.skel    Select parser skeleton\n"
-	    "  -t           Include debugging code in generated parser\n"
-	    "  -v           Write description of parser to `y.output'\n");
+            "  -b prefix    Change `y' into `prefix' in all output filenames\n"
+            "  -d           Generate header file `y.tab.h'\n"
+            "  -DNAME       Define btyacc preprocessor variable NAME\n"
+            "  -E           Print preprocessed grammar to stdout\n"
+            "  -l           Do not insert #line directives into generated code\n"
+            "  -r           Write tables to `y.tab.c', code to `y.code.c'\n"
+            "  -S x.skel    Select parser skeleton\n"
+            "  -t           Include debugging code in generated parser\n"
+            "  -v           Write description of parser to `y.output'\n");
   exit(1);
 }
 
@@ -187,14 +187,14 @@ static void getargs(int argc, char **argv)
     register char *s;
 
     if (argc > 0) {
-    	char *ds1, *ds2;
+        char *ds1, *ds2;
         myname = argv[0];
         // skip MSDOS and UNIX path elements: executable NAME only!
         ds1 = strrchr(myname, ':');
         if (!ds1) ds1 = myname; else ++ds1;
         ds2 = strrchr(ds1, '/');
         if (!ds2) ds2 = ds1; else ++ds2;
-       	ds1 = strrchr(ds2, '\\');
+        ds1 = strrchr(ds2, '\\');
         if (!ds1) ds1 = ds2; else ++ds1;
         myname = ds1;
         ds1 = strrchr(myname, '.');
@@ -202,117 +202,117 @@ static void getargs(int argc, char **argv)
     }
     for (i = 1; i < argc; ++i)
     {
-	s = argv[i];
-	if (*s != '-') break;
-	switch (*++s)
-	{
-	case '\0':
-	    input_file = stdin;
-	    if (i + 1 < argc) usage();
-	    return;
+        s = argv[i];
+        if (*s != '-') break;
+        switch (*++s)
+        {
+        case '\0':
+            input_file = stdin;
+            if (i + 1 < argc) usage();
+            return;
 
-	case '-':
-	    ++i;
-	    goto no_more_options;
+        case '-':
+            ++i;
+            goto no_more_options;
 
-	case 'b':
-	    if (*++s)
-		 file_prefix = s;
-	    else if (++i < argc)
-		file_prefix = argv[i];
-	    else
-		usage();
-	    continue;
+        case 'b':
+            if (*++s)
+                 file_prefix = s;
+            else if (++i < argc)
+                file_prefix = argv[i];
+            else
+                usage();
+            continue;
 
-	case 'd':
-	    dflag = 1;
-	    break;
+        case 'd':
+            dflag = 1;
+            break;
 
-	case 'D':
-	    /* Find the preprocessor variable */
-	    { char **ps;
-	      char *var_name = s + 1;
-	      extern char *defd_vars[];
+        case 'D':
+            /* Find the preprocessor variable */
+            { char **ps;
+              char *var_name = s + 1;
+              extern char *defd_vars[];
 
-	      for (ps = &defd_vars[0]; *ps; ++ps) {
-		if(strcmp(*ps,var_name)==0) {
-		  error(lineno, 0, 0, "Preprocessor variable %s already defined", var_name);
-		}
-	      }
-	      *ps = MALLOC(strlen(var_name)+1);
+              for (ps = &defd_vars[0]; *ps; ++ps) {
+                if(strcmp(*ps,var_name)==0) {
+                  error(lineno, 0, 0, "Preprocessor variable %s already defined", var_name);
+                }
+              }
+              *ps = MALLOC(strlen(var_name)+1);
 
-	      if (*ps == 0)
-	         no_space();
+              if (*ps == 0)
+                 no_space();
 
-	      strcpy(*ps, var_name);
-	      *++ps = NULL;
-	    }
-	    continue;
+              strcpy(*ps, var_name);
+              *++ps = NULL;
+            }
+            continue;
 
-	case 'E':
-	    Eflag = 1;
-	    break;
+        case 'E':
+            Eflag = 1;
+            break;
 
-	case 'l':
-	    lflag = 1;
-	    break;
+        case 'l':
+            lflag = 1;
+            break;
 
-	case 'r':
-	    rflag = 1;
-	    break;
+        case 'r':
+            rflag = 1;
+            break;
 
-	case 't':
-	    tflag = 1;
-	    break;
+        case 't':
+            tflag = 1;
+            break;
 
-	case 'v':
-	    vflag = 1;
-	    break;
+        case 'v':
+            vflag = 1;
+            break;
 
-	case 'S':
-	    if (*++s)
-			active_section_list = read_skel(s);
-	    else if (++i < argc)
-			active_section_list = read_skel(argv[i]);
-	    else
-			usage();
-	    continue;
+        case 'S':
+            if (*++s)
+                        active_section_list = read_skel(s);
+            else if (++i < argc)
+                        active_section_list = read_skel(argv[i]);
+            else
+                        usage();
+            continue;
 
-	default:
-	    usage();
-	}
+        default:
+            usage();
+        }
 
-	for (;;)
-	{
-	    switch (*++s)
-	    {
-	    case '\0':
-		goto end_of_option;
+        for (;;)
+        {
+            switch (*++s)
+            {
+            case '\0':
+                goto end_of_option;
 
-	    case 'd':
-		dflag = 1;
-		break;
+            case 'd':
+                dflag = 1;
+                break;
 
-	    case 'l':
-		lflag = 1;
-		break;
+            case 'l':
+                lflag = 1;
+                break;
 
-	    case 'r':
-		rflag = 1;
-		break;
+            case 'r':
+                rflag = 1;
+                break;
 
-	    case 't':
-		tflag = 1;
-		break;
+            case 't':
+                tflag = 1;
+                break;
 
-	    case 'v':
-		vflag = 1;
-		break;
+            case 'v':
+                vflag = 1;
+                break;
 
-	    default:
-		usage();
-	    }
-	}
+            default:
+                usage();
+            }
+        }
 end_of_option:;
     }
 
@@ -322,14 +322,14 @@ no_more_options:;
 
     if (!file_prefix) {
       if (input_file_name) {
-	file_prefix = strdup(input_file_name);
+        file_prefix = strdup(input_file_name);
 
-	if (!file_prefix) no_space();
+        if (!file_prefix) no_space();
 
-	if ((s = strrchr(file_prefix, '.')))
-	  *s = 0;
+        if ((s = strrchr(file_prefix, '.')))
+          *s = 0;
       } else {
-	file_prefix = "y";
+        file_prefix = "y";
       }
     }
 }
@@ -343,8 +343,8 @@ char *allocate(unsigned n)
     {
         /* VM: add a few bytes here, cause
          * Linux calloc does not like sizes like 32768 */
-	p = CALLOC(1, n+10);
-	if (!p) no_space();
+        p = CALLOC(1, n+10);
+        if (!p) no_space();
     }
     return (p);
 }
@@ -402,7 +402,7 @@ static void create_union_file(void)
     i = len + (sizeof(temp_form) - 1);
 
     if (len && tmpdir[len - 1] != DIR_CHAR)
-	++i;
+        ++i;
 
     union_file_name = MALLOC(i);
 
@@ -413,8 +413,8 @@ static void create_union_file(void)
 
     if (len && tmpdir[len - 1] != DIR_CHAR)
     {
-	union_file_name[len] = DIR_CHAR;
-	++len;
+        union_file_name[len] = DIR_CHAR;
+        ++len;
     }
 
     strcpy(union_file_name + len, temp_form);
@@ -433,7 +433,7 @@ void create_files(void)
     len = (int)strlen(tmpdir);
     i = len + (int)strlen(temp_form) + 1;
     if (len && tmpdir[len - 1] != DIR_CHAR)
-	++i;
+        ++i;
 
     action_file_name = MALLOC(i);
 
@@ -450,9 +450,9 @@ void create_files(void)
 
     if (len && tmpdir[len - 1] != DIR_CHAR)
     {
-	action_file_name[len] = DIR_CHAR;
-	text_file_name[len] = DIR_CHAR;
-	++len;
+        action_file_name[len] = DIR_CHAR;
+        text_file_name[len] = DIR_CHAR;
+        ++len;
     }
 
     strcpy(action_file_name + len, temp_form);
@@ -468,37 +468,37 @@ void create_files(void)
 
     output_file_name = MALLOC(len + 7);
     if (output_file_name == 0)
-		no_space();
+                no_space();
     strcpy(output_file_name, file_prefix);
     strcpy(output_file_name + len, OUTPUT_SUFFIX);
 
     if (rflag)
     {
-		code_file_name = MALLOC(len + 8);
-		if (code_file_name == 0)
-			no_space();
-		strcpy(code_file_name, file_prefix);
-		strcpy(code_file_name + len, CODE_SUFFIX);
+                code_file_name = MALLOC(len + 8);
+                if (code_file_name == 0)
+                        no_space();
+                strcpy(code_file_name, file_prefix);
+                strcpy(code_file_name + len, CODE_SUFFIX);
     }
     else
-		code_file_name = output_file_name;
+                code_file_name = output_file_name;
 
     if (dflag)
     {
-		defines_file_name = MALLOC(len + 7);
-		if (defines_file_name == 0)
-			no_space();
-		strcpy(defines_file_name, file_prefix);
-		strcpy(defines_file_name + len, DEFINES_SUFFIX);
+                defines_file_name = MALLOC(len + 7);
+                if (defines_file_name == 0)
+                        no_space();
+                strcpy(defines_file_name, file_prefix);
+                strcpy(defines_file_name + len, DEFINES_SUFFIX);
     }
 
     if (vflag)
     {
-		verbose_file_name = MALLOC(len + 8);
-		if (verbose_file_name == 0)
-			no_space();
-		strcpy(verbose_file_name, file_prefix);
-		strcpy(verbose_file_name + len, VERBOSE_SUFFIX);
+                verbose_file_name = MALLOC(len + 8);
+                if (verbose_file_name == 0)
+                        no_space();
+                strcpy(verbose_file_name, file_prefix);
+                strcpy(verbose_file_name + len, VERBOSE_SUFFIX);
     }
 }
 
@@ -507,51 +507,51 @@ static void open_input_files(void)
 {
     if (input_file == 0)
     {
-		input_file = fopen(input_file_name, "r");
-		if (input_file == 0)
-			open_error(input_file_name);
+                input_file = fopen(input_file_name, "r");
+                if (input_file == 0)
+                        open_error(input_file_name);
     }
 }
 
 
 void open_output_files(void)
 {
-	/* do this only once, first time is on demand, i.e. as late as possible */
-	if (!action_file && !text_file && !verbose_file && !defines_file && !output_file && !code_file)
-	{
-		create_files();
+        /* do this only once, first time is on demand, i.e. as late as possible */
+        if (!action_file && !text_file && !verbose_file && !defines_file && !output_file && !code_file)
+        {
+                create_files();
 
-		if (vflag)
-		{
-			verbose_file = fopen(verbose_file_name, "w");
-			if (verbose_file == 0)
-				open_error(verbose_file_name);
-		}
+                if (vflag)
+                {
+                        verbose_file = fopen(verbose_file_name, "w");
+                        if (verbose_file == 0)
+                                open_error(verbose_file_name);
+                }
 
-		if (dflag)
-		{
-			defines_file = fopen(defines_file_name, "w");
-			if (defines_file == 0)
-				open_error(defines_file_name);
+                if (dflag)
+                {
+                        defines_file = fopen(defines_file_name, "w");
+                        if (defines_file == 0)
+                                open_error(defines_file_name);
 
-			create_union_file();
-		}
+                        create_union_file();
+                }
 
-		output_file = fopen(output_file_name, "w");
-		if (output_file == 0)
-		open_error(output_file_name);
+                output_file = fopen(output_file_name, "w");
+                if (output_file == 0)
+                open_error(output_file_name);
 
-		if (rflag)
-		{
-			code_file = fopen(code_file_name, "w");
-			if (code_file == 0)
-				open_error(code_file_name);
-		}
-		else
-			code_file = output_file;
+                if (rflag)
+                {
+                        code_file = fopen(code_file_name, "w");
+                        if (code_file == 0)
+                                open_error(code_file_name);
+                }
+                else
+                        code_file = output_file;
 
-		write_section("banner");
-	}
+                write_section("banner");
+        }
 }
 
 
@@ -563,7 +563,7 @@ int main(int argc, char **argv)
     signal_setup();
 #endif
 
-	active_section_list = section_list_btyaccpa;
+        active_section_list = section_list_btyaccpa;
     getargs(argc, argv);
     BTYACC_INTERRUPTION_CHECK();
     open_input_files();

@@ -37,22 +37,22 @@
 #include <stdio.h>
 
 
-/*  machine-dependent definitions			*/
-/*  the following definitions are for the Tahoe		*/
-/*  they might have to be changed for other machines	*/
+/*  machine-dependent definitions                       */
+/*  the following definitions are for the Tahoe         */
+/*  they might have to be changed for other machines    */
 
-/*  MAXCHAR is the largest unsigned character value	*/
-/*  MAXSHORT is the largest value of a C short		*/
-/*  MINSHORT is the most negative value of a C short	*/
-/*  MAXTABLE is the maximum table size			*/
-/*  BITS_PER_WORD is the number of bits in a C unsigned	*/
-/*  WORDSIZE computes the number of words needed to	*/
-/*	store n bits					*/
-/*  BIT returns the value of the n-th bit starting	*/
-/*	from r (0-indexed)				*/
-/*  SETBIT sets the n-th bit starting from r		*/
+/*  MAXCHAR is the largest unsigned character value     */
+/*  MAXSHORT is the largest value of a C short          */
+/*  MINSHORT is the most negative value of a C short    */
+/*  MAXTABLE is the maximum table size                  */
+/*  BITS_PER_WORD is the number of bits in a C unsigned */
+/*  WORDSIZE computes the number of words needed to     */
+/*      store n bits                                    */
+/*  BIT returns the value of the n-th bit starting      */
+/*      from r (0-indexed)                              */
+/*  SETBIT sets the n-th bit starting from r            */
 
-#define	MAXCHAR		255
+#define MAXCHAR         255
 
 
 
@@ -60,15 +60,15 @@
 #if defined(__MSDOS__) /* || defined(WIN32) || defined(__WIN32) */
 #define BITS_PER_WORD   16
 #define LOG2_BPW    4
-#define	MAXSHORT	((int)0x7FFF)
-#define MINSHORT	((int)0x8000)
-#define MAXTABLE	4000
+#define MAXSHORT        ((int)0x7FFF)
+#define MINSHORT        ((int)0x8000)
+#define MAXTABLE        4000
 #else    /* Real computers... */
-#define BITS_PER_WORD	32
+#define BITS_PER_WORD   32
 #define LOG2_BPW    5
-#define	MAXSHORT	((int)0x7FFFFFFF)
-#define MINSHORT	((int)0x80000000)
-#define MAXTABLE	120000
+#define MAXSHORT        ((int)0x7FFFFFFF)
+#define MINSHORT        ((int)0x80000000)
+#define MAXTABLE        120000
 #endif
 #define BITS_PER_WORD_1 (BITS_PER_WORD-1)
 
@@ -82,17 +82,17 @@ typedef int Yshort;
 
 /*  character names  */
 
-#define	NUL		'\0'    /*  the null character  */
-#define	NEWLINE		'\n'    /*  line feed  */
-#define	SP		' '     /*  space  */
-#define	BS		'\b'    /*  backspace  */
-#define	HT		'\t'    /*  horizontal tab  */
-#define	VT		'\013'  /*  vertical tab  */
-#define	CR		'\r'    /*  carriage return  */
-#define	FF		'\f'    /*  form feed  */
-#define	QUOTE		'\''    /*  single quote  */
-#define	DOUBLE_QUOTE	'\"'    /*  double quote  */
-#define	BACKSLASH	'\\'    /*  backslash  */
+#define NUL             '\0'    /*  the null character  */
+#define NEWLINE         '\n'    /*  line feed  */
+#define SP              ' '     /*  space  */
+#define BS              '\b'    /*  backspace  */
+#define HT              '\t'    /*  horizontal tab  */
+#define VT              '\013'  /*  vertical tab  */
+#define CR              '\r'    /*  carriage return  */
+#define FF              '\f'    /*  form feed  */
+#define QUOTE           '\''    /*  single quote  */
+#define DOUBLE_QUOTE    '\"'    /*  double quote  */
+#define BACKSLASH       '\\'    /*  backslash  */
 
 
 /* defines for constructing filenames */
@@ -116,30 +116,30 @@ UNION = 8,
 IDENT = 9,
 
 /* [i_a] bison emulation additions */
-BISON_DEBUG		= 110,
-BISON_DEFINE	= 111,
-BISON_DEFINES	= 112,
-BISON_LOCATIONS	= 113,
-BISON_PURE		= 114,
+BISON_DEBUG             = 110,
+BISON_DEFINE    = 111,
+BISON_DEFINES   = 112,
+BISON_LOCATIONS = 113,
+BISON_PURE              = 114,
 BISON_NAME_PREFIX = 115,
 BISON_FILE_PREFIX = 116,
 BISON_ERR_VERBOSE = 117,
-BISON_EXPECT	= 118,
+BISON_EXPECT    = 118,
 BISON_GLR_PARSER = 119,
-BISON_LEX_PARAM	= 120,
-BISON_NO_LINES	= 121,
-BISON_OUTPUT	= 122,
+BISON_LEX_PARAM = 120,
+BISON_NO_LINES  = 121,
+BISON_OUTPUT    = 122,
 BISON_PARSE_PARAM = 123,
-BISON_SKELETON	= 124,
+BISON_SKELETON  = 124,
 BISON_TOKEN_TABLE = 125,
-BISON_VERBOSE	= 126,
-BISON_YACC		= 127,
+BISON_VERBOSE   = 126,
+BISON_YACC              = 127,
 BISON_DESTRUCTOR = 128,
-BISON_PRINTER	= 129,
-BISON_NTERM		= 130,
-BISON_DPREC		= 131,
-BISON_MERGE		= 132,
-BISON_PREC		= 133
+BISON_PRINTER   = 129,
+BISON_NTERM             = 130,
+BISON_DPREC             = 131,
+BISON_MERGE             = 132,
+BISON_PREC              = 133
 } BtYacc_keyword_code;
 
 typedef enum symbol_class_enumeration
@@ -166,26 +166,26 @@ REDUCE = 2
 
 /*  character macros  */
 
-#define IS_IDENT(c)	(isalnum(c) || (c) == '_' || (c) == '.' || (c) == '$')
-#define	IS_OCTAL(c)	((c) >= '0' && (c) <= '7')
-#define	NUMERIC_VALUE(c)	((c) - '0')
+#define IS_IDENT(c)     (isalnum(c) || (c) == '_' || (c) == '.' || (c) == '$')
+#define IS_OCTAL(c)     ((c) >= '0' && (c) <= '7')
+#define NUMERIC_VALUE(c)        ((c) - '0')
 
 
 /*  symbol macros  */
 
-#define ISTOKEN(s)	((s) < start_symbol)
-#define ISVAR(s)	((s) >= start_symbol)
+#define ISTOKEN(s)      ((s) < start_symbol)
+#define ISVAR(s)        ((s) >= start_symbol)
 
 
 /*  storage allocation macros  */
 
-#define CALLOC(k,n)	(calloc((unsigned)(k),(unsigned)(n)))
-#define	FREE(x)		(free((char*)(x)))
-#define MALLOC(n)	(malloc((unsigned)(n)))
-#define	NEW(t)		((t*)allocate(sizeof(t)))
-#define	NEW2(n,t)	((t*)allocate((unsigned)((n)*sizeof(t))))
-#define REALLOC(p,n)	(realloc((char*)(p),(unsigned)(n)))
-#define RENEW(p,n,t)	((t*)realloc((char*)(p),(unsigned)((n)*sizeof(t))))
+#define CALLOC(k,n)     (calloc((unsigned)(k),(unsigned)(n)))
+#define FREE(x)         (free((char*)(x)))
+#define MALLOC(n)       (malloc((unsigned)(n)))
+#define NEW(t)          ((t*)allocate(sizeof(t)))
+#define NEW2(n,t)       ((t*)allocate((unsigned)((n)*sizeof(t))))
+#define REALLOC(p,n)    (realloc((char*)(p),(unsigned)(n)))
+#define RENEW(p,n,t)    ((t*)realloc((char*)(p),(unsigned)((n)*sizeof(t))))
 
 
 /*  the structure of a symbol table entry  */
@@ -455,7 +455,7 @@ SPLINT_NO_RETURN void done(int) GCC_NO_RETURN;
 void BtYacc_stop_test(void);
 #define BTYACC_INTERRUPTION_CHECK() BtYacc_stop_test()
 #else
-#define BTYACC_INTERRUPTION_CHECK() 
+#define BTYACC_INTERRUPTION_CHECK()
 #endif
 
 char *allocate(unsigned);

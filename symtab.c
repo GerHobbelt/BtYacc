@@ -6,9 +6,9 @@
 
 
 /* TABLE_SIZE is the number of entries in the symbol table. */
-/* TABLE_SIZE must be a power of two.			    */
+/* TABLE_SIZE must be a power of two.                       */
 
-#define	TABLE_SIZE 1024
+#define TABLE_SIZE 1024
 
 
 bucket **symbol_table;
@@ -25,7 +25,7 @@ int hash(char const * name)
     s = name;
     k = *s;
     while ((c = *++s))
-	k = (31*k + c) & (TABLE_SIZE - 1);
+        k = (31*k + c) & (TABLE_SIZE - 1);
 
     return (k);
 }
@@ -68,9 +68,9 @@ bucket* lookup(char const * name)
 
     while (bp)
     {
-	if (strcmp(name, bp->name) == 0) return (bp);
-	bpp = &bp->link;
-	bp = *bpp;
+        if (strcmp(name, bp->name) == 0) return (bp);
+        bpp = &bp->link;
+        bp = *bpp;
     }
 
     *bpp = bp = make_bucket(name);
@@ -90,7 +90,7 @@ void create_symbol_table()
     if (symbol_table == 0) no_space();
 
     for (i = 0; i < TABLE_SIZE; ++i)
-	symbol_table[i] = 0;
+        symbol_table[i] = 0;
 
     bp = make_bucket("error");
     bp->index = 1;
@@ -115,7 +115,7 @@ void free_symbols()
 
     for (p = first_symbol; p; p = q)
     {
-	q = p->next;
-	FREE(p);
+        q = p->next;
+        FREE(p);
     }
 }

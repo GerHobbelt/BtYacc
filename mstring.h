@@ -2,7 +2,7 @@
 #define _string_h_
 
 struct mstring {
-    char	*base, *ptr, *end;
+    char        *base, *ptr, *end;
     };
 
 void msprintf(struct mstring *, const char *, ...);
@@ -16,6 +16,6 @@ int strnscmp(const char *, const char *);
 /* hash a string, ignoring whitespace */
 unsigned int strnshash(const char *);
 
-#define mputc(m, ch)	((m)->ptr==(m)->end?mputchar(m,ch):(*(m)->ptr++=(ch)))
+#define mputc(m, ch)    ((m)->ptr==(m)->end?mputchar(m,ch):(*(m)->ptr++=(ch)))
 
 #endif /* _string_h_ */
