@@ -21,14 +21,14 @@ CC        = bcc
 MAKEFILE      = Makefile.dos
 
 OBJS1  = closure.obj error.obj lalr.obj log.obj lr0.obj main.obj mkpar.obj output.obj
-OBJS2  = mstring.obj reader.obj skeleton.obj symtab.obj verbose.obj warshall.obj write.obj
+OBJS2  = mstring.obj reader.obj skeleton.obj push_skel.obj symtab.obj verbose.obj warshall.obj write.obj
 OBJS   = $(OBJS1) $(OBJS2)
 
 
 PROGRAM       = btyacc.exe
 
 SRCS          = closure.c error.c lalr.c log.c lr0.c main.c mkpar.c output.c  \
-                mstring.c reader.c skeleton.c symtab.c verbose.c warshall.c write.c
+                mstring.c reader.c skeleton.c push_skel.c symtab.c verbose.c warshall.c write.c
 
 OTHERS        = README README.BYACC \
                 Makefile btyaccpa.ske empty.y skel2c manpage
@@ -55,6 +55,9 @@ program:        $(PROGRAM)
 skeleton.c: btyaccpa.ske
         awk -f skel2c btyaccpa.ske >skeleton.c
 
+push_skel.c: push.skel
+        awk -f skel2c push.skel >push_skel.c
+
 ###
 closure.obj: defs.h
 error.obj: defs.h
@@ -67,6 +70,7 @@ mstring.obj: mstring.h
 output.obj: defs.h write.h
 reader.obj: defs.h mstring.h write.h
 skeleton.obj: defs.h
+push_skel.obj: defs.h
 symtab.obj: defs.h
 verbose.obj: defs.h
 warshall.obj: defs.h

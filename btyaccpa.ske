@@ -289,7 +289,8 @@ static void yyFreeState(YYParseState **p);
  */
 int yyparse()
 {
-  int yym, yyn, yystate, yychar, yynewerrflag;
+  int yym, yyn, yychar, yynewerrflag;
+  int unsigned yystate;
   YYParseState *yyerrctx = 0;
   int reduce_posn;
 
@@ -341,7 +342,7 @@ yyloop:
         yys = yyname[yychar];
       if (!yys)
         yys = "illegal-symbol";
-      fprintf(stderr, "btyacc[%3d,%2d%s]: read token %d (%s)",
+      fprintf(stderr, "btyacc[%3u,%2d%s]: read token %d (%s)",
               yystate, yydepth, (yytrial ? ",trial" : ""), yychar, yys);
 #ifdef YYDBPR
       fputc('<', stderr);
@@ -366,7 +367,7 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        fprintf(stderr, "btyacc[%3d,%2d%s]: CONFLICT: following successful "
+        fprintf(stderr, "btyacc[%3u,%2d%s]: CONFLICT: following successful "
                 "trial parse\n", yystate, yydepth, (yytrial ? ",trial" :""));
       }
 #endif
@@ -385,7 +386,7 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        fprintf(stderr, "btyacc[%3d,%2d%s]: CONFLICT. ",
+        fprintf(stderr, "btyacc[%3u,%2d%s]: CONFLICT. ",
                 yystate, yydepth, (yytrial ? ",trial" : ""));
         if(yyps->save)
           fputs("ALREADY in conflict, continuing trial parse.\n", stderr);
@@ -460,7 +461,7 @@ yyloop:
     {
 #if YYDEBUG
       if (yydebug)
-        fprintf(stderr, "btyacc[%3d,%2d%s]: shifting to state %d\n",
+        fprintf(stderr, "btyacc[%3u,%2d%s]: shifting to state %d\n",
                 yystate, yydepth, (yytrial ? ",trial" : ""), yyctable[ctry]);
 #endif
       if (yychar < 0)
@@ -488,7 +489,7 @@ yyloop:
   {
 #if YYDEBUG
     if (yydebug)
-      fprintf(stderr, "btyacc[%3d,%2d%s]: shifting to state %d\n",
+      fprintf(stderr, "btyacc[%3u,%2d%s]: shifting to state %d\n",
               yystate, yydepth, (yytrial ? ",trial" : ""), yytable[yyn]);
 #endif
     yychar = YYEMPTY;
@@ -531,7 +532,7 @@ yyerrhandler:
     YYParseState *save = yyps->save;
 #if YYDEBUG
     if (yydebug)
-      fprintf(stderr, "btyacc[%3d,%2d%s]: ERROR, "
+      fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR, "
               "CONFLICT BACKTRACKING to state %d, %d tokens\n",
               yystate, yydepth, (yytrial ? ",trial" : ""),
               yyps->save->state, yylvp - yylvals - yyps->save->lexeme);
@@ -676,7 +677,7 @@ yyinrecovery:
         yys = yyname[yychar];
       if (!yys)
         yys = "illegal-symbol";
-      fprintf(stderr, "btyacc[%3d,%2d%s]: ERROR recovery discards token "
+      fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR recovery discards token "
               "%d (%s)\n",
               yystate, yydepth, (yytrial ? ",trial" : ""), yychar, yys);
     }
@@ -696,7 +697,7 @@ yyreduce:
 #if YYDEBUG
   if (yydebug)
   {
-    fprintf(stderr, "btyacc[%3d,%2d%s]: reducing by rule %d (%s)",
+    fprintf(stderr, "btyacc[%3u,%2d%s]: reducing by rule %d (%s)",
             yystate, yydepth, (yytrial ? ",trial" : ""), yyn, yyrule[yyn]);
 #ifdef YYDBPR
     if (yym)
@@ -819,7 +820,7 @@ yyreduce:
   }
 #if YYDEBUG
   if (yydebug)
-    fprintf(stderr, "btyacc[%3d,%2d%s]: reduced, shifting to state %u\n",
+    fprintf(stderr, "btyacc[%3u,%2d%s]: reduced, shifting to state %u\n",
             *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""), yystate);
 #endif
   if (yyps->ssp >= yyps->ss + yyps->stacksize - 1)

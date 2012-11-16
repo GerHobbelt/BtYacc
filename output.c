@@ -1412,7 +1412,7 @@ void write_section(char const * section_name)
 
 	open_output_files();
 
-    for (sl = &section_list[0]; sl->name; ++sl) {
+    for (sl = &active_section_list[0]; sl->name; ++sl) {
       if(strcmp(sl->name,section_name)==0) {
 	break;
       }

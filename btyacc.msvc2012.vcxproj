@@ -594,6 +594,18 @@
     <Text Include="manpage.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="!README.TXT" />
+    <None Include="btyacc-c.ske" />
+    <None Include="btyacc.1" />
+    <None Include="btyacc.sgml" />
+    <None Include="ChangeLog" />
+    <None Include="CMakeLists.txt" />
+    <None Include="create-distribs.bat" />
+    <None Include="create-distribs.exclude" />
+    <None Include="empty.y" />
+    <None Include="Makefile" />
+    <None Include="makefile.dos" />
+    <None Include="manpage" />
     <None Include="README" />
     <None Include="README.BYACC" />
     <CustomBuild Include="btyaccpa.ske">
@@ -744,7 +756,9 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">push_skel.c;%(Outputs)</Outputs>
     </CustomBuild>
+    <None Include="README.Debian" />
     <None Include="skel2c" />
+    <None Include="VERSION.TXT" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

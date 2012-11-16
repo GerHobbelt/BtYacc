@@ -16,6 +16,9 @@
     <Filter Include="Generated Files">
       <UniqueIdentifier>{83542821-af03-4b31-8c0b-9c8fd0460630}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Extra Files">
+      <UniqueIdentifier>{90b25bb1-cb89-49b8-a163-894a5978461d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="closure.c">
@@ -105,6 +108,48 @@
     </None>
     <None Include="skel2c">
       <Filter>Generated Files</Filter>
+    </None>
+    <None Include="!README.TXT">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="btyacc.1">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="btyacc.sgml">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="btyacc-c.ske">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="ChangeLog">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="CMakeLists.txt">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="create-distribs.bat">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="create-distribs.exclude">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="empty.y">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="Makefile">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="makefile.dos">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="manpage">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="README.Debian">
+      <Filter>Extra Files</Filter>
+    </None>
+    <None Include="VERSION.TXT">
+      <Filter>Extra Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

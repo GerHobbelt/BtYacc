@@ -34,6 +34,9 @@
 
 
 
+
+%% tables
+
 %% header
 #define yyclearin (yychar=(-1))
 #define yyerrok (yyerrflag=0)

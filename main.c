@@ -271,9 +271,9 @@ static void getargs(int argc, char **argv)
 
 	case 'S':
 	    if (*++s)
-			read_skel(s);
+			active_section_list = read_skel(s);
 	    else if (++i < argc)
-			read_skel(argv[i]);
+			active_section_list = read_skel(argv[i]);
 	    else
 			usage();
 	    continue;
@@ -555,27 +555,30 @@ void open_output_files(void)
 }
 
 
+struct section *active_section_list = NULL;
+
 int main(int argc, char **argv)
 {
 #ifdef BTYACC_USE_SIGNAL_HANDLING
     signal_setup();
 #endif
 
+	active_section_list = section_list_btyaccpa;
     getargs(argc, argv);
-    BTYACC_INTERRUPTION_CHECK
+    BTYACC_INTERRUPTION_CHECK();
     open_input_files();
-    BTYACC_INTERRUPTION_CHECK
+    BTYACC_INTERRUPTION_CHECK();
     reader();
-    BTYACC_INTERRUPTION_CHECK
+    BTYACC_INTERRUPTION_CHECK();
     lr0();
-    BTYACC_INTERRUPTION_CHECK
+    BTYACC_INTERRUPTION_CHECK();
     lalr();
-    BTYACC_INTERRUPTION_CHECK
+    BTYACC_INTERRUPTION_CHECK();
     make_parser();
-    BTYACC_INTERRUPTION_CHECK
+    BTYACC_INTERRUPTION_CHECK();
     verbose();
-    BTYACC_INTERRUPTION_CHECK
+    BTYACC_INTERRUPTION_CHECK();
     output();
-    BTYACC_INTERRUPTION_CHECK
+    BTYACC_INTERRUPTION_CHECK();
     done(0);
 }

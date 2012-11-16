@@ -17,7 +17,7 @@ LDFLAGS	      = #-static
 
 LIBS	      =
 
-CC	      = gcc
+CC            = gcc
 LINKER	      = gcc
 # LINKER      = cl
 # CC	      = cl
@@ -27,18 +27,18 @@ DOCBOOK2MAN   = docbook2man
 MAKEFILE      = Makefile
 
 OBJS	      = closure.o error.o lalr.o log.o lr0.o main.o mkpar.o output.o	\
-		mstring.o reader.o readskel.o skeleton.o symtab.o verbose.o warshall.o write.o
+		mstring.o reader.o readskel.o skeleton.o push_skel.o symtab.o verbose.o warshall.o write.o
 
 PRINT	      = pr -f -l88
 
 PROGRAM	      = btyacc
 
 SRCS	      = closure.c error.c lalr.c log.c lr0.c main.c mkpar.c output.c	\
-		mstring.c reader.c readskel.c skeleton.c symtab.c verbose.c warshall.c write.c
+		mstring.c reader.c readskel.c skeleton.c push_skel.c symtab.c verbose.c warshall.c write.c
 
 OTHERS	      = README README.BYACC \
 		Makefile btyaccpa.ske push.skel empty.y skel2c manpage makefile.dos \
-		skeleton.c
+		skeleton.c push_skel.c
 
 all:		$(PROGRAM) btyacc.1
 
@@ -49,7 +49,7 @@ clean:;		rm -f $(OBJS)
 
 clobber:;	rm -f $(OBJS) $(PROGRAM)
 
-distclean:;	rm -f $(OBJS) $(PROGRAM) skeleton.c *.zip *.gz
+distclean:;	rm -f $(OBJS) $(PROGRAM) skeleton.c push_skel.c *.zip *.gz
 
 depend:;	mkmf -f $(MAKEFILE) PROGRAM=$(PROGRAM) DEST=$(DEST)
 
@@ -86,6 +86,9 @@ zip:
 skeleton.c: btyaccpa.ske skel2c
 		awk -f skel2c btyaccpa.ske > skeleton.c
  
+push_skel.c: push.skel skel2c
+		awk -f skel2c push.skel > push_skel.c
+ 
 etags TAGS:
 		etags *.c *.h
 
@@ -105,6 +108,7 @@ mstring.o: mstring.h
 output.o: defs.h write.h
 reader.o: defs.h mstring.h write.h
 skeleton.o: defs.h
+push_skel.o: defs.h
 symtab.o: defs.h
 verbose.o: defs.h
 warshall.o: defs.h

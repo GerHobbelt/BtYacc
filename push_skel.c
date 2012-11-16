@@ -1,11 +1,14 @@
 /*
-** This file generated automatically from 
+** This file generated automatically from push.skel
 */
 
 #include "defs.h"
-char const * const banner[] =
+
+
+
+static char const * const banner[] =
 {
-    "#line 2 \"D:\\h\\prj\\1original\\visyond\\visygit\\util\\btyacc\\push.skel\"",
+    "#line 2 \"push.skel\"",
     "/*",
     "**    \"@(#)push.skel, based on byacc 1.8 (Berkeley) 01/20/91\";",
     "*/",
@@ -41,12 +44,20 @@ char const * const banner[] =
     "",
     "",
     "",
+    "",
     0
 };
 
-char const * const header[] =
+static char const * const tables[] =
 {
-    "#line 38 \"D:\\h\\prj\\1original\\visyond\\visygit\\util\\btyacc\\push.skel\"",
+    "#line 39 \"push.skel\"",
+    "",
+    0
+};
+
+static char const * const header[] =
+{
+    "#line 41 \"push.skel\"",
     "#define yyclearin (yychar=(-1))",
     "#define yyerrok (yyerrflag=0)",
     "/*",
@@ -152,9 +163,9 @@ char const * const header[] =
     0
 };
 
-char const * const body[] =
+static char const * const body[] =
 {
-    "#line 141 \"D:\\h\\prj\\1original\\visyond\\visygit\\util\\btyacc\\push.skel\"",
+    "#line 144 \"push.skel\"",
     "",
     "#ifndef YYNEWSTATE",
     "#ifdef __oldc",
@@ -565,9 +576,9 @@ char const * const body[] =
     0
 };
 
-char const * const trailer[] =
+static char const * const trailer[] =
 {
-    "#line 549 \"D:\\h\\prj\\1original\\visyond\\visygit\\util\\btyacc\\push.skel\"",
+    "#line 552 \"push.skel\"",
     "",
     "    }",
     "",
@@ -674,8 +685,9 @@ char const * const trailer[] =
     0
 };
 
-struct section section_list[] = {
+struct section section_list_push[] = {
 	{ "banner", &banner[0] },
+	{ "tables", &tables[0] },
 	{ "header", &header[0] },
 	{ "body", &body[0] },
 	{ "trailer", &trailer[0] },

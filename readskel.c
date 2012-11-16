@@ -68,14 +68,19 @@ static char const * const * fin_section(void)
   return rv;
 }
 
-void read_skel(char const * name)
+struct section *read_skel(char const * name)
 {
 char	buf[256];
 int	section = -2;
 int	line = 0, sline = 1, eline = 1;
 int	i;
 FILE	*fp;
+struct section *section_list = (struct section *)calloc(32, sizeof(section_list[0]));
 
+	if (!section_list) {
+		error(0, 0, 0, "Out of memory while preparing to read skeleton file \"%s\"", name);
+	    exit(1);
+	}
     if (!(fp = fopen(name, "r")))
 	open_error(name);
     while(fgets(buf, 255, fp)) {
@@ -123,4 +128,5 @@ FILE	*fp;
 	section_list[section].ptr = fin_section();
     if (section == -2)
 	error(0, 0, 0, "No sections found in skeleton file \"%s\"", name);
+	return section_list;
 }

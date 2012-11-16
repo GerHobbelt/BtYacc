@@ -265,7 +265,9 @@ struct section {
     char const * const * ptr;
 };
 
-extern struct section section_list[];
+extern struct section section_list_push[];
+extern struct section section_list_btyaccpa[];
+extern struct section *active_section_list;
 
 
 /* global variables */
@@ -283,12 +285,6 @@ extern char *cptr;
 extern char *line;
 extern int lineno;
 extern int outline;
-
-extern char const * const banner[];
-extern char const * const tables[];
-extern char const * const header[];
-extern char const * const body[];
-extern char const * const trailer[];
 
 extern char *action_file_name;
 extern char *code_file_name;
@@ -457,9 +453,9 @@ SPLINT_NO_RETURN void done(int) GCC_NO_RETURN;
 #if defined(SIGINT) || defined(SIGTERM) || defined(SIGHUP)
 #define BTYACC_USE_SIGNAL_HANDLING
 void BtYacc_stop_test(void);
-#define BTYACC_INTERRUPTION_CHECK BtYacc_stop_test();
+#define BTYACC_INTERRUPTION_CHECK() BtYacc_stop_test()
 #else
-#define BTYACC_INTERRUPTION_CHECK
+#define BTYACC_INTERRUPTION_CHECK() 
 #endif
 
 char *allocate(unsigned);
@@ -542,7 +538,7 @@ void print_grammar(void);
 void reader(void);
 
 /* readskel.c */
-void read_skel(char const * name);
+struct section *read_skel(char const * name);
 
 /* symtab.c */
 int hash(char const * name);
