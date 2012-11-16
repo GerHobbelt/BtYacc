@@ -7,7 +7,7 @@
    the altered version can easily be distinguished from the original.  */
 
 /*
-** This file generated automatically from btyaccpa.ske
+** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\btyaccpa.ske
 */
 
 #include "defs.h"
@@ -1131,9 +1131,9 @@ static char const * const trailer[] =
 };
 
 struct section section_list_btyaccpa[] = {
-        { "banner", &banner[0] },
-        { "tables", &tables[0] },
-        { "header", &header[0] },
-        { "body", &body[0] },
-        { "trailer", &trailer[0] },
-        { 0, 0 } };
+	{ "banner", &banner[0] },
+	{ "tables", &tables[0] },
+	{ "header", &header[0] },
+	{ "body", &body[0] },
+	{ "trailer", &trailer[0] },
+	{ 0, 0 } };

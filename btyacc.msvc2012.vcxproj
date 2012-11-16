@@ -577,12 +577,14 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">
       </Outputs>
     </ClCompile>
+    <ClCompile Include="write.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defs.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="mstring.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="write.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="btyacc.ico" />
@@ -598,6 +600,7 @@
     <None Include="btyacc-c.ske" />
     <None Include="btyacc.1" />
     <None Include="btyacc.sgml" />
+    <None Include="build.h.in" />
     <None Include="ChangeLog" />
     <None Include="CMakeLists.txt" />
     <None Include="create-distribs.bat" />
@@ -634,15 +637,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug x86_x64|x64'">skeleton.c;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">generate C skeleton for %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">awk -f skel2c %(FullPath) &gt; skeleton.c
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">gawk -f skel2c %(FullPath) &gt; skeleton.c
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Itanium'">skeleton.c;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">generate C skeleton for %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">awk -f skel2c %(FullPath) &gt; skeleton.c
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gawk -f skel2c %(FullPath) &gt; skeleton.c
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">skeleton.c;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">generate C skeleton for %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">awk -f skel2c %(FullPath) &gt; skeleton.c
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">gawk -f skel2c %(FullPath) &gt; skeleton.c
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">skeleton.c;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release Itanium|Itanium'">generate C skeleton for %(FullPath)</Message>
@@ -670,15 +673,15 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release x86_x64|x64'">skeleton.c;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">generate C skeleton for %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">awk -f skel2c %(FullPath) &gt; skeleton.c
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">gawk -f skel2c %(FullPath) &gt; skeleton.c
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Itanium'">skeleton.c;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">generate C skeleton for %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">awk -f skel2c %(FullPath) &gt; skeleton.c
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gawk -f skel2c %(FullPath) &gt; skeleton.c
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">skeleton.c;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">generate C skeleton for %(FullPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">awk -f skel2c %(FullPath) &gt; skeleton.c
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">gawk -f skel2c %(FullPath) &gt; skeleton.c
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">skeleton.c;%(Outputs)</Outputs>
     </CustomBuild>

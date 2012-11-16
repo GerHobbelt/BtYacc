@@ -69,6 +69,9 @@
     <ClCompile Include="log.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="write.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defs.h">
@@ -81,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="write.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -150,6 +156,9 @@
     </None>
     <None Include="VERSION.TXT">
       <Filter>Extra Files</Filter>
+    </None>
+    <None Include="build.h.in">
+      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

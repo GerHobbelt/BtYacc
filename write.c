@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include "write.h"
 
+
 void BtYacc_putc(char c, FILE* f)
 {
     if (putc(c, f) == EOF)

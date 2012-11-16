@@ -12,13 +12,9 @@ BEGIN {
     {
 		fname = FILENAME;
 
-		# Could use 'gsub(/\\/, "\\\\")' instead of the following
-		# two lines, but there's a bug in mawk and the original
-		# awk (not in gawk) which is triggered by that.
-		gsub(/\\/, "\\\1", fname);
-		gsub(/\1/, "\\", fname);
-		gsub(/\t/, "\\t", fname);
-		gsub(/\"/, "\\\"", fname);
+		gsub(/\\/, "/", fname);
+		gsub(/.*\//, "", fname);
+		gsub(/.*:/, "", fname);
 
 		fname_as_varname = fname;
 		gsub(/\..*/, "", fname_as_varname);

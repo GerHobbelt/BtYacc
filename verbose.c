@@ -9,43 +9,6 @@
 
 static Yshort *null_rules;
 
-void BtYacc_puts(char const * text, FILE *f)
-{
-    if (fputs(text, f) == EOF)
-    {
-       perror("BtYacc_puts");
-       abort();
-    }
-}
-
-
-void BtYacc_printf(FILE *f, char const * format, ...)
-{
-  va_list vl;
-
-  va_start(vl, format);
-
-  if (vfprintf(f, format, vl) < 0)
-  {
-     perror("BtYacc: vfprintf");
-     va_end(vl);
-     abort();
-  }
-
-  va_end(vl);
-}
-
-
-void BtYacc_putc(char c, FILE *f)
-{
-    if (putc(c, f) == EOF)
-    {
-       perror("BtYacc_putc");
-       abort();
-    }
-}
-
-
 void verbose(void)
 {
     register int i;
