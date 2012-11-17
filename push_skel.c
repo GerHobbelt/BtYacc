@@ -1,5 +1,5 @@
 /*
-** This file generated automatically from push.skel
+** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\push.skel
 */
 
 #include "defs.h"

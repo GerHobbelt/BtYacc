@@ -37,7 +37,10 @@ char *myname = "btyacc";
 static char const temp_form[] = "yacc_t_XXXXXX";
 
 int unsigned lineno = 0;
-int unsigned outline = 0;
+int unsigned CODE_FILE = 0;             /*  y.code.c (used when the -r option is specified) */
+int unsigned DEFINES_FILE = 1;          /*  y.tab.h                                         */
+int unsigned OUTPUT_FILE = 2;           /*  y.tab.c                                         */
+int unsigned outline[3] = {0};
 
 char *action_file_name = NULL;
 char *code_file_name = NULL;
@@ -506,6 +509,7 @@ void create_files(void)
     else
     {
         code_file_name = output_file_name;
+        CODE_FILE = OUTPUT_FILE;
     }
 
     if (dflag)

@@ -18,7 +18,7 @@ void msprintf(struct mstring *s, const char *fmt, ...)
 {
 static char     buf[4096];      /* a big static buffer */
 va_list         args;
-size_t          len;
+int             len;
 
     if (!s || !s->base) return;
     va_start(args, fmt);
@@ -26,7 +26,7 @@ size_t          len;
     va_end(args);
 
     len = (int)strlen(buf);
-    if (len > (s->end - s->ptr)) {
+    if (len > (int)(s->end - s->ptr)) {
         int     cp = (int)(s->ptr - s->base), cl = (int)(s->end - s->base), nl = cl;
         while (len > (nl - cp))
             nl = nl + nl + TAIL;

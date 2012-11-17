@@ -364,28 +364,32 @@ int keyword(void)
 void copy_ident(void)
 {
     register int c;
-    register FILE *f;
 
-        open_output_files();
-        f = output_file;
+    open_output_files();
 
     if ((c = nextc()) == EOF) unexpected_EOF();
     if (c != '"') syntax_error(lineno, line, cptr);
-    ++outline;
-    BtYacc_puts("#ident \"", f);
+    ++outline[OUTPUT_FILE];
+    BtYacc_puts("#ident \"", output_file);
 
-    for (;;) {
+    for (;;)
+    {
         c = *++cptr;
-        if (c == '\n') {
-            BtYacc_puts("\"\n", f);
-            return; }
+        if (c == '\n')
+        {
+            BtYacc_puts("\"\n", output_file);
+            return;
+        }
 
-        BtYacc_putc(c, f);
+        BtYacc_putc(c, output_file);
 
-        if (c == '"') {
-            BtYacc_putc('\n', f);
+        if (c == '"')
+        {
+            BtYacc_putc('\n', output_file);
             ++cptr;
-            return; } }
+            return;
+        }
+    }
 }
 
 #define OUTC(c) do { /* output a character on f1 and f2, if non-null */ \

@@ -284,7 +284,10 @@ extern char *name_prefix;
 extern char *cptr;
 extern char *line;
 extern int unsigned lineno;
-extern int unsigned outline;
+extern int unsigned CODE_FILE;              /*  y.code.c (used when the -r option is specified) */
+extern int unsigned DEFINES_FILE;           /*  y.tab.h                                         */
+extern int unsigned OUTPUT_FILE;            /*  y.tab.c                                         */
+extern int unsigned outline[3];
 
 extern char *action_file_name;
 extern char *code_file_name;

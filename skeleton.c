@@ -1131,9 +1131,9 @@ static char const * const trailer[] =
 };
 
 struct section section_list_btyaccpa[] = {
-    { "banner", &banner[0] },
-    { "tables", &tables[0] },
-    { "header", &header[0] },
-    { "body", &body[0] },
-    { "trailer", &trailer[0] },
-    { 0, 0 } };
+	{ "banner", &banner[0] },
+	{ "tables", &tables[0] },
+	{ "header", &header[0] },
+	{ "body", &body[0] },
+	{ "trailer", &trailer[0] },
+	{ 0, 0 } };
