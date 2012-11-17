@@ -24,9 +24,9 @@ char tflag = 0;
 char vflag = 0;
 int Eflag = 0;
 
-char *file_prefix = "y";
+char *file_prefix = NULL;
 char *name_prefix = "yy";
-char *myname = "yacc";
+char *myname = "btyacc";
 #if defined(__MSDOS__) || defined(WIN32) || defined(__WIN32)
 #define DIR_CHAR '\\'
 #define DEFAULT_TMPDIR "."
@@ -36,8 +36,8 @@ char *myname = "yacc";
 #endif
 static char const temp_form[] = "yacc_t_XXXXXX";
 
-int lineno = 0;
-int outline = 0;
+int unsigned lineno = 0;
+int unsigned outline = 0;
 
 char *action_file_name = NULL;
 char *code_file_name = NULL;
@@ -239,7 +239,7 @@ static void getargs(int argc, char **argv)
                   error(lineno, 0, 0, "Preprocessor variable %s already defined", var_name);
                 }
               }
-              *ps = MALLOC(strlen(var_name)+1);
+              *ps = (char *)MALLOC(strlen(var_name)+1);
 
               if (*ps == 0)
                  no_space();
@@ -320,17 +320,30 @@ no_more_options:;
     if (i + 1 != argc) usage();
     input_file_name = argv[i];
 
-    if (!file_prefix) {
+    if (!file_prefix || !*file_prefix) {
       if (input_file_name) {
+        char *s2;
+
         file_prefix = strdup(input_file_name);
 
         if (!file_prefix) no_space();
 
-        if ((s = strrchr(file_prefix, '.')))
-          *s = 0;
-      } else {
-        file_prefix = "y";
+        // strip off any leading directories from the input file path:
+        s = strrchr(file_prefix, '/');
+        if (!s) s = file_prefix; else s++;
+        s2 = strrchr(s, '\\');
+        if (!s2) s2 = s; else s2++;
+        s = strrchr(s2, ':');
+        if (!s) s = s2; else s++;
+
+        if ((s2 = strrchr(s, '.')))
+          *s2 = 0;
+
+        memmove(file_prefix, s, strlen(s) + 1);
       }
+    }
+    if (!file_prefix || !*file_prefix) {
+        file_prefix = "y";
     }
 }
 
@@ -343,7 +356,7 @@ char *allocate(unsigned n)
     {
         /* VM: add a few bytes here, cause
          * Linux calloc does not like sizes like 32768 */
-        p = CALLOC(1, n+10);
+        p = (char *)CALLOC(1, n+10);
         if (!p) no_space();
     }
     return (p);
@@ -388,30 +401,45 @@ static FILE* create_temporary_file(char* fname_template)
 #endif
 }
 
-static char const TEMPORARY_DIR_ENV_VAR[] = "TMPDIR";
+// Return path to temp dir without trailing '/' DIRSEP
+static char *getenv_tempdir(void)
+{
+    static char const *TEMPORARY_DIR_ENV_VAR[] = { "TMPDIR", "TEMP", "TMP", NULL };
+    size_t i, len;
+    char* tmpdir = NULL;
+
+    for (i = 0; TEMPORARY_DIR_ENV_VAR[i]; i++)
+    {
+        tmpdir = getenv(TEMPORARY_DIR_ENV_VAR[i]);
+        if (tmpdir && *tmpdir)
+            break;
+    }
+
+    if (!tmpdir || !*tmpdir)
+       tmpdir = DEFAULT_TMPDIR;
+
+    len = strlen(tmpdir);
+    if (len && tmpdir[len - 1] == DIR_CHAR)
+        tmpdir[len - 1] = 0;
+    return tmpdir;
+}
 
 static void create_union_file(void)
 {
     size_t i, len;
-    char* tmpdir = getenv(TEMPORARY_DIR_ENV_VAR);
-
-    if (tmpdir == 0)
-       tmpdir = DEFAULT_TMPDIR;
+    char* tmpdir = getenv_tempdir();
 
     len = strlen(tmpdir);
-    i = len + (sizeof(temp_form) - 1);
+    i = len + (sizeof(temp_form));
 
-    if (len && tmpdir[len - 1] != DIR_CHAR)
-        ++i;
-
-    union_file_name = MALLOC(i);
+    union_file_name = (char *)MALLOC(i);
 
     if (union_file_name == 0)
        no_space();
 
     strcpy(union_file_name, tmpdir);
 
-    if (len && tmpdir[len - 1] != DIR_CHAR)
+    if (len)
     {
         union_file_name[len] = DIR_CHAR;
         ++len;
@@ -425,22 +453,17 @@ static void create_union_file(void)
 void create_files(void)
 {
     size_t i, len;
-    char* tmpdir = getenv(TEMPORARY_DIR_ENV_VAR);
+    char* tmpdir = getenv_tempdir();
 
-    if (tmpdir == 0)
-       tmpdir = DEFAULT_TMPDIR;
+    len = strlen(tmpdir);
+    i = len + strlen(temp_form) + 2;
 
-    len = (int)strlen(tmpdir);
-    i = len + (int)strlen(temp_form) + 1;
-    if (len && tmpdir[len - 1] != DIR_CHAR)
-        ++i;
-
-    action_file_name = MALLOC(i);
+    action_file_name = (char *)MALLOC(i);
 
     if (action_file_name == 0)
        no_space();
 
-    text_file_name = MALLOC(i);
+    text_file_name = (char *)MALLOC(i);
 
     if (text_file_name == 0)
        no_space();
@@ -448,7 +471,7 @@ void create_files(void)
     strcpy(action_file_name, tmpdir);
     strcpy(text_file_name, tmpdir);
 
-    if (len && tmpdir[len - 1] != DIR_CHAR)
+    if (len)
     {
         action_file_name[len] = DIR_CHAR;
         text_file_name[len] = DIR_CHAR;
@@ -464,9 +487,9 @@ void create_files(void)
     action_file = create_temporary_file(action_file_name);
     text_file = create_temporary_file(text_file_name);
 
-    len = (int)strlen(file_prefix);
+    len = strlen(file_prefix);
 
-    output_file_name = MALLOC(len + 7);
+    output_file_name = (char *)MALLOC(len + 7);
     if (output_file_name == 0)
         no_space();
     strcpy(output_file_name, file_prefix);
@@ -474,7 +497,7 @@ void create_files(void)
 
     if (rflag)
     {
-        code_file_name = MALLOC(len + 8);
+        code_file_name = (char *)MALLOC(len + 8);
         if (code_file_name == 0)
             no_space();
         strcpy(code_file_name, file_prefix);
@@ -487,7 +510,7 @@ void create_files(void)
 
     if (dflag)
     {
-        defines_file_name = MALLOC(len + 7);
+        defines_file_name = (char *)MALLOC(len + 7);
         if (defines_file_name == 0)
             no_space();
         strcpy(defines_file_name, file_prefix);
@@ -496,7 +519,7 @@ void create_files(void)
 
     if (vflag)
     {
-        verbose_file_name = MALLOC(len + 8);
+        verbose_file_name = (char *)MALLOC(len + 8);
         if (verbose_file_name == 0)
             no_space();
         strcpy(verbose_file_name, file_prefix);
@@ -541,7 +564,7 @@ void open_output_files(void)
 
         output_file = fopen(output_file_name, "w");
         if (output_file == 0)
-                        open_error(output_file_name);
+            open_error(output_file_name);
 
         if (rflag)
         {
@@ -567,7 +590,7 @@ int main(int argc, char **argv)
     signal_setup();
 #endif
 
-	active_section_list = section_list_btyaccpa;
+    active_section_list = section_list_btyaccpa;
     getargs(argc, argv);
     BTYACC_INTERRUPTION_CHECK();
     open_input_files();

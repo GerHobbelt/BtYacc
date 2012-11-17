@@ -16,19 +16,19 @@ static char const * * ap_end;
 static void add_ptr(char const * const p)
 {
     if (ap == ap_end) {
-                int size = CHUNK;
-                char * * nap;
+        size_t size = CHUNK;
+        char * * nap;
 
-                while ((ap - ap_start) * sizeof(*nap) >= size)
-                        size = size * 2;
-                if (!(nap = (char **)malloc(size)))
-                        no_space();
-                if (ap > ap_start)
-                        memcpy(nap, ap_start, (ap-ap_start) * sizeof(*nap));
-                ap = nap + (ap - ap_start);
-                ap_start = nap;
-                ap_end = nap + size/sizeof(*nap);
-        }
+        while ((ap - ap_start) * sizeof(*nap) >= size)
+            size = size * 2;
+        if (!(nap = (char **)malloc(size)))
+            no_space();
+        if (ap > ap_start)
+            memcpy(nap, ap_start, (ap-ap_start) * sizeof(*nap));
+        ap = (char const **)nap + (ap - ap_start);
+        ap_start = (char const **)nap;
+        ap_end = (char const **)nap + size/sizeof(*nap);
+    }
     *ap++ = p;
 }
 
@@ -77,10 +77,8 @@ int     i;
 FILE    *fp;
 struct section *section_list = (struct section *)calloc(32, sizeof(section_list[0]));
 
-    if (!section_list) {
-        error(0, 0, 0, "Out of memory while preparing to read skeleton file \"%s\"", name);
-        exit(1);
-    }
+    if (!section_list) no_space();
+
     if (!(fp = fopen(name, "r")))
         open_error(name);
     while(fgets(buf, 255, fp)) {

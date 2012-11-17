@@ -29,7 +29,7 @@ int linesize;
 
 FILE *inc_file = NULL;
 char  inc_file_name[LINESIZE];
-int   inc_save_lineno;
+int unsigned inc_save_lineno;
 
 int in_ifdef = 0;
 int ifdef_skip;
@@ -225,7 +225,7 @@ char *skip_comment()
 {
     register char *s;
 
-    int st_lineno = lineno;
+    int unsigned st_lineno = lineno;
     char *st_line = dup_line();
     char *st_cptr = st_line + (cptr - line);
 
@@ -397,7 +397,7 @@ void copy_ident(void)
 void copy_string(int quote, FILE *f1, FILE *f2)
 {
 register int    c;
-int             s_lineno = lineno;
+int unsigned    s_lineno = lineno;
 char            *s_line = dup_line();
 char            *s_cptr = s_line + (cptr - line - 1);
 
@@ -427,7 +427,7 @@ register int    c;
                 OUTC(' '); }
         OUTC('*'); OUTC('/'); }
     else if (c == '*') {
-        int c_lineno = lineno;
+        int unsigned c_lineno = lineno;
         char *c_line = dup_line();
         char *c_cptr = c_line + (cptr - line - 1);
         OUTC(c);
@@ -449,7 +449,7 @@ void copy_text(void)
     register int c;
     register FILE *f;
     int need_newline = 0;
-    int t_lineno = lineno;
+    int unsigned t_lineno = lineno;
     char *t_line = dup_line();
     char *t_cptr = t_line + (cptr - line - 2);
 
@@ -500,7 +500,7 @@ void copy_union(void)
     FILE *dc_file;
     register int c;
     int depth;
-    int u_lineno = lineno;
+    int unsigned u_lineno = lineno;
     char *u_line = dup_line();
     char *u_cptr = u_line + (cptr - line - 6);
 
@@ -566,7 +566,7 @@ bucket *get_literal(void)
     register int n;
     register char *s;
     register bucket *bp;
-    int s_lineno = lineno;
+    int unsigned s_lineno = lineno;
     char *s_line = dup_line();
     char *s_cptr = s_line + (cptr - line);
 
@@ -785,7 +785,7 @@ char    *s;
 char *get_tag(void)
 {
     register int c;
-    int t_lineno = lineno;
+    int unsigned t_lineno = lineno;
     char *t_line = dup_line();
     char *t_cptr = t_line + (cptr - line);
 
@@ -960,7 +960,7 @@ void read_declarations(void)
         t_cptr = cptr;
         switch (k = keyword()) {
         default:
-                break;
+            break;
         case MARK:
             return;
         case IDENT:
@@ -986,84 +986,84 @@ void read_declarations(void)
             break;
         case BISON_NO_LINES:
             lflag = 1;
-                break;
+            break;
         case BISON_VERBOSE:
             vflag = 1;
-                break;
+            break;
         case BISON_DEFINES:
         case BISON_LOCATIONS:
         case BISON_PURE:
         case BISON_YACC:
-                /* ignore */
-                break;
+            /* ignore */
+            break;
         case BISON_ERR_VERBOSE:
         case BISON_DEBUG:
             tflag = 1;
-                break;
+            break;
         case BISON_NAME_PREFIX:
-                {
-                        bucket *bp;
+            {
+                bucket *bp;
 
-                        /* = prefix */
-                    c = nextc();
-                        if (c != '=') error(lineno, line, cptr, "syntax error: expected '=' following %%name-prefix");
-                        cptr++;
-                    c = nextc();
-                        if (c == '\'' || c == '"')
-                        {
-                                bp = get_literal();
-                                /* strip quotes */
-                                name_prefix = strdup(bp->name + 1);
-                                name_prefix[strlen(name_prefix)-1] = 0;
-                        }
-                        else
-                        {
-                                bp = get_name();
-                                name_prefix = strdup(bp->name);
-                        }
+                /* = prefix */
+                c = nextc();
+                if (c != '=') error(lineno, line, cptr, "syntax error: expected '=' following %%name-prefix");
+                cptr++;
+                c = nextc();
+                if (c == '\'' || c == '"')
+                {
+                    bp = get_literal();
+                    /* strip quotes */
+                    name_prefix = strdup(bp->name + 1);
+                    name_prefix[strlen(name_prefix)-1] = 0;
                 }
-                break;
+                else
+                {
+                    bp = get_name();
+                    name_prefix = strdup(bp->name);
+                }
+            }
+            break;
         case BISON_FILE_PREFIX:
-                {
-                        bucket *bp;
+            {
+                bucket *bp;
 
-                        /* = prefix */
-                    c = nextc();
-                        if (k != '=') error(lineno, line, cptr, "syntax error: expected '=' following %%file-prefix");
-                        cptr++;
-                    c = nextc();
-                        if (c == '\'' || c == '"')
-                        {
-                                bp = get_literal();
-                                /* strip quotes */
-                                file_prefix = strdup(bp->name + 1);
-                                file_prefix[strlen(file_prefix)-1] = 0;
-                        }
-                        else
-                        {
-                                bp = get_name();
-                                file_prefix = strdup(bp->name);
-                        }
+                /* = prefix */
+                c = nextc();
+                if (k != '=') error(lineno, line, cptr, "syntax error: expected '=' following %%file-prefix");
+                cptr++;
+                c = nextc();
+                if (c == '\'' || c == '"')
+                {
+                    bp = get_literal();
+                    /* strip quotes */
+                    file_prefix = strdup(bp->name + 1);
+                    file_prefix[strlen(file_prefix)-1] = 0;
                 }
-                break;
+                else
+                {
+                    bp = get_name();
+                    file_prefix = strdup(bp->name);
+                }
+            }
+            break;
         case BISON_DEFINE:
 #if 0
+            {
+                char **ps;
+                char *var_name = s + 1;
+                extern char *defd_vars[];
+                for (ps = &defd_vars[0]; *ps; ps++)
                 {
-                        char **ps;
-                        char *var_name = s + 1;
-                        extern char *defd_vars[];
-                        for (ps = &defd_vars[0]; *ps; ps++)
-                        {
-                                if(strcmp(*ps,var_name) == 0)
-                                {
-                                        error(lineno, line, t_cptr, "Preprocessor variable %s already defined", var_name);
-                                }
-                        }
-                        *ps = MALLOC(strlen(var_name)+1);
-                        strcpy(*ps, var_name);
-                        *++ps = NULL;
+                    if(strcmp(*ps,var_name) == 0)
+                    {
+                        error(lineno, line, t_cptr, "Preprocessor variable %s already defined", var_name);
+                    }
+                }
+                *ps = MALLOC(strlen(var_name)+1);
+                strcpy(*ps, var_name);
+                *++ps = NULL;
             }
-                break;
+            break;
 #endif
         case BISON_PREC:
         case BISON_DPREC:
@@ -1078,8 +1078,8 @@ void read_declarations(void)
         case BISON_DESTRUCTOR:
         case BISON_PRINTER:
         case BISON_NTERM:
-                unsupported_feature(lineno, line, t_cptr);
-                break;
+            unsupported_feature(lineno, line, t_cptr);
+            break;
         } }
 }
 
@@ -1133,14 +1133,14 @@ void expand_rules(void)
 
 /* set in copy_args and incremented by the various routines that will rescan
 ** the argument list as appropriate */
-static int rescan_lineno;
+static int unsigned rescan_lineno;
 
 static char *copy_args(int *alen)
 {
 struct mstring  *s = msnew();
 int             depth = 0, len = 1, c;
 char            quote = 0;
-int             a_lineno = lineno;
+int unsigned    a_lineno = lineno;
 char            *a_line = dup_line();
 char            *a_cptr = a_line + (cptr - line - 1);
 
@@ -1378,7 +1378,7 @@ void advance_to_start(void)
     register int c;
     register bucket *bp;
     char *s_cptr;
-    int s_lineno;
+    int unsigned s_lineno;
     char        *args = 0;
     int         argslen = 0;
 
@@ -1421,7 +1421,7 @@ void advance_to_start(void)
     ++cptr;
 }
 
-void start_rule(bucket *bp, int s_lineno)
+void start_rule(bucket *bp, int unsigned s_lineno)
 {
     if (bp->classc == TERM)
         terminal_lhs(s_lineno);
@@ -1510,7 +1510,7 @@ void add_symbol(void)
 {
     register int c;
     register bucket *bp;
-    int s_lineno = lineno;
+    int unsigned s_lineno = lineno;
     char *args = 0;
     int argslen = 0;
 
@@ -1574,7 +1574,7 @@ void copy_action(void)
     int haveyyval = 0;
     char *tag;
     register FILE *f;
-    int a_lineno = lineno;
+    int unsigned a_lineno = lineno;
     char *a_line = dup_line();
     char *a_cptr = a_line + (cptr - line);
     Yshort *offsets=0, maxoffset;
@@ -1620,7 +1620,7 @@ loop:
     c = *cptr;
     if (c == '$') {
         if (cptr[1] == '<') {
-            int d_lineno = lineno;
+            int unsigned d_lineno = lineno;
             char *d_line = dup_line();
             char *d_cptr = d_line + (cptr - line);
 

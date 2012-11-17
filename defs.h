@@ -116,11 +116,11 @@ UNION                           = 8,
 IDENT                           = 9,
 
 /* [i_a] bison emulation additions */
-BISON_DEBUG             		= 110,
+BISON_DEBUG                     = 110,
 BISON_DEFINE                    = 111,
 BISON_DEFINES                   = 112,
 BISON_LOCATIONS                 = 113,
-BISON_PURE              		= 114,
+BISON_PURE                      = 114,
 BISON_NAME_PREFIX               = 115,
 BISON_FILE_PREFIX               = 116,
 BISON_ERR_VERBOSE               = 117,
@@ -133,13 +133,13 @@ BISON_PARSE_PARAM               = 123,
 BISON_SKELETON                  = 124,
 BISON_TOKEN_TABLE               = 125,
 BISON_VERBOSE                   = 126,
-BISON_YACC              		= 127,
+BISON_YACC                      = 127,
 BISON_DESTRUCTOR                = 128,
 BISON_PRINTER                   = 129,
-BISON_NTERM             		= 130,
-BISON_DPREC             		= 131,
-BISON_MERGE             		= 132,
-BISON_PREC              		= 133
+BISON_NTERM                     = 130,
+BISON_DPREC                     = 131,
+BISON_MERGE                     = 132,
+BISON_PREC                      = 133
 } BtYacc_keyword_code;
 
 typedef enum symbol_class_enumeration
@@ -283,8 +283,8 @@ extern char *file_prefix;
 extern char *name_prefix;
 extern char *cptr;
 extern char *line;
-extern int lineno;
-extern int outline;
+extern int unsigned lineno;
+extern int unsigned outline;
 
 extern char *action_file_name;
 extern char *code_file_name;
@@ -421,12 +421,12 @@ void revalued_warning(char const * s);
 void terminal_start(char const * s);
 void restarted_warning(void);
 void no_grammar(void);
-void terminal_lhs(int);
+void terminal_lhs(int unsigned lineno);
 void prec_redeclared(void);
 void unterminated_action(int unsigned lineno, char const * line, char const * cptr);
 void unterminated_arglist(int unsigned lineno, char const * line, char const * cptr);
 void bad_formals(void);
-void dollar_warning(int, int);
+void dollar_warning(int unsigned lineno, int i);
 void dollar_error(int unsigned lineno, char const * line, char const * cptr);
 void untyped_lhs(void);
 void untyped_rhs(int i, char const * s);
@@ -522,7 +522,7 @@ void initialize_grammar(void);
 void expand_items(void);
 void expand_rules(void);
 void advance_to_start(void);
-void start_rule(bucket *, int);
+void start_rule(bucket *bp, int unsigned lineno);
 void end_rule(void);
 void insert_empty_rule(void);
 void add_symbol(void);
