@@ -77,10 +77,10 @@ int     i;
 FILE    *fp;
 struct section *section_list = (struct section *)calloc(32, sizeof(section_list[0]));
 
-        if (!section_list) {
-                error(0, 0, 0, "Out of memory while preparing to read skeleton file \"%s\"", name);
-            exit(1);
-        }
+    if (!section_list) {
+        error(0, 0, 0, "Out of memory while preparing to read skeleton file \"%s\"", name);
+        exit(1);
+    }
     if (!(fp = fopen(name, "r")))
         open_error(name);
     while(fgets(buf, 255, fp)) {
@@ -128,5 +128,5 @@ struct section *section_list = (struct section *)calloc(32, sizeof(section_list[
         section_list[section].ptr = fin_section();
     if (section == -2)
         error(0, 0, 0, "No sections found in skeleton file \"%s\"", name);
-        return section_list;
+    return section_list;
 }

@@ -284,7 +284,7 @@ static struct keyword { char name[20]; int token; } keywords[] = {
         { "define", BISON_DEFINE },                       /* [i_a] bison emulation additions */
         { "defines", BISON_DEFINES },                     /* [i_a] bison emulation additions */
         { "destructor", BISON_DESTRUCTOR },               /* [i_a] bison emulation additions */
-        { "dprec", BISON_DPREC },                                     /* [i_a] bison emulation additions */
+        { "dprec", BISON_DPREC },                         /* [i_a] bison emulation additions */
         { "error-verbose", BISON_ERR_VERBOSE },           /* [i_a] bison emulation additions */
         { "error_verbose", BISON_ERR_VERBOSE },           /* [i_a] bison emulation additions */
         { "expect", BISON_EXPECT },                       /* [i_a] bison emulation additions */
@@ -299,7 +299,7 @@ static struct keyword { char name[20]; int token; } keywords[] = {
         { "lex-param", BISON_LEX_PARAM },                 /* [i_a] bison emulation additions */
         { "lex_param", BISON_LEX_PARAM },                 /* [i_a] bison emulation additions */
         { "locations", BISON_LOCATIONS },                 /* [i_a] bison emulation additions */
-        { "merge", BISON_MERGE },                                                 /* [i_a] bison emulation additions */
+        { "merge", BISON_MERGE },                         /* [i_a] bison emulation additions */
         { "name-prefix", BISON_NAME_PREFIX },             /* [i_a] bison emulation additions */
         { "name_prefix", BISON_NAME_PREFIX },             /* [i_a] bison emulation additions */
         { "no-lines", BISON_NO_LINES },                   /* [i_a] bison emulation additions */
@@ -308,7 +308,7 @@ static struct keyword { char name[20]; int token; } keywords[] = {
         { "nterm", BISON_NTERM },                         /* [i_a] bison emulation additions */
         { "output", BISON_OUTPUT },                       /* [i_a] bison emulation additions */
         { "parse-param", BISON_PARSE_PARAM },             /* [i_a] bison emulation additions */
-        { "prec", BISON_PREC },                                   /* [i_a] bison emulation additions */
+        { "prec", BISON_PREC },                           /* [i_a] bison emulation additions */
         { "printer", BISON_PRINTER },                     /* [i_a] bison emulation additions */
         { "pure-parser", BISON_PURE },                    /* [i_a] bison emulation additions */
         { "pure_parser", BISON_PURE },                    /* [i_a] bison emulation additions */

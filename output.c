@@ -36,7 +36,8 @@ void output()
     free_parser();
     output_debug();
     output_stype();
-    if (rflag) write_section("tables");
+    if (rflag)
+        write_section("tables");
     write_section("header");
     output_trailing_text();
     write_section("body");
@@ -50,12 +51,10 @@ void output_rule_data()
     register int i;
     register int j;
 
-        open_output_files();
+    open_output_files();
 
-    if (!rflag)
-        BtYacc_puts("static ", output_file);
-
-    BtYacc_printf(output_file, "Yshort yylhs[] = {%42d,",
+    BtYacc_printf(output_file, "%sYshort yylhs[] = {%41d,",
+            (!rflag ? "static " : ""),
             symbol_value[start_symbol]);
 
     j = 10;
@@ -70,18 +69,18 @@ void output_rule_data()
             j = 1;
         }
         else
+        {
             ++j;
-
+        }
         BtYacc_printf(output_file, "%5d,", symbol_value[rlhs[i]]);
     }
     if (!rflag) outline += 2;
 
     BtYacc_puts("\n};\n", output_file);
 
-    if (!rflag)
-        BtYacc_puts("static ", output_file);
-
-    BtYacc_printf(output_file, "Yshort yylen[] = {%42d,", 2);
+    BtYacc_printf(output_file, "%sYshort yylen[] = {%41d,",
+                (!rflag ? "static " : ""),
+                2);
 
     j = 10;
 
@@ -95,7 +94,9 @@ void output_rule_data()
             j = 1;
         }
         else
-          ++j;
+        {
+            ++j;
+        }
 
         BtYacc_printf(output_file, "%5d,", rrhs[i + 1] - rrhs[i] - 1);
     }
@@ -111,10 +112,8 @@ void output_yydefred()
 
         open_output_files();
 
-    if (!rflag)
-        BtYacc_puts("static ", output_file);
-
-    BtYacc_printf(output_file, "Yshort yydefred[] = {%39d,",
+    BtYacc_printf(output_file, "%sYshort yydefred[] = {%38d,",
+            (!rflag ? "static " : ""),
             (defred[0] ? defred[0] - 2 : 0));
 
     j = 10;
@@ -122,7 +121,9 @@ void output_yydefred()
     for (i = 1; i < nstates; ++i)
     {
         if (j < 10)
+        {
             ++j;
+        }
         else
         {
             if (!rflag) ++outline;
@@ -143,12 +144,16 @@ static int find_conflict_base(int cbase)
 {
     int i,j;
 
-    for (i = 0; i < cbase; ++i) {
-        for (j = 0; j + cbase < nconflicts; ++j) {
+    for (i = 0; i < cbase; ++i)
+    {
+        for (j = 0; j + cbase < nconflicts; ++j)
+        {
             if (conflicts[i+j] != conflicts[cbase+j])
-                break; }
+                break;
+        }
         if (j+cbase >= nconflicts)
-            return i; }
+            return i;
+    }
     return cbase;
 }
 
@@ -389,15 +394,15 @@ static void goto_actions(void)
 {
     register int i, j, k;
 
-        open_output_files();
+    open_output_files();
 
     state_count = NEW2(nstates, Yshort);
 
     k = default_goto(start_symbol + 1);
-    if (!rflag)
-        BtYacc_puts("static ", output_file);
 
-    BtYacc_printf(output_file, "Yshort yydgoto[] = {%40d,", k);
+    BtYacc_printf(output_file, "%sYshort yydgoto[] = {%39d,",
+                (!rflag ? "static " : ""),
+                k);
     save_column(start_symbol + 1, k);
 
     j = 10;
@@ -635,10 +640,9 @@ void output_base()
 
         open_output_files();
 
-    if (!rflag)
-        BtYacc_puts("static ", output_file);
-
-    BtYacc_printf(output_file, "Yshort yysindex[] = {%39d,", base[0]);
+    BtYacc_printf(output_file, "%sYshort yysindex[] = {%38d,",
+                (!rflag ? "static " : ""),
+                base[0]);
     j = 10;
 
     for (i = 1; i < nstates; ++i) {
@@ -656,10 +660,9 @@ void output_base()
 
     BtYacc_puts("\n};\n", output_file);
 
-    if (!rflag)
-                BtYacc_puts("static ", output_file);
-
-    BtYacc_printf(output_file, "Yshort yyrindex[] = {%39d,", base[nstates]);
+    BtYacc_printf(output_file, "%sYshort yyrindex[] = {%38d,",
+                (!rflag ? "static " : ""),
+                base[nstates]);
     j = 10;
 
     for (i = nstates + 1; i < 2 * nstates; ++i) {
@@ -677,10 +680,9 @@ void output_base()
 
     BtYacc_puts("\n};\n", output_file);
 
-    if (!rflag)
-                BtYacc_puts("static ", output_file);
-
-    BtYacc_printf(output_file, "Yshort yycindex[] = {%39d,", base[2*nstates]);
+    BtYacc_printf(output_file, "%sYshort yycindex[] = {%38d,",
+                (!rflag ? "static " : ""),
+                base[2*nstates]);
     j = 10;
 
     for (i = 2 * nstates + 1; i < 3 * nstates; ++i) {
@@ -699,10 +701,9 @@ void output_base()
 
     BtYacc_puts("\n};\n", output_file);
 
-    if (!rflag)
-                BtYacc_puts("static ", output_file);
-
-    BtYacc_printf(output_file, "Yshort yygindex[] = {%39d,", base[3*nstates]);
+    BtYacc_printf(output_file, "%sYshort yygindex[] = {%38d,",
+                (!rflag ? "static " : ""),
+                base[3*nstates]);
     j = 10;
 
     for (i = 3 * nstates + 1; i < nvectors - 1; ++i) {
@@ -743,10 +744,9 @@ void output_table()
 
     BtYacc_printf(code_file, "#define YYTABLESIZE %d\n", high);
 
-    if (!rflag)
-                BtYacc_puts("static ", output_file);
-
-    BtYacc_printf(output_file, "Yshort yytable[] = {%40d,", table[0]);
+    BtYacc_printf(output_file, "%sYshort yytable[] = {%39d,",
+                (!rflag ? "static " : ""),
+                table[0]);
 
     j = 10;
 
@@ -780,10 +780,9 @@ void output_check()
 
         open_output_files();
 
-    if (!rflag)
-        BtYacc_puts("static ", output_file);
-
-    BtYacc_printf(output_file, "Yshort yycheck[] = {%40d,", check[0]);
+    BtYacc_printf(output_file, "%sYshort yycheck[] = {%39d,",
+                (!rflag ? "static " : ""),
+                check[0]);
 
     j = 10;
 
@@ -813,12 +812,11 @@ void output_ctable()
     register int i;
     register int j;
 
-        open_output_files();
+    open_output_files();
 
-    if (!rflag)
-                BtYacc_puts("static ", output_file);
-
-    BtYacc_printf(output_file, "Yshort yyctable[] = {%39d,", conflicts ? conflicts[0] : 0);
+    BtYacc_printf(output_file, "%sYshort yyctable[] = {%38d,",
+                (!rflag ? "static " : ""),
+                (conflicts ? conflicts[0] : 0));
 
     j = 10;
 
@@ -881,7 +879,7 @@ void output_defines()
     register char *s;
     FILE *dc_file;
 
-        open_output_files();
+    open_output_files();
 
     if(dflag) {
       BtYacc_puts("#ifndef _yacc_defines_h_\n", defines_file);
@@ -950,7 +948,7 @@ void output_stored_text()
     register FILE *in, *out;
     register int state; /* 0=middle of line, 1=start of line, 2=seen '#' */
 
-        open_output_files();
+    open_output_files();
 
     state = 1;
 
@@ -1025,10 +1023,8 @@ void output_debug()
 
     BtYacc_puts("#if YYDEBUG\n", output_file);
 
-    if (!rflag)
-        BtYacc_puts("static ", output_file);
-
-    BtYacc_puts("char *yyname[] = {", output_file);
+    BtYacc_printf(output_file, "%schar *yyname[] = {",
+                (!rflag ? "static " : ""));
     j = 80;
     for (i = 0; i <= max; ++i)
     {
@@ -1171,10 +1167,9 @@ void output_debug()
     FREE(symnam);
 
     if (!rflag) ++outline;
-    if (!rflag)
-        BtYacc_puts("static ", output_file);
 
-    BtYacc_puts("char *yyrule[] = {\n", output_file);
+    BtYacc_printf(output_file, "%schar *yyrule[] = {\n",
+                (!rflag ? "static " : ""));
 
     for (i = 2; i < nrules; ++i)
     {
@@ -1239,7 +1234,7 @@ void output_debug()
 
 void output_stype()
 {
-        open_output_files();
+    open_output_files();
 
     if (!unionized && ntags == 0)
     {
@@ -1257,7 +1252,7 @@ void output_trailing_text()
     if (line == 0)
                 return;
 
-        open_output_files();
+    open_output_files();
 
     in = input_file;
     out = code_file;
@@ -1410,7 +1405,7 @@ void write_section(char const * section_name)
     int i;
     struct section *sl;
 
-        open_output_files();
+    open_output_files();
 
     for (sl = &active_section_list[0]; sl->name; ++sl) {
       if(strcmp(sl->name,section_name)==0) {
