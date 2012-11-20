@@ -12,28 +12,28 @@ typedef
     }
   shorts;
 
-int tokensetsize;
-Yshort *lookaheads;
-Yshort *LAruleno;
-unsigned *LA;
-Yshort *accessing_symbol;
-core **state_table;
-shifts **shift_table;
-reductions **reduction_table;
-Yshort *goto_map;
-Yshort *from_state;
-Yshort *to_state;
+int tokensetsize = 0;
+Yshort *lookaheads = NULL;
+Yshort *LAruleno = NULL;
+int unsigned *LA = NULL;
+Yshort *accessing_symbol = NULL;
+core **state_table = NULL;
+shifts **shift_table = NULL;
+reductions **reduction_table = NULL;
+Yshort *goto_map = NULL;
+Yshort *from_state = NULL;
+Yshort *to_state = NULL;
 
-static int infinity;
-static int maxrhs;
-static int ngotos;
-static unsigned *F;
-static Yshort **includes;
-static shorts **lookback;
-static Yshort **R;
-static Yshort *INDEX;
-static Yshort *VERTICES;
-static int top;
+static int infinity = 0;
+static int maxrhs = 0;
+static int ngotos = 0;
+static unsigned *F = NULL;
+static Yshort **includes = NULL;
+static shorts **lookback = NULL;
+static Yshort **R = NULL;
+static Yshort *INDEX = NULL;
+static Yshort *VERTICES = NULL;
+static int top = 0;
 
 
 

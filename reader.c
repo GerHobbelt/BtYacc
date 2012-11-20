@@ -17,39 +17,39 @@
 /* this is a hard limit, but seems more than adequate */
 #define MAXARGS 20
 
-char *cache;
-int cinc, cache_size;
+char *cache = NULL;
+int cinc = 0, cache_size = 0;
 
-int ntags, tagmax, havetags=0;
-char **tag_table;
+int ntags = 0, tagmax = 0, havetags = 0;
+char **tag_table = NULL;
 
-char saw_eof, unionized;
-char *cptr, *line;
-int linesize;
+char saw_eof = 0, unionized = 0;
+char *cptr = NULL, *line = NULL;
+int linesize = 0;
 
 FILE *inc_file = NULL;
-char  inc_file_name[LINESIZE];
-int unsigned inc_save_lineno;
+char  inc_file_name[LINESIZE] = "???";
+int unsigned inc_save_lineno = 0;
 
 int in_ifdef = 0;
-int ifdef_skip;
+int ifdef_skip = 0;
 
 #define MAX_DEFD_VARS 1000
 char *defd_vars[MAX_DEFD_VARS] = {NULL};
 
-bucket *goal;
-int prec;
-int gensym;
-char last_was_action;
+bucket *goal = NULL;
+int prec = 0;
+int gensym = 0;
+char last_was_action = 0;
 
-int maxitems;
-bucket **pitem;
+int maxitems = 0;
+bucket **pitem = NULL;
 
-int maxrules;
-bucket **plhs;
+int maxrules = 0;
+bucket **plhs = NULL;
 
-int name_pool_size;
-char *name_pool;
+int name_pool_size = 0;
+char *name_pool = NULL;
 
 char const line_format[] = "#line %d \"%s\"\n";
 
@@ -207,7 +207,7 @@ char *get_line() {
   return cptr = line;
 }
 
-char *dup_line()
+char *dup_line(void)
 {
     register char *p, *s, *t;
 
@@ -221,7 +221,7 @@ char *dup_line()
     return (p);
 }
 
-char *skip_comment()
+char *skip_comment(void)
 {
     register char *s;
 
@@ -240,7 +240,7 @@ char *skip_comment()
     return cptr = s + 2;
 }
 
-int nextc()
+int nextc(void)
 {
     register char *s;
 
@@ -508,7 +508,7 @@ void copy_union(void)
     char *u_line = dup_line();
     char *u_cptr = u_line + (cptr - line - 6);
 
-        open_output_files();
+    open_output_files();
 
     if (unionized) over_unionized(cptr - 6);
     unionized = 1;
@@ -951,7 +951,7 @@ void declare_start(void)
 void read_declarations(void)
 {
     register int c, k;
-        char *t_cptr;
+    char *t_cptr;
 
     cache_size = 256;
     cache = MALLOC(cache_size);

@@ -8,30 +8,26 @@
 #include "log.h"
 #endif
 
-extern Yshort *itemset;
-extern Yshort *itemsetend;
-extern unsigned *ruleset;
+int nstates = 0;
+core *first_state = NULL;
+shifts *first_shift = NULL;
+reductions *first_reduction = NULL;
 
-int nstates;
-core *first_state;
-shifts *first_shift;
-reductions *first_reduction;
+static core **state_set = NULL;
+static core *this_state = NULL;
+static core *last_state = NULL;
+static shifts *last_shift = NULL;
+static reductions *last_reduction = NULL;
 
-static core **state_set;
-static core *this_state;
-static core *last_state;
-static shifts *last_shift;
-static reductions *last_reduction;
+static int nshifts = 0;
+static Yshort *shift_symbol = NULL;
 
-static int nshifts;
-static Yshort *shift_symbol;
+static Yshort *redset = NULL;
+static Yshort *shiftset = NULL;
 
-static Yshort *redset;
-static Yshort *shiftset;
-
-static Yshort **kernel_base;
-static Yshort **kernel_end;
-static Yshort *kernel_items;
+static Yshort **kernel_base = NULL;
+static Yshort **kernel_end = NULL;
+static Yshort *kernel_items = NULL;
 
 
 static void allocate_itemsets(void)
@@ -400,7 +396,7 @@ static void generate_states(void)
 
 /* show_cores is used for debugging */
 
-void show_cores()
+void show_cores(void)
 {
     core *p;
     int i, j, k, n;
@@ -435,7 +431,7 @@ void show_cores()
 
 /* show_ritems is used for debugging */
 
-void show_ritems()
+void show_ritems(void)
 {
     int i;
 
@@ -445,7 +441,7 @@ void show_ritems()
 
 
 /* show_rrhs is used for debugging */
-void show_rrhs()
+void show_rrhs(void)
 {
     int i;
 
@@ -456,7 +452,7 @@ void show_rrhs()
 
 /* show_shifts is used for debugging */
 
-void show_shifts()
+void show_shifts(void)
 {
     shifts *p;
     int i, j, k;
@@ -530,7 +526,7 @@ static void set_derives(void)
 #endif
 }
 
-void free_derives()
+void free_derives(void)
 {
     FREE(derives[start_symbol]);
     FREE(derives);
@@ -587,13 +583,13 @@ static void set_nullable(void)
 }
 
 
-void free_nullable()
+void free_nullable(void)
 {
     FREE(nullable);
 }
 
 
-void lr0()
+void lr0(void)
 {
     set_derives();
     set_nullable();

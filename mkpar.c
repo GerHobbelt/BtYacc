@@ -5,18 +5,18 @@
 #include "defs.h"
 #include "log.h"
 
-action **parser;
-int SRtotal;
-int RRtotal;
-Yshort *SRconflicts;
-Yshort *RRconflicts;
-Yshort *defred;
-Yshort *rules_used;
-Yshort nunused;
-Yshort final_state;
+action **parser = NULL;
+int SRtotal = 0;
+int RRtotal = 0;
+Yshort *SRconflicts = NULL;
+Yshort *RRconflicts = NULL;
+Yshort *defred = NULL;
+Yshort *rules_used = NULL;
+Yshort nunused = 0;
+Yshort final_state = NULL;
 
-static int SRcount;
-static int RRcount;
+static int SRcount = 0;
+static int RRcount = 0;
 
 static void find_final_state(void)
 {
@@ -152,7 +152,7 @@ static void defreds(void)
         defred[i] = sole_reduction(i);
 }
 
-void make_parser()
+void make_parser(void)
 {
     register int i;
 
@@ -308,7 +308,7 @@ void free_action_row(action *p)
     }
 }
 
-void free_parser()
+void free_parser(void)
 {
   register int i;
 

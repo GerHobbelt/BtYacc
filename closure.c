@@ -4,15 +4,15 @@
 
 #include "defs.h"
 
-Yshort *itemset;
-Yshort *itemsetend;
-unsigned *ruleset;
+Yshort *itemset = NULL;
+Yshort *itemsetend = NULL;
+int unsigned *ruleset = NULL;
 
-static unsigned *first_derives;
-static unsigned *EFF;
+static int unsigned *first_derives = NULL;
+static int unsigned *EFF = NULL;
 
 
-void finalize_closure()
+void finalize_closure(void)
 {
   FREE(itemset);
   FREE(ruleset);
@@ -139,7 +139,7 @@ static void set_EFF(void)
 }
 
 
-void set_first_derives()
+void set_first_derives(void)
 {
   register unsigned *rrow;
   register unsigned *vrow;

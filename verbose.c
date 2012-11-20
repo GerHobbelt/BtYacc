@@ -7,7 +7,7 @@
 #include <stdarg.h>
 
 
-static Yshort *null_rules;
+static Yshort *null_rules = NULL;
 
 void verbose(void)
 {

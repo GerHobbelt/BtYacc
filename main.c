@@ -24,6 +24,7 @@ char tflag = 0;
 char vflag = 0;
 int Eflag = 0;
 
+char *target_dir = NULL;
 char *file_prefix = NULL;
 char *name_prefix = "yy";
 char *myname = "btyacc";
@@ -176,6 +177,7 @@ static SPLINT_NO_RETURN void usage(void)
             "  -DNAME       Define btyacc preprocessor variable NAME\n"
             "  -E           Print preprocessed grammar to stdout\n"
             "  -l           Do not insert #line directives into generated code\n"
+			"  -o path      Write all files to directory <path> instead of current working directory\n"
             "  -r           Write tables to `y.tab.c', code to `y.code.c'\n"
             "  -S x.skel    Select parser skeleton\n"
             "  -t           Include debugging code in generated parser\n"
@@ -259,6 +261,15 @@ static void getargs(int argc, char **argv)
         case 'l':
             lflag = 1;
             break;
+
+        case 'o':
+            if (*++s)
+                target_dir = s;
+            else if (++i < argc)
+                target_dir = argv[i];
+            else
+                usage();
+            continue;
 
         case 'r':
             rflag = 1;
@@ -348,6 +359,21 @@ no_more_options:;
     if (!file_prefix || !*file_prefix) {
         file_prefix = "y";
     }
+
+	if (target_dir && *target_dir) {
+        char *p;
+		size_t l = strlen(target_dir);
+        p = (char *)MALLOC(l + 2);
+		if (!p) no_space();
+		strcpy(p, target_dir);
+		if (p[l - 1] != '/' && p[l - 1] != '\\' && p[l - 1] != ':')
+		{
+			p[l++] = '/';
+			p[l] = 0;
+		}
+	}
+	if (!target_dir || !*target_dir) 
+		target_dir = "";
 }
 
 char *allocate(unsigned n)
@@ -490,11 +516,12 @@ void create_files(void)
     action_file = create_temporary_file(action_file_name);
     text_file = create_temporary_file(text_file_name);
 
-    len = strlen(file_prefix);
+    len = strlen(file_prefix) + strlen(target_dir);
 
     output_file_name = (char *)MALLOC(len + 7);
     if (output_file_name == 0)
         no_space();
+    strcpy(output_file_name, target_dir);
     strcpy(output_file_name, file_prefix);
     strcpy(output_file_name + len, OUTPUT_SUFFIX);
 
@@ -503,6 +530,7 @@ void create_files(void)
         code_file_name = (char *)MALLOC(len + 8);
         if (code_file_name == 0)
             no_space();
+	    strcpy(code_file_name, target_dir);
         strcpy(code_file_name, file_prefix);
         strcpy(code_file_name + len, CODE_SUFFIX);
     }
@@ -517,6 +545,7 @@ void create_files(void)
         defines_file_name = (char *)MALLOC(len + 7);
         if (defines_file_name == 0)
             no_space();
+	    strcpy(defines_file_name, target_dir);
         strcpy(defines_file_name, file_prefix);
         strcpy(defines_file_name + len, DEFINES_SUFFIX);
     }
@@ -526,6 +555,7 @@ void create_files(void)
         verbose_file_name = (char *)MALLOC(len + 8);
         if (verbose_file_name == 0)
             no_space();
+	    strcpy(verbose_file_name, target_dir);
         strcpy(verbose_file_name, file_prefix);
         strcpy(verbose_file_name + len, VERBOSE_SUFFIX);
     }

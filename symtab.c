@@ -11,9 +11,9 @@
 #define TABLE_SIZE 1024
 
 
-bucket **symbol_table;
-bucket *first_symbol;
-bucket *last_symbol;
+bucket **symbol_table = NULL;
+bucket *first_symbol = NULL;
+bucket *last_symbol = NULL;
 
 
 int hash(char const * name)
@@ -81,7 +81,7 @@ bucket* lookup(char const * name)
 }
 
 
-void create_symbol_table()
+void create_symbol_table(void)
 {
     register int i;
     register bucket *bp;
@@ -102,14 +102,14 @@ void create_symbol_table()
 }
 
 
-void free_symbol_table()
+void free_symbol_table(void)
 {
     FREE(symbol_table);
     symbol_table = 0;
 }
 
 
-void free_symbols()
+void free_symbols(void)
 {
     register bucket *p, *q;
 

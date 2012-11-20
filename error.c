@@ -10,9 +10,6 @@
 #include "write.h"
 #include <stdarg.h>
 
-extern FILE *inc_file;
-extern char inc_file_name[];
-
 /*
  * VM: print error message with file coordinates.
  * Do it in style acceptable to emacs.

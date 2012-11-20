@@ -5,25 +5,25 @@
 #include "defs.h"
 #include "write.h"
 
-static int nvectors;
-static int nentries;
-static Yshort **froms;
-static Yshort **tos;
-static Yshort *conflicts, nconflicts;
-static Yshort *tally;
-static Yshort *width;
-static Yshort *state_count;
-static Yshort *order;
-static Yshort *base;
-static Yshort *pos;
-static int maxtable;
-static Yshort *table;
-static Yshort *check;
-static int lowzero;
-static int high;
+static int nvectors = 0;
+static int nentries = 0;
+static Yshort **froms = NULL;
+static Yshort **tos = NULL;
+static Yshort *conflicts = NULL, nconflicts = 0;
+static Yshort *tally = NULL;
+static Yshort *width = NULL;
+static Yshort *state_count = NULL;
+static Yshort *order = NULL;
+static Yshort *base = NULL;
+static Yshort *pos = NULL;
+static int maxtable = 0;
+static Yshort *table = NULL;
+static Yshort *check = NULL;
+static int lowzero = 0;
+static int high = 0;
 
 
-void output()
+void output(void)
 {
     free_itemsets();
     free_shifts();
@@ -46,7 +46,7 @@ void output()
 }
 
 
-void output_rule_data()
+void output_rule_data(void)
 {
     register int i;
     register int j;
@@ -104,7 +104,7 @@ void output_rule_data()
 }
 
 
-void output_yydefred()
+void output_yydefred(void)
 {
     register int i, j;
 
@@ -459,7 +459,7 @@ static void sort_actions(void)
     }
 }
 
-void output_actions()
+void output_actions(void)
 {
     nvectors = 3*nstates + nvars;
 
@@ -629,7 +629,7 @@ int pack_vector(int vector)
 
 
 
-void output_base()
+void output_base(void)
 {
     register int i, j;
 
@@ -728,7 +728,7 @@ void output_base()
 
 
 
-void output_table()
+void output_table(void)
 {
     register int i;
     register int j;
@@ -775,7 +775,7 @@ void output_table()
 
 
 
-void output_check()
+void output_check(void)
 {
     register int i;
     register int j;
@@ -807,7 +807,7 @@ void output_check()
     FREE(check);
 }
 
-void output_ctable()
+void output_ctable(void)
 {
     register int i;
     register int j;
@@ -872,7 +872,7 @@ int is_C_identifier(char const * name)
 }
 
 
-void output_defines()
+void output_defines(void)
 {
     register int c, i;
     register char *s;
@@ -943,7 +943,7 @@ void output_defines()
 }
 
 
-void output_stored_text()
+void output_stored_text(void)
 {
     register int c;
     register FILE *in;
@@ -988,7 +988,7 @@ void output_stored_text()
 }
 
 
-void output_debug()
+void output_debug(void)
 {
     register int i, j, k, max;
     char **symnam, *s;
@@ -1229,7 +1229,7 @@ void output_debug()
 }
 
 
-void output_stype()
+void output_stype(void)
 {
     open_output_files();
 
@@ -1241,7 +1241,7 @@ void output_stype()
 }
 
 
-void output_trailing_text()
+void output_trailing_text(void)
 {
     register int c, last;
     register FILE *in;
@@ -1306,7 +1306,7 @@ void output_trailing_text()
 }
 
 
-void output_semantic_actions()
+void output_semantic_actions(void)
 {
     register int c, last;
     register int state; /* 0=middle of line, 1=start of line, 2=seen '#' */
@@ -1359,7 +1359,7 @@ void output_semantic_actions()
 }
 
 
-void free_itemsets()
+void free_itemsets(void)
 {
     register core *cp, *next;
 
@@ -1372,7 +1372,7 @@ void free_itemsets()
 }
 
 
-void free_shifts()
+void free_shifts(void)
 {
     register shifts *sp, *next;
 
@@ -1386,7 +1386,7 @@ void free_shifts()
 
 
 
-void free_reductions()
+void free_reductions(void)
 {
     register reductions *rp, *next;
 

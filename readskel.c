@@ -8,10 +8,10 @@
 /* amount of memeory to allocate at once */
 #define CHUNK   8192
 
-static char     *cp, *cp_end;
-static char const * * ap;
-static char const * * ap_start;
-static char const * * ap_end;
+static char     *cp = NULL, *cp_end = NULL;
+static char const * * ap = NULL;
+static char const * * ap_start = NULL;
+static char const * * ap_end = NULL;
 
 static void add_ptr(char const * const p)
 {

@@ -104,51 +104,51 @@ typedef int Yshort;
 
 typedef enum keyword_code_enumeration
 {
-TOKEN                           = 0,
-LEFT                            = 1,
-RIGHT                           = 2,
-NONASSOC                        = 3,
-MARK                            = 4,
-TEXT                            = 5,
-TYPE                            = 6,
-START                           = 7,
-UNION                           = 8,
-IDENT                           = 9,
+	TOKEN                           = 0,
+	LEFT                            = 1,
+	RIGHT                           = 2,
+	NONASSOC                        = 3,
+	MARK                            = 4,
+	TEXT                            = 5,
+	TYPE                            = 6,
+	START                           = 7,
+	UNION                           = 8,
+	IDENT                           = 9,
 
-/* [i_a] bison emulation additions */
-BISON_DEBUG                     = 110,
-BISON_DEFINE                    = 111,
-BISON_DEFINES                   = 112,
-BISON_LOCATIONS                 = 113,
-BISON_PURE                      = 114,
-BISON_NAME_PREFIX               = 115,
-BISON_FILE_PREFIX               = 116,
-BISON_ERR_VERBOSE               = 117,
-BISON_EXPECT                    = 118,
-BISON_GLR_PARSER                = 119,
-BISON_LEX_PARAM                 = 120,
-BISON_NO_LINES                  = 121,
-BISON_OUTPUT                    = 122,
-BISON_PARSE_PARAM               = 123,
-BISON_SKELETON                  = 124,
-BISON_TOKEN_TABLE               = 125,
-BISON_VERBOSE                   = 126,
-BISON_YACC                      = 127,
-BISON_DESTRUCTOR                = 128,
-BISON_PRINTER                   = 129,
-BISON_NTERM                     = 130,
-BISON_DPREC                     = 131,
-BISON_MERGE                     = 132,
-BISON_PREC                      = 133
+	/* [i_a] bison emulation additions */
+	BISON_DEBUG                     = 110,
+	BISON_DEFINE                    = 111,
+	BISON_DEFINES                   = 112,
+	BISON_LOCATIONS                 = 113,
+	BISON_PURE                      = 114,
+	BISON_NAME_PREFIX               = 115,
+	BISON_FILE_PREFIX               = 116,
+	BISON_ERR_VERBOSE               = 117,
+	BISON_EXPECT                    = 118,
+	BISON_GLR_PARSER                = 119,
+	BISON_LEX_PARAM                 = 120,
+	BISON_NO_LINES                  = 121,
+	BISON_OUTPUT                    = 122,
+	BISON_PARSE_PARAM               = 123,
+	BISON_SKELETON                  = 124,
+	BISON_TOKEN_TABLE               = 125,
+	BISON_VERBOSE                   = 126,
+	BISON_YACC                      = 127,
+	BISON_DESTRUCTOR                = 128,
+	BISON_PRINTER                   = 129,
+	BISON_NTERM                     = 130,
+	BISON_DPREC                     = 131,
+	BISON_MERGE                     = 132,
+	BISON_PREC                      = 133
 } BtYacc_keyword_code;
 
 typedef enum symbol_class_enumeration
 {
-UNKNOWN = 0,
-TERM = 1,
-NONTERM = 2,
-ACTION = 3,
-ARGUMENT = 4
+	UNKNOWN = 0,
+	TERM = 1,
+	NONTERM = 2,
+	ACTION = 3,
+	ARGUMENT = 4
 } BtYacc_symbol_class;
 
 
@@ -279,6 +279,7 @@ extern char tflag;
 extern char vflag;
 
 extern char *myname;
+extern char *target_dir;
 extern char *file_prefix;
 extern char *name_prefix;
 extern char *cptr;
@@ -346,7 +347,7 @@ extern Yshort *accessing_symbol;
 extern core **state_table;
 extern shifts **shift_table;
 extern reductions **reduction_table;
-extern unsigned *LA;
+extern int unsigned *LA;
 extern Yshort *LAruleno;
 extern Yshort *lookaheads;
 extern Yshort *goto_map;
@@ -362,6 +363,11 @@ extern Yshort *defred;
 extern Yshort *rules_used;
 extern Yshort nunused;
 extern Yshort final_state;
+
+extern Yshort *itemset;
+extern Yshort *itemsetend;
+extern int unsigned *ruleset;
+
 
 /* system variable */
 #if !HAS_MSVC_2005_ISO_RTL

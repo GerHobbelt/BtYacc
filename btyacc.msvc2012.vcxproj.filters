@@ -19,6 +19,9 @@
     <Filter Include="Extra Files">
       <UniqueIdentifier>{90b25bb1-cb89-49b8-a163-894a5978461d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Extra Files\Test Files">
+      <UniqueIdentifier>{b8cf5d91-e395-4b75-885e-23efdfb69671}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="closure.c">
@@ -159,6 +162,33 @@
     </None>
     <None Include="build.h.in">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="test\ansiC.y">
+      <Filter>Extra Files\Test Files</Filter>
+    </None>
+    <None Include="test\ansiC2.y">
+      <Filter>Extra Files\Test Files</Filter>
+    </None>
+    <None Include="test\empty.y">
+      <Filter>Extra Files\Test Files</Filter>
+    </None>
+    <None Include="test\error.y">
+      <Filter>Extra Files\Test Files</Filter>
+    </None>
+    <None Include="test\firebird.y">
+      <Filter>Extra Files\Test Files</Filter>
+    </None>
+    <None Include="test\ftp.y">
+      <Filter>Extra Files\Test Files</Filter>
+    </None>
+    <None Include="test\t1.y">
+      <Filter>Extra Files\Test Files</Filter>
+    </None>
+    <None Include="test\t2.y">
+      <Filter>Extra Files\Test Files</Filter>
+    </None>
+    <None Include="test\test.y">
+      <Filter>Extra Files\Test Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
