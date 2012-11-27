@@ -633,7 +633,7 @@ void output_base(void)
 {
     register int i, j;
 
-        open_output_files();
+    open_output_files();
 
     BtYacc_printf(output_file, "%sYshort yysindex[] = {%38d,",
                 (!rflag ? "static " : ""),

@@ -86,7 +86,7 @@ static char const * const tables[] =
     "extern _YACC_EXTERN_ Yshort yylhs[];",
     "extern _YACC_EXTERN_ Yshort yylen[];",
     "",
-    "/* idx: current state; entry: non-zero if to reduce regardless of lookahead*/",
+    "/* idx: current state; entry: non-zero if to reduce regardless of lookahead */",
     "extern _YACC_EXTERN_ Yshort yydefred[];",
     "",
     "extern _YACC_EXTERN_ Yshort yydgoto[];",

@@ -8,13 +8,8 @@
 *.user
 *.ncb
 
-build/msvc2010/bin/
-build/msvc2010/obj/
-build/msvc2010/ipch/
-
-build/msvc2008/bin/
-build/msvc2008/obj/
-build/msvc2008/ipch/
+obj/
+ipch/
 
 *.suo
 *.sdf
