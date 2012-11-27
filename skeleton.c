@@ -1,11 +1,3 @@
-/* -*- C -*-
-
-   The banner used here should be replaced with an #ident directive if
-   the target C compiler supports #ident directives.
-
-   If the skeleton is changed, the banner should be changed so that
-   the altered version can easily be distinguished from the original.  */
-
 /*
 ** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\btyaccpa.ske
 */
@@ -14,9 +6,26 @@
 
 
 
+static char const * const language[] =
+{
+    "#line 2 \"btyaccpa.ske\"",
+    "C",
+    "",
+    0
+};
+
+/* -*- C -*-
+
+   The banner used here should be replaced with an #ident directive if
+   the target C compiler supports #ident directives.
+
+   If the skeleton is changed, the banner should be changed so that
+   the altered version can easily be distinguished from the original.  
+*/
+
 static char const * const banner[] =
 {
-    "#line 10 \"btyaccpa.ske\"",
+    "#line 15 \"btyaccpa.ske\"",
     "/* -*- C -*-",
     "",
     "    @(#)btyaccpar, based on byacc 1.8 (Berkeley)",
@@ -75,7 +84,7 @@ static char const * const banner[] =
 
 static char const * const tables[] =
 {
-    "#line 64 \"btyaccpa.ske\"",
+    "#line 69 \"btyaccpa.ske\"",
     "",
     "#ifdef __cplusplus",
     "#ifndef _YACC_EXTERN_",
@@ -119,10 +128,10 @@ static char const * const tables[] =
 
 static char const * const header[] =
 {
-    "#line 103 \"btyaccpa.ske\"",
+    "#line 108 \"btyaccpa.ske\"",
     "",
     "#ifndef YYERRCODE",
-    "#error Make sure you '#include' the generated yacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.",
+    "#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.",
     "#endif",
     "",
     "/* YYPOSN is user-defined text position type. */",
@@ -278,7 +287,7 @@ static char const * const header[] =
 
 static char const * const body[] =
 {
-    "#line 257 \"btyaccpa.ske\"",
+    "#line 262 \"btyaccpa.ske\"",
     "",
     "",
     "/*",
@@ -770,7 +779,7 @@ static char const * const body[] =
 
 static char const * const trailer[] =
 {
-    "#line 744 \"btyaccpa.ske\"",
+    "#line 749 \"btyaccpa.ske\"",
     "",
     "  default:",
     "    break;",
@@ -1127,13 +1136,107 @@ static char const * const trailer[] =
     "",
     "  *v = 0;",
     "}",
+    "",
+    0
+};
+
+static char const * const line_position[] =
+{
+    "#line 1107 \"btyaccpa.ske\"",
+    "#line %d \"%s\"",
+    "",
+    0
+};
+
+static char const * const rflag_prefix[] =
+{
+    "#line 1110 \"btyaccpa.ske\"",
+    "static",
+    0
+};
+
+static char const * const not_rflag_prefix[] =
+{
+    "#line 1112 \"btyaccpa.ske\"",
+    "",
+    0
+};
+
+static char const * const int_table_start[] =
+{
+    "#line 1114 \"btyaccpa.ske\"",
+    "%sYshort %s[%d] = {%41d,",
+    0
+};
+
+static char const * const int_table_entry[] =
+{
+    "#line 1116 \"btyaccpa.ske\"",
+    "%5d,",
+    0
+};
+
+static char const * const int_table_end[] =
+{
+    "#line 1118 \"btyaccpa.ske\"",
+    "",
+    "};",
+    "",
+    0
+};
+
+static char const * const table_size[] =
+{
+    "#line 1122 \"btyaccpa.ske\"",
+    "#define YYTABLESIZE %d",
+    "",
+    0
+};
+
+static char const * const DEFINES_FILENAME[] =
+{
+    "#line 1125 \"btyaccpa.ske\"",
+    "%s%s.tab.h",
+    0
+};
+
+static char const * const OUTPUT_FILENAME[] =
+{
+    "#line 1127 \"btyaccpa.ske\"",
+    "%s%s.tab.c",
+    0
+};
+
+static char const * const CODE_FILENAME[] =
+{
+    "#line 1129 \"btyaccpa.ske\"",
+    "%s%s.code.c",
+    0
+};
+
+static char const * const VERBOSE_FILENAME[] =
+{
+    "#line 1131 \"btyaccpa.ske\"",
+    "%s%s.output",
     0
 };
 
 struct section section_list_btyaccpa[] = {
+	{ "language", &language[0] },
 	{ "banner", &banner[0] },
 	{ "tables", &tables[0] },
 	{ "header", &header[0] },
 	{ "body", &body[0] },
 	{ "trailer", &trailer[0] },
+	{ "line_position", &line_position[0] },
+	{ "rflag_prefix", &rflag_prefix[0] },
+	{ "!rflag_prefix", &not_rflag_prefix[0] },
+	{ "int_table_start", &int_table_start[0] },
+	{ "int_table_entry", &int_table_entry[0] },
+	{ "int_table_end", &int_table_end[0] },
+	{ "table_size", &table_size[0] },
+	{ "DEFINES_FILENAME", &DEFINES_FILENAME[0] },
+	{ "OUTPUT_FILENAME", &OUTPUT_FILENAME[0] },
+	{ "CODE_FILENAME", &CODE_FILENAME[0] },
+	{ "VERBOSE_FILENAME", &VERBOSE_FILENAME[0] },
 	{ 0, 0 } };

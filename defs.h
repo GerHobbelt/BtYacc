@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 
 /*  machine-dependent definitions                       */
@@ -95,12 +96,6 @@ typedef int Yshort;
 #define BACKSLASH       '\\'    /*  backslash  */
 
 
-/* defines for constructing filenames */
-
-#define DEFINES_SUFFIX  ".tab.h"
-#define OUTPUT_SUFFIX   ".tab.c"
-#define CODE_SUFFIX     ".code.c"
-#define VERBOSE_SUFFIX  ".output"
 
 typedef enum keyword_code_enumeration
 {
@@ -263,6 +258,7 @@ struct action
 struct section {
     char const * name;
     char const * const * ptr;
+	char const * cached_multiline_ptr;
 };
 
 extern struct section section_list_push[];
@@ -319,7 +315,7 @@ extern int nvars;
 extern int ntags;
 
 extern char unionized;
-extern char const line_format[];
+extern char const *line_format;
 
 extern int   start_symbol;
 extern char  **symbol_name;
@@ -413,7 +409,9 @@ SPLINT_NO_RETURN void open_error(char const * filename) GCC_NO_RETURN;
 SPLINT_NO_RETURN void unexpected_EOF(void) GCC_NO_RETURN;
 void print_pos(char const * st_line, char const * st_cptr);
 void error(int unsigned lineno, char const * line, char const * cptr, char const * msg, ...);
+void errorv(int unsigned lineno, char const * line, char const * cptr, char const * msg0, char const * msg, va_list args);
 SPLINT_NO_RETURN void syntax_error(int unsigned lineno, char const * line, char const * cptr) GCC_NO_RETURN;
+SPLINT_NO_RETURN void syntax_error_ex(int unsigned lineno, char const * line, char const * cptr, char const *msg, ...) GCC_NO_RETURN;
 SPLINT_NO_RETURN void unsupported_feature(int unsigned lineno, char const * line, char const * cptr) GCC_NO_RETURN;
 SPLINT_NO_RETURN void unterminated_comment(int unsigned lineno, char const * line, char const * cptr) GCC_NO_RETURN;
 SPLINT_NO_RETURN void unterminated_string(int unsigned lineno, char const * line, char const * cptr) GCC_NO_RETURN;
@@ -504,6 +502,7 @@ void free_itemsets(void);
 void free_shifts(void);
 void free_reductions(void);
 void write_section(char const * section_name);
+char const *get_section(char const * section_name);
 
 /* reader.c */
 int cachec(int);

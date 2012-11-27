@@ -115,8 +115,16 @@ int read_errs = 0;
 
 void error(int unsigned lineno, char const * line, char const * cptr, char const * msg, ...)
 {
-  char sbuf[512];
   va_list args;
+
+  va_start(args, msg);
+  errorv(lineno, line, cptr, NULL, msg, args);
+  va_end(args);
+}
+
+void errorv(int unsigned lineno, char const * line, char const * cptr, char const * msg0, char const * msg, va_list args)
+{
+  char sbuf[2048];
 
   if (fprintf(stderr, "lineno: %u\n", lineno) < 0)
   {
@@ -136,7 +144,11 @@ void error(int unsigned lineno, char const * line, char const * cptr, char const
      abort();
   }
 
-  va_start(args, msg);
+  if (msg0 && (fprintf(stderr, "%s", msg0) < 0))
+  {
+     perror("error: fprintf");
+     abort();
+  }
 
   if (vsprintf(sbuf, msg, args) < 0)
   {
@@ -145,18 +157,26 @@ void error(int unsigned lineno, char const * line, char const * cptr, char const
      abort();
   }
 
-  va_end(args);
   FileError("%s", sbuf);
   ++read_errs;
 }
 
 void unsupported_feature(int unsigned lineno, char const * line, char const * cptr) {
-  error(lineno, line, cptr, "unsupported feature: %%%s", cptr);
+  error(lineno, line, cptr, "unsupported feature: %s", cptr);
   exit(1);
 }
 
 void syntax_error(int unsigned lineno, char const * line, char const * cptr) {
   error(lineno, line, cptr, "syntax error");
+  exit(1);
+}
+
+void syntax_error_ex(int unsigned lineno, char const * line, char const * cptr, char const *msg, ...) {
+  va_list args;
+
+  va_start(args, msg);
+  errorv(lineno, line, cptr, "syntax error: ", msg, args);
+  va_end(args);
   exit(1);
 }
 

@@ -109,9 +109,15 @@ struct section *section_list = (struct section *)calloc(32, sizeof(section_list[
               while(isalnum(*++e));
               *e = 0;
 
-              for (i = 0; section_list[i].name; ++i)
-                if (!strcmp(section_list[i].name, p))
+			  // match section name with the one in the default template:
+              for (i = 0; section_list_btyaccpa[i].name; ++i)
+			  {
+                if (!strcmp(section_list_btyaccpa[i].name, p)) 
+				{
                   section = i;
+				  section_list[section].name = section_list_btyaccpa[i].name;
+				}
+			  }
             }
             if (section >= 0)
               add_fmt("#line %d \"%s\"", line+1, name);
@@ -126,5 +132,15 @@ struct section *section_list = (struct section *)calloc(32, sizeof(section_list[
         section_list[section].ptr = fin_section();
     if (section == -2)
         error(0, 0, 0, "No sections found in skeleton file \"%s\"", name);
+
+	/* and copy the default sections which were not specced in the custom template: */
+    for (i = 0; section_list_btyaccpa[i].name; ++i)
+	{
+		if (!section_list[i].name)
+		{
+			section_list[i] = section_list_btyaccpa[i];
+		}
+	}
+
     return section_list;
 }

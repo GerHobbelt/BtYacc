@@ -372,7 +372,7 @@ no_more_options:;
 			p[l] = 0;
 		}
 	}
-	if (!target_dir || !*target_dir) 
+	if (!target_dir || !*target_dir)
 		target_dir = "";
 }
 
@@ -518,21 +518,17 @@ void create_files(void)
 
     len = strlen(file_prefix) + strlen(target_dir);
 
-    output_file_name = (char *)MALLOC(len + 7);
+    output_file_name = (char *)MALLOC(len + 256);
     if (output_file_name == 0)
         no_space();
-    strcpy(output_file_name, target_dir);
-    strcpy(output_file_name, file_prefix);
-    strcpy(output_file_name + len, OUTPUT_SUFFIX);
+    sprintf(output_file_name, get_section("OUTPUT_FILENAME"), target_dir, file_prefix);
 
     if (rflag)
     {
-        code_file_name = (char *)MALLOC(len + 8);
+        code_file_name = (char *)MALLOC(len + 256);
         if (code_file_name == 0)
             no_space();
-	    strcpy(code_file_name, target_dir);
-        strcpy(code_file_name, file_prefix);
-        strcpy(code_file_name + len, CODE_SUFFIX);
+	    sprintf(code_file_name, get_section("CODE_FILENAME"), target_dir, file_prefix);
     }
     else
     {
@@ -542,22 +538,18 @@ void create_files(void)
 
     if (dflag)
     {
-        defines_file_name = (char *)MALLOC(len + 7);
+        defines_file_name = (char *)MALLOC(len + 256);
         if (defines_file_name == 0)
             no_space();
-	    strcpy(defines_file_name, target_dir);
-        strcpy(defines_file_name, file_prefix);
-        strcpy(defines_file_name + len, DEFINES_SUFFIX);
+	    sprintf(defines_file_name, get_section("DEFINES_FILENAME"), target_dir, file_prefix);
     }
 
     if (vflag)
     {
-        verbose_file_name = (char *)MALLOC(len + 8);
+        verbose_file_name = (char *)MALLOC(len + 256);
         if (verbose_file_name == 0)
             no_space();
-	    strcpy(verbose_file_name, target_dir);
-        strcpy(verbose_file_name, file_prefix);
-        strcpy(verbose_file_name + len, VERBOSE_SUFFIX);
+	    sprintf(verbose_file_name, get_section("VERBOSE_FILENAME"), target_dir, file_prefix);
     }
 }
 
@@ -618,6 +610,13 @@ void open_output_files(void)
 
 struct section *active_section_list = NULL;
 
+#ifdef _DEBUG
+void atexit_handler(void)
+{
+	printf("atexit!");
+}
+#endif
+
 int main(int argc, char **argv)
 {
 #ifdef BTYACC_USE_SIGNAL_HANDLING
@@ -626,6 +625,12 @@ int main(int argc, char **argv)
 
     active_section_list = section_list_btyaccpa;
     getargs(argc, argv);
+	line_format = get_section("line_position");
+
+#ifdef _DEBUG
+	atexit(atexit_handler);
+#endif
+
     BTYACC_INTERRUPTION_CHECK();
     open_input_files();
     BTYACC_INTERRUPTION_CHECK();

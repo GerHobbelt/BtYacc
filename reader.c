@@ -51,7 +51,7 @@ bucket **plhs = NULL;
 int name_pool_size = 0;
 char *name_pool = NULL;
 
-char const line_format[] = "#line %d \"%s\"\n";
+char const *line_format = NULL;
 
 int cachec(int c)
 {
@@ -66,7 +66,7 @@ int cachec(int c)
  * Return: 1 - reg. line finished with '\n'.
  *         0 - EOF.
  */
-char *get_line() {
+char *get_line(void) {
   extern int Eflag;
   FILE *f;
   int c;
@@ -213,11 +213,13 @@ char *dup_line(void)
 
     if (line == 0) return (0);
     s = line;
-    while (*s != '\n') ++s;
+    while (*s != '\n') 
+		++s;
     if (!(p = MALLOC(s - line + 1))) no_space();
     s = line;
     t = p;
-    while ((*t++ = *s++) != '\n');
+    while ((*t++ = *s++) != '\n')
+		;
     return (p);
 }
 
@@ -230,12 +232,16 @@ char *skip_comment(void)
     char *st_cptr = st_line + (cptr - line);
 
     s = cptr + 2;
-    while (s[0] != '*' || s[1] != '/') {
-        if (*s == '\n') {
+    while (s[0] != '*' || s[1] != '/') 
+	{
+        if (*s == '\n') 
+		{
             if ((s = get_line()) == 0)
-                unterminated_comment(st_lineno, st_line, st_cptr); }
+                unterminated_comment(st_lineno, st_line, st_cptr); 
+		}
         else
-            ++s; }
+            ++s; 
+	}
     FREE(st_line);
     return cptr = s + 2;
 }
@@ -247,8 +253,10 @@ int nextc(void)
     if (line == 0 && get_line() == 0)
         return (EOF);
     s = cptr;
-    for (;;) {
-        switch (*s) {
+    for (;;) 
+	{
+        switch (*s) 
+		{
         case '\n':
             if ((s = get_line()) == 0) return EOF;
             break;
@@ -265,17 +273,23 @@ int nextc(void)
             cptr = s;
             return ('%');
         case '/':
-            if (s[1] == '*') {
+            if (s[1] == '*') 
+			{
                 cptr = s;
                 s = skip_comment();
-                break; }
-            else if (s[1] == '/') {
+                break; 
+			}
+            else if (s[1] == '/') 
+			{
                 if ((s = get_line()) == 0) return EOF;
-                break; }
+                break; 
+			}
             /* fall through */
         default:
             cptr = s;
-            return (*s); } }
+            return *s; 
+		} 
+	}
 }
 
 static struct keyword { char name[20]; int token; } keywords[] = {
@@ -356,7 +370,7 @@ int keyword(void)
     if (c == '0') return (TOKEN);
     if (c == '2') return (NONASSOC);
   }
-  syntax_error(lineno, line, t_cptr);
+  syntax_error_ex(lineno, line, t_cptr, "expected a keyword or one of these: [ %%{  %%%%  %%\\  %%<  %%>  %%0  %%2 ]");
   /*NOTREACHED*/
   return 0;
 }
@@ -368,7 +382,7 @@ void copy_ident(void)
     open_output_files();
 
     if ((c = nextc()) == EOF) unexpected_EOF();
-    if (c != '"') syntax_error(lineno, line, cptr);
+	if (c != '"') syntax_error_ex(lineno, line, cptr, "expected a quoted #indent string");
     ++outline[OUTPUT_FILE];
     BtYacc_puts("#ident \"", output_file);
 
@@ -405,45 +419,66 @@ int unsigned    s_lineno = lineno;
 char            *s_line = dup_line();
 char            *s_cptr = s_line + (cptr - line - 1);
 
-    for (;;) {
+    for (;;) 
+	{
         OUTC(c = *cptr++);
-        if (c == quote) {
+        if (c == quote) 
+		{
             FREE(s_line);
-            return; }
+            return; 
+		}
         if (c == '\n')
             unterminated_string(s_lineno, s_line, s_cptr);
-        if (c == '\\') {
+        if (c == '\\') 
+		{
             OUTC(c = *cptr++);
-            if (c == '\n') {
+            if (c == '\n') 
+			{
                 if (get_line() == 0)
-                    unterminated_string(s_lineno, s_line, s_cptr); } } }
+                    unterminated_string(s_lineno, s_line, s_cptr); 
+			} 
+		} 
+	}
 }
 
 void copy_comment(FILE *f1, FILE *f2)
 {
 register int    c;
 
-    if ((c = *cptr) == '/') {
+    if ((c = *cptr) == '/') 
+	{
         OUTC('*');
-        while ((c = *++cptr) != '\n') {
+        while ((c = *++cptr) != '\n') 
+		{
             OUTC(c);
             if (c == '*' && cptr[1] == '/')
-                OUTC(' '); }
-        OUTC('*'); OUTC('/'); }
-    else if (c == '*') {
+                OUTC(' '); 
+		}
+        OUTC('*'); 
+		OUTC('/'); 
+	}
+    else if (c == '*') 
+	{
         int unsigned c_lineno = lineno;
         char *c_line = dup_line();
         char *c_cptr = c_line + (cptr - line - 1);
         OUTC(c);
-        while ((c = *++cptr) != '*' || cptr[1] != '/') {
+		++cptr;
+        while ((c = cptr[0]) != '*' || cptr[1] != '/') 
+		{
             OUTC(c);
-            if (c == '\n') {
+			++cptr;
+            if (c == '\n') 
+			{
                 if (get_line() == 0)
-                    unterminated_comment(c_lineno, c_line, c_cptr); } }
+                    unterminated_comment(c_lineno, c_line, c_cptr); 
+			} 
+		}
         OUTC(c);
         OUTC('/');
         FREE(c_line);
-        cptr += 2; }
+        cptr += 2; 
+	}
 }
 
 #undef OUTC
@@ -457,8 +492,8 @@ void copy_text(void)
     char *t_line = dup_line();
     char *t_cptr = t_line + (cptr - line - 2);
 
-        open_output_files();
-        f = text_file;
+    open_output_files();
+    f = text_file;
 
     if (*cptr == '\n') {
         if (get_line() == 0)
@@ -514,7 +549,7 @@ void copy_union(void)
     unionized = 1;
 
     if (!lflag)
-        BtYacc_printf(text_file, line_format, lineno, (inc_file?inc_file_name:input_file_name));
+        BtYacc_printf(text_file, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
 
     /* VM: Print to either code file or defines file but not to both */
     dc_file = dflag ? union_file : text_file;
@@ -576,14 +611,17 @@ bucket *get_literal(void)
 
     quote = *cptr++;
     cinc = 0;
-    for (;;) {
+    for (;;) 
+	{
         c = *cptr++;
         if (c == quote) break;
         if (c == '\n') unterminated_string(s_lineno, s_line, s_cptr);
-        if (c == '\\') {
+        if (c == '\\') 
+		{
             char *c_cptr = cptr - 1;
             c = *cptr++;
-            switch (c) {
+            switch (c) 
+			{
             case '\n':
                 get_line();
                 if (line == 0) unterminated_string(s_lineno, s_line, s_cptr);
@@ -592,12 +630,16 @@ bucket *get_literal(void)
             case '4': case '5': case '6': case '7':
                 n = c - '0';
                 c = *cptr;
-                if (IS_OCTAL(c)) {
+                if (IS_OCTAL(c)) 
+				{
                     n = (n << 3) + (c - '0');
                     c = *++cptr;
-                    if (IS_OCTAL(c)) {
+                    if (IS_OCTAL(c)) 
+					{
                         n = (n << 3) + (c - '0');
-                        ++cptr; } }
+                        ++cptr; 
+					} 
+				}
                 if (n > MAXCHAR) illegal_character(c_cptr);
                 c = n;
                 break;
@@ -606,13 +648,15 @@ bucket *get_literal(void)
                 n = hexval(c);
                 if (n < 0 || n >= 16)
                     illegal_character(c_cptr);
-                for (;;) {
+                for (;;) 
+				{
                     c = *cptr;
                     i = hexval(c);
                     if (i < 0 || i >= 16) break;
                     ++cptr;
                     n = (n << 4) + i;
-                    if (n > MAXCHAR) illegal_character(c_cptr); }
+                    if (n > MAXCHAR) illegal_character(c_cptr); 
+				}
                 c = n;
                 break;
             case 'a': c = 7; break;
@@ -621,8 +665,11 @@ bucket *get_literal(void)
             case 'n': c = '\n'; break;
             case 'r': c = '\r'; break;
             case 't': c = '\t'; break;
-            case 'v': c = '\v'; break; } }
-        cachec(c); }
+            case 'v': c = '\v'; break; 
+			} 
+		}
+        cachec(c); 
+	}
     FREE(s_line);
 
     n = cinc;
@@ -638,16 +685,21 @@ bucket *get_literal(void)
     else
         cachec('"');
 
-    for (i = 0; i < n; ++i) {
+    for (i = 0; i < n; ++i) 
+	{
         c = ((unsigned char *)s)[i];
-        if (c == '\\' || c == cache[0]) {
+        if (c == '\\' || c == cache[0]) 
+		{
             cachec('\\');
-            cachec(c); }
+            cachec(c); 
+		}
         else if (isprint(c))
             cachec(c);
-        else {
+        else 
+		{
             cachec('\\');
-            switch (c) {
+            switch (c) 
+			{
             case 7: cachec('a'); break;
             case '\b': cachec('b'); break;
             case '\f': cachec('f'); break;
@@ -659,7 +711,10 @@ bucket *get_literal(void)
                 cachec(((c >> 6) & 7) + '0');
                 cachec(((c >> 3) & 7) + '0');
                 cachec((c & 7) + '0');
-                break; } } }
+                break; 
+			} 
+		} 
+	}
     if (n == 1)
         cachec('\'');
     else
@@ -682,13 +737,14 @@ int is_reserved(char const * name)
         strcmp(name, "$end") == 0)
         return (1);
 
-    if (name[0] == '$' && name[1] == '$' && isdigit(name[2])) {
+    if (name[0] == '$' && name[1] == '$' && isdigit(name[2])) 
+	{
         char const * s = name + 3;
 
         while (isdigit(*s)) ++s;
 
         if (*s == NUL)
-                return (1);
+            return (1);
     }
 
     return (0);
@@ -768,16 +824,22 @@ static char *cache_tag(char *tag, int len)
 int     i;
 char    *s;
 
-    for (i = 0; i < ntags; ++i) {
+    for (i = 0; i < ntags; ++i) 
+	{
         if (strncmp(tag, tag_table[i], len) == 0 &&
             // VM: this is bug fix proposed by Matthias Meixner
             tag_table[i][len]==0)
-            return (tag_table[i]); }
-    if (ntags >= tagmax) {
+		{
+			return (tag_table[i]); 
+		}
+	}
+    if (ntags >= tagmax) 
+	{
         tagmax += 16;
         tag_table = tag_table ? RENEW(tag_table, tagmax, char *)
                               : NEW2(tagmax, char *);
-        if (tag_table == 0) no_space(); }
+        if (tag_table == 0) no_space(); 
+	}
     s = MALLOC(len + 1);
     if (s == 0) no_space();
     strncpy(s, tag, len);
@@ -833,12 +895,15 @@ void declare_tokens(int assoc)
 
     c = nextc();
     if (c == EOF) unexpected_EOF();
-    if (c == '<') {
+    if (c == '<') 
+	{
         tag = get_tag();
         c = nextc();
-        if (c == EOF) unexpected_EOF(); }
+        if (c == EOF) unexpected_EOF(); 
+	}
 
-    for (;;) {
+    for (;;) 
+	{
         if (isalpha(c) || c == '_' || c == '.' || c == '$')
             bp = get_name();
         else if (c == '\'' || c == '"')
@@ -849,27 +914,34 @@ void declare_tokens(int assoc)
         if (bp == goal) tokenized_start(bp->name);
         bp->classc = TERM;
 
-        if (tag) {
+        if (tag) 
+		{
             if (bp->tag && tag != bp->tag)
                 retyped_warning(bp->name);
-            bp->tag = tag; }
+            bp->tag = tag; 
+		}
 
-        if (assoc != TOKEN) {
+        if (assoc != TOKEN) 
+		{
             if (bp->prec && prec != bp->prec)
                 reprec_warning(bp->name);
             bp->assoc = assoc;
-            bp->prec = prec; }
+            bp->prec = prec; 
+		}
 
         c = nextc();
         if (c == EOF) unexpected_EOF();
         value = UNDEFINED;
-        if (isdigit(c)) {
+        if (isdigit(c)) 
+		{
             value = get_number();
             if (bp->value != UNDEFINED && value != bp->value)
                 revalued_warning(bp->name);
             bp->value = value;
             c = nextc();
-            if (c == EOF) unexpected_EOF(); } }
+            if (c == EOF) unexpected_EOF(); 
+		} 
+	}
 }
 
 static void declare_argtypes(bucket *bp)
@@ -884,7 +956,7 @@ int     args = 0, c;
     for (;;) {
         c = nextc();
         if (c == EOF) unexpected_EOF();
-        if (c != '<') syntax_error(lineno, line, cptr);
+        if (c != '<') syntax_error_ex(lineno, line, cptr, "expected an <argument_type>");
         tags[args++] = get_tag();
         c = nextc();
         if (c == ')') break;
@@ -939,7 +1011,7 @@ void declare_start(void)
     c = nextc();
     if (c == EOF) unexpected_EOF();
     if (!isalpha(c) && c != '_' && c != '.' && c != '$')
-        syntax_error(lineno, line, cptr);
+        syntax_error_ex(lineno, line, cptr, "expected a %%start terminal token or non-terminal");
     bp = get_name();
     if (bp->classc == TERM)
         terminal_start(bp->name);
@@ -957,12 +1029,14 @@ void read_declarations(void)
     cache = MALLOC(cache_size);
     if (cache == 0) no_space();
 
-    for (;;) {
+    for (;;) 
+	{
         c = nextc();
         if (c == EOF) unexpected_EOF();
-        if (c != '%') syntax_error(lineno, line, cptr);
+		if (c != '%') syntax_error_ex(lineno, line, cptr, "expected a %%-prefixed declaration command, e.g. %%token, %%left, %%right, %%ident, %%{ ... %%}, %%union");
         t_cptr = cptr;
-        switch (k = keyword()) {
+        switch (k = keyword()) 
+		{
         default:
             break;
         case MARK:
@@ -1084,7 +1158,8 @@ void read_declarations(void)
         case BISON_NTERM:
             unsupported_feature(lineno, line, t_cptr);
             break;
-        } }
+        } 
+	}
 }
 
 void initialize_grammar(void)
@@ -1386,11 +1461,13 @@ void advance_to_start(void)
     char        *args = 0;
     int         argslen = 0;
 
-    for (;;) {
+    for (;;) 
+	{
         c = nextc();
         if (c != '%') break;
         s_cptr = cptr;
-        switch (keyword()) {
+        switch (keyword()) 
+		{
         case MARK:
             no_grammar();
         case TEXT:
@@ -1400,26 +1477,32 @@ void advance_to_start(void)
             declare_start();
             break;
         default:
-            syntax_error(lineno, line, s_cptr); } }
+			syntax_error_ex(lineno, line, s_cptr, "expected a %%start, %%{ ... %%} text snippet or a %% mark"); 
+		} 
+	}
 
     c = nextc();
     if (!isalpha(c) && c != '_' && c != '.' && c != '_')
-        syntax_error(lineno, line, cptr);
+        syntax_error_ex(lineno, line, cptr, "expected a terminal token or non-terminal");
     bp = get_name();
-    if (goal == 0) {
+    if (goal == 0) 
+	{
         if (bp->classc == TERM)
             terminal_start(bp->name);
-        goal = bp; }
+        goal = bp; 
+	}
 
     s_lineno = lineno;
     c = nextc();
     if (c == EOF) unexpected_EOF();
-    if (c == '(') {
+    if (c == '(') 
+	{
         ++cptr;
         args = copy_args(&argslen);
         if (args == 0) no_space();
-        c = nextc(); }
-    if (c != ':') syntax_error(lineno, line, cptr);
+        c = nextc(); 
+	}
+    if (c != ':') syntax_error_ex(lineno, line, cptr, "expected a colon ':' starting the rule definition");
     start_rule(bp, s_lineno);
     parse_arginfo(bp, args, argslen);
     ++cptr;
@@ -1822,9 +1905,11 @@ int mark_symbol(void)
     register bucket *bp;
 
     c = cptr[1];
-    if (c == '%' || c == '\\') {
+    if (c == '%' || c == '\\') 
+	{
         cptr += 2;
-        return (1); }
+        return (1); 
+	}
 
     if (c == '=')
         cptr += 2;
@@ -1835,17 +1920,19 @@ int mark_symbol(void)
              ((c = cptr[5], !IS_IDENT(c))))
         cptr += 5;
     else
-        syntax_error(lineno, line, cptr);
+        syntax_error_ex(lineno, line, cptr, "expected a PRECedence");
 
     c = nextc();
     if (isalpha(c) || c == '_' || c == '.' || c == '$')
         bp = get_name();
     else if (c == '\'' || c == '"')
         bp = get_literal();
-    else {
-        syntax_error(lineno, line, cptr);
+    else 
+	{
+        syntax_error_ex(lineno, line, cptr, "expected a terminal, non-terminal token or simple token literal string");
         /*NOTREACHED*/
-        return 0;}
+        return 0;
+	}
 
     if (rprec[nrules] != UNDEFINED && bp->prec != rprec[nrules])
         prec_redeclared();
@@ -1870,14 +1957,20 @@ void read_grammar(void)
             add_symbol();
         else if (c == '{' || c == '=' || c == '[')
             copy_action();
-        else if (c == '|') {
+        else if (c == '|') 
+		{
             end_rule();
             start_rule(plhs[nrules-1], 0);
-            ++cptr; }
-        else if (c == '%') {
-            if (mark_symbol()) break; }
+            ++cptr; 
+		}
+        else if (c == '%') 
+		{
+            if (mark_symbol()) 
+				break; 
+		}
         else
-            syntax_error(lineno, line, cptr); }
+            syntax_error(lineno, line, cptr); 
+	}
     end_rule();
     if (goal->args > 0)
         error(0, 0, 0, "start symbol %s requires arguments", goal->name);
@@ -1937,9 +2030,11 @@ void pack_symbols(void)
 
     nsyms = 2;
     ntokens = 1;
-    for (bp = first_symbol; bp; bp = bp->next) {
+    for (bp = first_symbol; bp; bp = bp->next) 
+	{
         ++nsyms;
-        if (bp->classc == TERM) ++ntokens; }
+        if (bp->classc == TERM) ++ntokens; 
+	}
     start_symbol = ntokens;
     nvars = nsyms - ntokens;
 

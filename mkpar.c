@@ -13,7 +13,7 @@ Yshort *RRconflicts = NULL;
 Yshort *defred = NULL;
 Yshort *rules_used = NULL;
 Yshort nunused = 0;
-Yshort final_state = NULL;
+Yshort final_state = 0;
 
 static int SRcount = 0;
 static int RRcount = 0;

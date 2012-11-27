@@ -1,10 +1,15 @@
+%% language
+C
+
+%% ---
 /* -*- C -*-
 
    The banner used here should be replaced with an #ident directive if
    the target C compiler supports #ident directives.
 
    If the skeleton is changed, the banner should be changed so that
-   the altered version can easily be distinguished from the original.  */
+   the altered version can easily be distinguished from the original.  
+*/
 
 %% banner
 /* -*- C -*-
@@ -102,7 +107,7 @@ extern _YACC_EXTERN_ char *yyrule[];
 %% header
 
 #ifndef YYERRCODE
-#error Make sure you '#include' the generated yacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.
+#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.
 #endif
 
 /* YYPOSN is user-defined text position type. */
@@ -1097,3 +1102,31 @@ static void yyFreeState(YYParseState **v)
 
   *v = 0;
 }
+
+%% line_position
+#line %d "%s"
+
+%% rflag_prefix
+static
+%% !rflag_prefix
+
+%% int_table_start
+%sYshort %s[%d] = {%41d,
+%% int_table_entry
+%5d,
+%% int_table_end
+
+};
+
+%% table_size
+#define YYTABLESIZE %d
+
+%% DEFINES_FILENAME
+%s%s.tab.h
+%% OUTPUT_FILENAME
+%s%s.tab.c
+%% CODE_FILENAME
+%s%s.code.c
+%% VERBOSE_FILENAME
+%s%s.output
+%% ---

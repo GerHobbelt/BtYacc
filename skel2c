@@ -3,6 +3,15 @@ BEGIN {
     nsec = 0;
 }
 
+/^%% *-+/ { 
+    if (havesection) 
+    {
+        printf "    0\n};\n\n";
+    }
+    havesection = 0;
+    next; 
+}
+
 /^%%/ { 
     if (havesection) 
     {
@@ -30,9 +39,14 @@ BEGIN {
         havesection = 1;
         section = $2;
         seclist[nsec] = section;
+
+		sec_id_name = section;
+		gsub(/\!/, "not_", sec_id_name);
+
+        secnamelist[nsec] = sec_id_name;
         nsec = nsec + 1;
         
-        printf "static char const * const %s[] =\n{\n", $2;
+        printf "static char const * const %s[] =\n{\n", sec_id_name;
 
         printf "    \"#line %d \\\"%s\\\"\",\n", FNR+1, fname; 
     } 
@@ -70,8 +84,10 @@ END   {
     if (nsec > 0) 
     {
         printf "struct section section_list_%s[] = {\n", fname_as_varname;
-        for (i=0; i<nsec; ++i)
-            printf "\t{ \"%s\", &%s[0] },\n", seclist[i], seclist[i];
+        for (i = 0; i < nsec; ++i)
+		{
+            printf "\t{ \"%s\", &%s[0] },\n", seclist[i], secnamelist[i];
+		}
         printf "\t{ 0, 0 } };\n"
     }
 }
