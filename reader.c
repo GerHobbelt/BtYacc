@@ -548,43 +548,47 @@ void copy_union(void)
     if (unionized) over_unionized(cptr - 6);
     unionized = 1;
 
-    if (!lflag)
-        BtYacc_printf(text_file, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
-
     /* VM: Print to either code file or defines file but not to both */
     dc_file = dflag ? union_file : text_file;
 
-    BtYacc_puts("\ntypedef union", dc_file);
+    if (!lflag)
+        BtYacc_printf(dc_file, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+
+	BtYacc_printf(dc_file, get_section("union_decl_start"));
 
     depth = 0;
-loop:
-    c = *cptr++;
-    BtYacc_putc(c, dc_file);
+	while ((c = *cptr++))
+	{
+		BtYacc_putc(c, dc_file);
 
-    switch (c) {
-    case '\n':
-      get_line();
-      if (line == 0) unterminated_union(u_lineno, u_line, u_cptr);
-      goto loop;
-    case '{':
-      ++depth;
-      goto loop;
-    case '}':
-      if (--depth == 0) {
-        BtYacc_puts(" YYSTYPE;\n", dc_file);
-        FREE(u_line);
-        return; }
-      goto loop;
-    case '\'':
-    case '"':
-      copy_string(c, dc_file, 0);
-      goto loop;
-    case '/':
-      copy_comment(dc_file, 0);
-      goto loop;
-    default:
-      goto loop;
-    }
+		switch (c) {
+		case '\n':
+		  get_line();
+		  if (line == 0) unterminated_union(u_lineno, u_line, u_cptr);
+		  continue;
+		case '{':
+		  ++depth;
+		  continue;
+		case '}':
+		  if (--depth == 0) 
+		  {
+			BtYacc_printf(dc_file, get_section("union_decl_end"));
+			FREE(u_line);
+			break; 
+		  }
+		  continue;
+		case '\'':
+		case '"':
+		  copy_string(c, dc_file, 0);
+		  continue;
+		case '/':
+		  copy_comment(dc_file, 0);
+		  continue;
+		default:
+		  continue;
+		}
+		break;
+	}
 }
 
 int hexval(int c)

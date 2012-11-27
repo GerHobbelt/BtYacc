@@ -491,7 +491,6 @@ void output_base(void);
 void output_table(void);
 void output_check(void);
 void output_ctable(void);
-int is_C_identifier(char const * name);
 void output_defines(void);
 void output_stored_text(void);
 void output_debug(void);

@@ -702,7 +702,7 @@ void output_ctable(void)
 }
 
 
-int is_C_identifier(char const * name)
+static int is_C_identifier(char const * name)
 {
     register char const * s;
     register int c;
@@ -712,21 +712,21 @@ int is_C_identifier(char const * name)
     if (c == '"')
     {
         c = *++s;
-        if (!isalpha(c) && c != '_' && c != '$')
+        if (!isalpha(c) && c != '_')
             return (0);
         while ((c = *++s) != '"')
         {
-            if (!isalnum(c) && c != '_' && c != '$')
+            if (!isalnum(c) && c != '_')
                 return (0);
         }
         return (1);
     }
 
-    if (!isalpha(c) && c != '_' && c != '$')
+    if (!isalpha(c) && c != '_')
         return (0);
     while ((c = *++s))
     {
-        if (!isalnum(c) && c != '_' && c != '$')
+        if (!isalnum(c) && c != '_')
             return (0);
     }
     return (1);
@@ -742,9 +742,8 @@ void output_defines(void)
 
     open_output_files();
 
-    if(dflag) {
-      BtYacc_puts("#ifndef _yacc_defines_h_\n", defines_file);
-      BtYacc_puts("#define _yacc_defines_h_\n\n", defines_file);
+    if (dflag) {
+      BtYacc_printf(defines_file, count_newlines(DEFINES_FILE, get_section("defines_file_protection_start")));
     }
 
     /* VM: Print to either code file or defines file but not to both */
@@ -756,30 +755,65 @@ void output_defines(void)
         s = symbol_name[i];
         if (is_C_identifier(s))
         {
-            BtYacc_puts("#define ", dc_file);
             c = *s;
             if (c == '"')
             {
-                while ((c = *++s) != '"')
-                {
-                    BtYacc_putc(c, dc_file);
-                }
+				char *d;
+
+				s++;
+				s = strdup(s);
+				if (!s) no_space();
+
+				d = s;
+                while (*d != '"')
+					d++;
+				*d = 0;
             }
-            else
+		}
+		else
+		{
+			/* turn this token into something that's acceptable for the given output language: */
+			char const *cset = get_section("token_charset");
+			char *d = MALLOC(strlen(s) * 3 + 12 + strlen(file_prefix));
+			char *dp;
+			char e = 0;
+
+			if (!d) no_space();
+			sprintf(d, "BTYACC_SYMBOL_%s_", file_prefix);
+			dp = d + strlen(d);
+            c = *s;
+            if (c == '"')
             {
-                do
-                {
-                    BtYacc_putc(c, dc_file);
-                }
-                while ((c = *++s));
-            }
-            ++outline[dc_f_idx];
-            BtYacc_printf(dc_file, " %d\n", symbol_value[i]);
-        }
+				e = '"';
+				s++;
+			}
+            else if (c == '\'')
+            {
+				e = '\'';
+				s++;
+			}
+            while (*s != e && *s)
+			{
+				if (strchr(cset, *s))
+				{
+					*dp++ = *s;
+				}
+				else
+				{
+					*dp++ = "0123456789ABCDEF"[(*s >> 4) & 0x0F];
+					*dp++ = "0123456789ABCDEF"[*s & 0x0F];
+					*dp++ = '_';
+				}
+				s++;
+			}
+			*dp = 0;
+			s = d;
+		}
+
+		BtYacc_printf(dc_file, count_newlines(dc_f_idx, get_section("define_token")), s, symbol_value[i]);
     }
 
-    ++outline[dc_f_idx];
-    BtYacc_printf(dc_file, "#define YYERRCODE %d\n", symbol_value[1]);
+	BtYacc_printf(dc_file, count_newlines(dc_f_idx, get_section("define_token")), "YYERRCODE", symbol_value[1]);
 
     if (dflag && unionized)
     {
@@ -792,14 +826,16 @@ void output_defines(void)
         union_file = fopen(union_file_name, "r");
         if (union_file == NULL) open_error(union_file_name);
         while ((c = getc(union_file)) != EOF) {
+		  if (c == '\n')
+	          ++outline[DEFINES_FILE];
           BtYacc_putc(c, defines_file);
         }
 
-        BtYacc_puts("extern YYSTYPE yylval;\n", defines_file);
+		BtYacc_puts(count_newlines(DEFINES_FILE, get_section("yystype_extern_decl")), defines_file);
     }
 
-    if(dflag) {
-      BtYacc_puts("\n#endif\n", defines_file);
+    if (dflag) {
+      BtYacc_printf(defines_file, count_newlines(DEFINES_FILE, get_section("defines_file_protection_end")));
     }
 }
 
@@ -877,23 +913,21 @@ void output_debug(void)
 
     open_output_files();
 
-    outline[CODE_FILE] += 4;
-    BtYacc_printf(code_file, "#define YYFINAL %d\n#ifndef YYDEBUG\n#define YYDEBUG %d\n#endif\n",
-            final_state, tflag);
+	BtYacc_printf(code_file, count_newlines(CODE_FILE, get_section("define_yyfinal")), final_state);
+	BtYacc_printf(code_file, count_newlines(CODE_FILE, get_section("define_yydebug")), tflag);
 
     if (rflag)
     {
-        outline[OUTPUT_FILE] += 3;
-        BtYacc_printf(output_file, "#ifndef YYDEBUG\n#define YYDEBUG %d\n#endif\n",
-                tflag);
+		BtYacc_printf(output_file, count_newlines(OUTPUT_FILE, get_section("define_yydebug")), tflag);
     }
 
     max = 0;
     for (i = 2; i < ntokens; ++i)
+	{
         if (symbol_value[i] > max)
             max = symbol_value[i];
-    ++outline[CODE_FILE];
-    BtYacc_printf(code_file, "#define YYMAXTOKEN %d\n", max);
+	}
+	BtYacc_printf(code_file, count_newlines(CODE_FILE, get_section("define_token")), "YYMAXTOKEN", max);
 
     symnam = (char **) MALLOC((max+1)*sizeof(char *));
     if (symnam == 0) no_space();
@@ -906,12 +940,8 @@ void output_debug(void)
         symnam[symbol_value[i]] = symbol_name[i];
     symnam[0] = "end-of-file";
 
-    ++outline[OUTPUT_FILE];
-    BtYacc_puts("#if YYDEBUG\n", output_file);
-
-    BtYacc_printf(output_file, "%schar *yyname[] = {",
-                get_rflag_prefix());
-    j = 80;
+	BtYacc_printf(output_file, count_newlines(OUTPUT_FILE, get_section("debug_yyname_strings_start")), get_rflag_prefix());
+    j = 0;
     for (i = 0; i <= max; ++i)
     {
         if ((s = symnam[i]))
@@ -1024,7 +1054,10 @@ void output_debug(void)
 
                 BtYacc_putc('"', output_file);
 
-                do { BtYacc_putc(*s, output_file); } while (*++s);
+                do 
+				{ 
+					BtYacc_putc(*s, output_file); 
+				} while (*++s);
 
                 BtYacc_puts("\",", output_file);
             }
@@ -1042,15 +1075,11 @@ void output_debug(void)
             BtYacc_puts("0,", output_file);
         }
     }
-    outline[OUTPUT_FILE] += 2;
 
-    BtYacc_puts("\n};\n", output_file);
+	BtYacc_printf(output_file, count_newlines(OUTPUT_FILE, get_section("debug_yyname_strings_end")));
     FREE(symnam);
 
-    ++outline[OUTPUT_FILE];
-
-    BtYacc_printf(output_file, "%schar *yyrule[] = {\n",
-                get_rflag_prefix());
+	BtYacc_printf(output_file, count_newlines(OUTPUT_FILE, get_section("debug_yyrule_strings_start")), get_rflag_prefix());
 
     for (i = 2; i < nrules; ++i)
     {
@@ -1106,8 +1135,7 @@ void output_debug(void)
         BtYacc_puts("\",\n", output_file);
     }
 
-    outline[OUTPUT_FILE] += 2;
-    BtYacc_puts("};\n#endif\n", output_file);
+	BtYacc_printf(output_file, count_newlines(OUTPUT_FILE, get_section("debug_yyrule_strings_end")));
 }
 
 
@@ -1117,8 +1145,7 @@ void output_stype(void)
 
     if (!unionized && ntags == 0)
     {
-        outline[CODE_FILE] += 3;
-        BtYacc_puts("#ifndef YYSTYPE\ntypedef int YYSTYPE;\n#endif\n", code_file);
+		BtYacc_puts(count_newlines(CODE_FILE, get_section("define_default_yystype")), code_file);
     }
 }
 

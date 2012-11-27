@@ -1193,30 +1193,158 @@ static char const * const table_size[] =
     0
 };
 
-static char const * const DEFINES_FILENAME[] =
+static char const * const defines_file_protection_start[] =
 {
     "#line 1125 \"btyaccpa.ske\"",
+    "",
+    "#ifndef _BTYACC_DEFINES_H_",
+    "#define _BTYACC_DEFINES_H_",
+    "",
+    "",
+    "",
+    0
+};
+
+static char const * const defines_file_protection_end[] =
+{
+    "#line 1132 \"btyaccpa.ske\"",
+    "",
+    "",
+    "#endif /* _BTYACC_DEFINES_H_ */",
+    "",
+    "",
+    0
+};
+
+static char const * const token_charset[] =
+{
+    "#line 1138 \"btyaccpa.ske\"",
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$",
+    0
+};
+
+static char const * const define_token[] =
+{
+    "#line 1140 \"btyaccpa.ske\"",
+    "#define %-60s %5d",
+    "",
+    0
+};
+
+static char const * const yystype_extern_decl[] =
+{
+    "#line 1143 \"btyaccpa.ske\"",
+    "extern YYSTYPE yylval;",
+    "",
+    0
+};
+
+static char const * const define_default_yystype[] =
+{
+    "#line 1146 \"btyaccpa.ske\"",
+    "#ifndef YYSTYPE",
+    "typedef int YYSTYPE;",
+    "#endif",
+    "",
+    0
+};
+
+static char const * const union_decl_start[] =
+{
+    "#line 1151 \"btyaccpa.ske\"",
+    "",
+    "typedef union",
+    0
+};
+
+static char const * const union_decl_end[] =
+{
+    "#line 1154 \"btyaccpa.ske\"",
+    " YYSTYPE;",
+    " ",
+    0
+};
+
+static char const * const define_yyfinal[] =
+{
+    "#line 1157 \"btyaccpa.ske\"",
+    "#define YYFINAL %d",
+    "",
+    0
+};
+
+static char const * const define_yydebug[] =
+{
+    "#line 1160 \"btyaccpa.ske\"",
+    "#ifndef YYDEBUG",
+    "#define YYDEBUG %d",
+    "#endif",
+    "",
+    0
+};
+
+static char const * const debug_yyname_strings_start[] =
+{
+    "#line 1165 \"btyaccpa.ske\"",
+    "#if YYDEBUG",
+    "%schar *yyname[] = {",
+    "",
+    0
+};
+
+static char const * const debug_yyname_strings_end[] =
+{
+    "#line 1169 \"btyaccpa.ske\"",
+    "",
+    "};",
+    "#endif",
+    "",
+    0
+};
+
+static char const * const debug_yyrule_strings_start[] =
+{
+    "#line 1174 \"btyaccpa.ske\"",
+    "#if YYDEBUG",
+    "%schar *yyrule[] = {",
+    "",
+    0
+};
+
+static char const * const debug_yyrule_strings_end[] =
+{
+    "#line 1178 \"btyaccpa.ske\"",
+    "",
+    "};",
+    "#endif",
+    "",
+    0
+};
+
+static char const * const DEFINES_FILENAME[] =
+{
+    "#line 1183 \"btyaccpa.ske\"",
     "%s%s.tab.h",
     0
 };
 
 static char const * const OUTPUT_FILENAME[] =
 {
-    "#line 1127 \"btyaccpa.ske\"",
+    "#line 1185 \"btyaccpa.ske\"",
     "%s%s.tab.c",
     0
 };
 
 static char const * const CODE_FILENAME[] =
 {
-    "#line 1129 \"btyaccpa.ske\"",
+    "#line 1187 \"btyaccpa.ske\"",
     "%s%s.code.c",
     0
 };
 
 static char const * const VERBOSE_FILENAME[] =
 {
-    "#line 1131 \"btyaccpa.ske\"",
+    "#line 1189 \"btyaccpa.ske\"",
     "%s%s.output",
     0
 };
@@ -1235,6 +1363,20 @@ struct section section_list_btyaccpa[] = {
 	{ "int_table_entry", &int_table_entry[0] },
 	{ "int_table_end", &int_table_end[0] },
 	{ "table_size", &table_size[0] },
+	{ "defines_file_protection_start", &defines_file_protection_start[0] },
+	{ "defines_file_protection_end", &defines_file_protection_end[0] },
+	{ "token_charset", &token_charset[0] },
+	{ "define_token", &define_token[0] },
+	{ "yystype_extern_decl", &yystype_extern_decl[0] },
+	{ "define_default_yystype", &define_default_yystype[0] },
+	{ "union_decl_start", &union_decl_start[0] },
+	{ "union_decl_end", &union_decl_end[0] },
+	{ "define_yyfinal", &define_yyfinal[0] },
+	{ "define_yydebug", &define_yydebug[0] },
+	{ "debug_yyname_strings_start", &debug_yyname_strings_start[0] },
+	{ "debug_yyname_strings_end", &debug_yyname_strings_end[0] },
+	{ "debug_yyrule_strings_start", &debug_yyrule_strings_start[0] },
+	{ "debug_yyrule_strings_end", &debug_yyrule_strings_end[0] },
 	{ "DEFINES_FILENAME", &DEFINES_FILENAME[0] },
 	{ "OUTPUT_FILENAME", &OUTPUT_FILENAME[0] },
 	{ "CODE_FILENAME", &CODE_FILENAME[0] },

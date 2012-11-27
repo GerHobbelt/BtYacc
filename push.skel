@@ -552,13 +552,15 @@ yyreduce:
 
     }
 
-#if YYDEBUG && defined(YYDBPR)
+#if YYDEBUG 
+#if defined(YYDBPR)
     if (yydebug)
     {
         printf("yydebug: after reduction, result is ");
         YYDBPR(yyval);
         printf("\n");
     }
+#endif
 #endif
     yyssp -= yym;
     yystate = *yyssp;

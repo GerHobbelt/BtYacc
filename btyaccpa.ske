@@ -1121,6 +1121,64 @@ static
 %% table_size
 #define YYTABLESIZE %d
 
+%% defines_file_protection_start
+
+#ifndef _BTYACC_DEFINES_H_
+#define _BTYACC_DEFINES_H_
+
+
+
+%% defines_file_protection_end
+
+
+#endif /* _BTYACC_DEFINES_H_ */
+
+
+%% token_charset
+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$
+%% define_token
+#define %-60s %5d
+
+%% yystype_extern_decl
+extern YYSTYPE yylval;
+
+%% define_default_yystype
+#ifndef YYSTYPE
+typedef int YYSTYPE;
+#endif
+
+%% union_decl_start
+
+typedef union
+%% union_decl_end
+ YYSTYPE;
+ 
+%% define_yyfinal
+#define YYFINAL %d
+
+%% define_yydebug
+#ifndef YYDEBUG
+#define YYDEBUG %d
+#endif
+
+%% debug_yyname_strings_start
+#if YYDEBUG
+%schar *yyname[] = {
+
+%% debug_yyname_strings_end
+
+};
+#endif
+
+%% debug_yyrule_strings_start
+#if YYDEBUG
+%schar *yyrule[] = {
+
+%% debug_yyrule_strings_end
+
+};
+#endif
+
 %% DEFINES_FILENAME
 %s%s.tab.h
 %% OUTPUT_FILENAME
