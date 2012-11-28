@@ -400,16 +400,49 @@ no_more_options:;
     name_uc_prefix = strdup(name_prefix);
 	strupr(name_uc_prefix);
 
-	if (target_dir && *target_dir) {
-        char *p;
-		size_t l = strlen(target_dir);
-        p = (char *)MALLOC(l + 2);
-		if (!p) no_space();
-		strcpy(p, target_dir);
-		if (p[l - 1] != '/' && p[l - 1] != '\\' && p[l - 1] != ':')
+	if (target_dir && *target_dir) 
+	{
+		if (0 == strcmp(target_dir, "@")) 
 		{
-			p[l++] = '/';
-			p[l] = 0;
+			if (!input_file_name) 
+			{
+				target_dir = "";
+			}
+			else
+			{
+				char *s2;
+				char *s;
+
+				target_dir = strdup(input_file_name);
+				if (!target_dir) no_space();
+
+				// strip off filename from the input file path:
+				s = strrchr(target_dir, '/');
+				if (!s) s = target_dir; else s++;
+				s2 = strrchr(s, '\\');
+				if (!s2) s2 = s; else s2++;
+				s = strrchr(s2, ':');
+				if (!s) s = s2; else s++;
+
+				*s2 = 0;
+			}
+		}
+		else
+		{
+			char *p;
+			size_t l;
+
+			l = strlen(target_dir);
+
+			p = (char *)MALLOC(l + 2);
+			if (!p) no_space();
+			strcpy(p, target_dir);
+			if (p[l - 1] != '/' && p[l - 1] != '\\' && p[l - 1] != ':')
+			{
+				p[l++] = '/';
+				p[l] = 0;
+			}
+			target_dir = p;
 		}
 	}
 	if (!target_dir || !*target_dir)
