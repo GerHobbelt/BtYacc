@@ -278,6 +278,7 @@ extern char *myname;
 extern char *target_dir;
 extern char *file_prefix;
 extern char *name_prefix;
+extern char *name_uc_prefix;
 extern char *cptr;
 extern char *line;
 extern int unsigned lineno;

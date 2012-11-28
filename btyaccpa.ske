@@ -414,8 +414,10 @@ yyloop:
       {
 #if YYDEBUG
         if (yydebug && yychar >= 0)
+		{
           fprintf(stderr, "btyacc[%s]: backtracking 1 token\n", (yytrial ? "trial" : "---"));
-#       endif
+		}
+#endif
 
         ++ctry;
       }
@@ -466,8 +468,10 @@ yyloop:
     {
 #if YYDEBUG
       if (yydebug)
+	  {
         fprintf(stderr, "btyacc[%3u,%2d%s]: shifting to state %d\n",
                 yystate, yydepth, (yytrial ? ",trial" : ""), yyctable[ctry]);
+	  }
 #endif
       if (yychar < 0)
       {
@@ -494,8 +498,10 @@ yyloop:
   {
 #if YYDEBUG
     if (yydebug)
+	{
       fprintf(stderr, "btyacc[%3u,%2d%s]: shifting to state %d\n",
               yystate, yydepth, (yytrial ? ",trial" : ""), yytable[yyn]);
+	}
 #endif
     yychar = YYEMPTY;
     if (yyps->errflag > 0)
@@ -537,10 +543,12 @@ yyerrhandler:
     YYParseState *save = yyps->save;
 #if YYDEBUG
     if (yydebug)
+	{
       fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR, "
               "CONFLICT BACKTRACKING to state %d, %d tokens\n",
               yystate, yydepth, (yytrial ? ",trial" : ""),
               yyps->save->state, yylvp - yylvals - yyps->save->lexeme);
+	}
 #endif
     /* Memorize most forward-looking error state in case
        it's really an error. */
@@ -636,10 +644,12 @@ yyinrecovery:
       {
 #if YYDEBUG
         if (yydebug)
+		{
           fprintf(stderr, "btyacc[%3d,%2d%s]: ERROR recovery shifts to "
                  "state %d\n",
                   *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""),
                   yytable[yyn]);
+		}
 #endif
         /* Use label yyerrlab, so that compiler does not warn */
         if(yyps->errflag != yyps->errflag)
@@ -651,10 +661,12 @@ yyinrecovery:
       {
 #if YYDEBUG
         if (yydebug)
+		{
           fprintf(stderr,
                   "btyacc[%3d,%2d%s]: ERROR recovery discards this state\n",
                   *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""));
-#       endif
+		}
+#endif
         if (yyps->ssp <= yyps->ss)
         {
           goto yyabort;
@@ -825,8 +837,10 @@ yyreduce:
   }
 #if YYDEBUG
   if (yydebug)
+  {
     fprintf(stderr, "btyacc[%3u,%2d%s]: reduced, shifting to state %u\n",
             *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""), yystate);
+  }
 #endif
   if (yyps->ssp >= yyps->ss + yyps->stacksize - 1)
   {
@@ -854,10 +868,12 @@ yyvalid:
   }
 #if YYDEBUG
   if (yydebug)
+  {
     fprintf(stderr, "btyacc[%3d,%2d%s]: CONFLICT trial successful, "
             "backtracking to state %d, %d tokens\n",
             yystate, yydepth, (yytrial ? ",trial" : ""),
             yypath->state, yylvp - yylvals - yypath->lexeme);
+  }
 #endif
   if(yyerrctx)
   {
@@ -1058,7 +1074,9 @@ static void yyMoreStack(YYParseState *yyps)
   yyps->psp = yyps->ps + p;
 #if YYDEBUG
   if (yydebug)
+  {
     fprintf(stderr, "btyacc: stack size increased to %d\n", yyps->stacksize);
+  }
 #endif
 }
 
@@ -1140,6 +1158,7 @@ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$
 #define %-60s %5d
 
 %% yystype_extern_decl
+
 extern YYSTYPE yylval;
 
 %% define_default_yystype
@@ -1152,9 +1171,13 @@ typedef int YYSTYPE;
 typedef union
 %% union_decl_end
  YYSTYPE;
+
  
+%% define_yymaxtoken
+#define YYMAXTOKEN %5d
+
 %% define_yyfinal
-#define YYFINAL %d
+#define YYFINAL %5d
 
 %% define_yydebug
 #ifndef YYDEBUG

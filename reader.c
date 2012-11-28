@@ -1073,59 +1073,87 @@ void read_declarations(void)
             vflag = 1;
             break;
         case BISON_DEFINES:
+            dflag = 1;
+            break;
         case BISON_LOCATIONS:
         case BISON_PURE:
         case BISON_YACC:
+        case BISON_ERR_VERBOSE:
             /* ignore */
             break;
-        case BISON_ERR_VERBOSE:
         case BISON_DEBUG:
             tflag = 1;
             break;
         case BISON_NAME_PREFIX:
             {
                 bucket *bp;
+				char *prefix;
 
                 /* = prefix */
                 c = nextc();
-                if (c != '=') error(lineno, line, cptr, "syntax error: expected '=' following %%name-prefix");
-                cptr++;
-                c = nextc();
+                if (c == '=') 
+				{
+					cptr++;
+					c = nextc();
+				}
                 if (c == '\'' || c == '"')
                 {
                     bp = get_literal();
                     /* strip quotes */
-                    name_prefix = strdup(bp->name + 1);
-                    name_prefix[strlen(name_prefix)-1] = 0;
+                    prefix = strdup(bp->name + 1);
+                    prefix[strlen(prefix)-1] = 0;
                 }
                 else
                 {
                     bp = get_name();
-                    name_prefix = strdup(bp->name);
+                    prefix = strdup(bp->name);
                 }
+
+				if (prefix && *prefix)
+				{
+					name_prefix = prefix;
+					name_uc_prefix = strdup(prefix);
+					strupr(name_uc_prefix);
+				}
+				else
+				{
+					 error(lineno, line, cptr, "syntax error: not a valid name prefix following %%name-prefix");
+				}
             }
             break;
         case BISON_FILE_PREFIX:
             {
                 bucket *bp;
+				char *prefix;
 
                 /* = prefix */
                 c = nextc();
-                if (k != '=') error(lineno, line, cptr, "syntax error: expected '=' following %%file-prefix");
-                cptr++;
-                c = nextc();
+                if (k == '=') 
+				{
+					cptr++;
+					c = nextc();
+				}
                 if (c == '\'' || c == '"')
                 {
                     bp = get_literal();
                     /* strip quotes */
-                    file_prefix = strdup(bp->name + 1);
-                    file_prefix[strlen(file_prefix)-1] = 0;
+                    prefix = strdup(bp->name + 1);
+                    prefix[strlen(prefix)-1] = 0;
                 }
                 else
                 {
                     bp = get_name();
-                    file_prefix = strdup(bp->name);
+                    prefix = strdup(bp->name);
                 }
+
+				if (prefix && *prefix)
+				{
+					file_prefix = prefix;
+				}
+				else
+				{
+					 error(lineno, line, cptr, "syntax error: not a valid file prefix following %%file-prefix");
+				}
             }
             break;
         case BISON_DEFINE:

@@ -927,7 +927,7 @@ void output_debug(void)
         if (symbol_value[i] > max)
             max = symbol_value[i];
 	}
-	BtYacc_printf(code_file, count_newlines(CODE_FILE, get_section("define_token")), "YYMAXTOKEN", max);
+	BtYacc_printf(code_file, count_newlines(CODE_FILE, get_section("define_yymaxtoken")), max);
 
     symnam = (char **) MALLOC((max+1)*sizeof(char *));
     if (symnam == 0) no_space();

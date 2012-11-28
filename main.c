@@ -27,6 +27,7 @@ int Eflag = 0;
 char *target_dir = NULL;
 char *file_prefix = NULL;
 char *name_prefix = "yy";
+char *name_uc_prefix = NULL;
 char *myname = "btyacc";
 #if defined(__MSDOS__) || defined(WIN32) || defined(__WIN32)
 #define DIR_CHAR '\\'
@@ -178,6 +179,8 @@ static SPLINT_NO_RETURN void usage(void)
             "  -E           Print preprocessed grammar to stdout\n"
             "  -l           Do not insert #line directives into generated code\n"
 			"  -o path      Write all files to directory <path> instead of current working directory\n"
+            "  -p prefix    Change `yy' into `prefix' in all output code.\n"
+			"               Note: '@' means we use the filename as a prefix.\n"
             "  -r           Write tables to `y.tab.c', code to `y.code.c'\n"
             "  -S x.skel    Select parser skeleton\n"
             "  -t           Include debugging code in generated parser\n"
@@ -225,6 +228,15 @@ static void getargs(int argc, char **argv)
                  file_prefix = s;
             else if (++i < argc)
                 file_prefix = argv[i];
+            else
+                usage();
+            continue;
+
+        case 'p':
+            if (*++s)
+                 name_prefix = s;
+            else if (++i < argc)
+                name_prefix = argv[i];
             else
                 usage();
             continue;
@@ -359,6 +371,34 @@ no_more_options:;
     if (!file_prefix || !*file_prefix) {
         file_prefix = "y";
     }
+
+    if (name_prefix && *name_prefix) {
+        char *s2;
+
+		if (0 == strcmp(name_prefix, "@") && 0 != strcmp(file_prefix, "y"))
+		{
+			name_prefix = strdup(file_prefix);
+		}
+
+		/* sanitize the prefix to be suitable as part of variable names: */
+		s2 = name_prefix;
+		if (*s2 && !isalpha(*s2) && *s2 != '_')
+		{
+			*s2 = 'y';
+		}
+		for (++s2; *s2; s2++)
+		{
+			if (!isalnum(*s2) && *s2 != '_')
+			{
+				*s2 = '_';
+			}
+		}
+    }
+    if (!name_prefix || !*name_prefix) {
+        name_prefix = "yy";
+    }
+    name_uc_prefix = strdup(name_prefix);
+	strupr(name_uc_prefix);
 
 	if (target_dir && *target_dir) {
         char *p;
