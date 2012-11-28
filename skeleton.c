@@ -1,5 +1,5 @@
 /*
-** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\btyaccpa.ske
+** This file generated automatically from btyaccpa.ske
 */
 
 #include "defs.h"
@@ -77,7 +77,7 @@ static char const * const banner[] =
     "  #define TRUE (!FALSE)",
     "#endif",
     "",
-    "typedef int Yshort;",
+    "typedef short int Yshort;",
     "",
     0
 };
@@ -273,8 +273,8 @@ static char const * const header[] =
     "/* Local prototypes. */",
     "int yyparse(void);",
     "",
-    "static int yyLex1();",
-    "static int yyExpand();",
+    "static int yyLex1(void);",
+    "static int yyExpand(void);",
     "static void yySCopy(YYSTYPE *to, YYSTYPE *from, int size);",
     "static void yyPCopy(YYPOSN  *to, YYPOSN  *from, int size);",
     "static void yyMoreStack(YYParseState *yyps);",
@@ -321,7 +321,7 @@ static char const * const body[] =
     "     (more error handling);",
     "   }",
     " */",
-    "int yyparse()",
+    "int yyparse(void)",
     "{",
     "  int yym, yyn, yychar, yynewerrflag;",
     "  int unsigned yystate;",
@@ -331,7 +331,8 @@ static char const * const body[] =
     "#if YYDEBUG",
     "  char *yys;",
     "",
-    "  if ((yys = getenv(\"YYDEBUG\")))",
+    "  yys = getenv(\"YYDEBUG\");",
+    "  if (yys)",
     "  {",
     "    yyn = *yys;",
     "    if (yyn >= '0' && yyn <= '9')",
@@ -486,7 +487,9 @@ static char const * const body[] =
     "      }",
     "      if (yychar >= 0)",
     "      {",
-    "        --yylvp--; --yylpp; --yylexp;",
+    "        --yylvp; ",
+    "\t--yylpp; ",
+    "\t--yylexp;",
     "        yychar = YYEMPTY;",
     "      }",
     "      save->lexeme = yylvp - yylvals;",
@@ -504,7 +507,9 @@ static char const * const body[] =
     "#endif",
     "      if (yychar < 0)",
     "      {",
-    "        ++yylvp; ++yylpp; ++yylexp;",
+    "        ++yylvp; ",
+    "\t++yylpp; ",
+    "\t++yylexp;",
     "      }",
     "      yychar = YYEMPTY;",
     "      if (yyps->errflag > 0)",
@@ -546,8 +551,9 @@ static char const * const body[] =
     "    *++(yyps->vsp) = yylval;",
     "    *++(yyps->psp) = yyposn;",
     "    goto yyloop;",
-    "  }",
-    "  if ((yyn = yyrindex[yystate]) &&",
+    "  }           ",
+    "  yyn = yyrindex[yystate];",
+    "  if (yyn != 0 &&",
     "      (yyn += yychar) >= 0 &&",
     "      yyn <= YYTABLESIZE &&",
     "      yycheck[yyn] == yychar)",
@@ -581,7 +587,7 @@ static char const * const body[] =
     "#endif",
     "    /* Memorize most forward-looking error state in case",
     "       it's really an error. */",
-    "    if(yyerrctx==0 || yyerrctx->lexeme<yylvp-yylvals)",
+    "    if (yyerrctx == 0 || yyerrctx->lexeme < yylvp-yylvals)",
     "    {",
     "      /* Free old saved error context state */",
     "      if(yyerrctx)",
@@ -613,7 +619,8 @@ static char const * const body[] =
     "    ctry = ++save->ctry;",
     "    yystate = save->state;",
     "    /* We tried shift, try reduce now */",
-    "    if ((yyn = yyctable[ctry]) >= 0)",
+    "    yyn = yyctable[ctry];",
+    "    if (yyn >= 0)",
     "    {",
     "      goto yyreduce;",
     "    }",
@@ -674,8 +681,7 @@ static char const * const body[] =
     "#if YYDEBUG",
     "        if (yydebug)",
     "\t\t{",
-    "          fprintf(stderr, \"btyacc[%3d,%2d%s]: ERROR recovery shifts to \"",
-    "                 \"state %d\\n\",",
+    "          fprintf(stderr, \"btyacc[%3d,%2d%s]: ERROR recovery shifts to state %d\\n\",",
     "                  *(yyps->ssp), yydepth, (yytrial ? \",trial\" : \"\"),",
     "                  yytable[yyn]);",
     "\t\t}",
@@ -728,12 +734,12 @@ static char const * const body[] =
     "              yystate, yydepth, (yytrial ? \",trial\" : \"\"), yychar, yys);",
     "    }",
     "#endif",
-    "    if(!yytrial)",
+    "    if (!yytrial)",
     "    {",
-    "      YYDELETEVAL(yylval,0);",
-    "      YYDELETEPOSN(yyposn,0);",
+    "      YYDELETEVAL(yylval, 0);",
+    "      YYDELETEPOSN(yyposn, 0);",
     "    }",
-    "    yychar = (YYEMPTY);",
+    "    yychar = YYEMPTY;",
     "    goto yyloop;",
     "  }",
     "",
@@ -791,7 +797,7 @@ static char const * const body[] =
 
 static char const * const trailer[] =
 {
-    "#line 761 \"btyaccpa.ske\"",
+    "#line 767 \"btyaccpa.ske\"",
     "",
     "  default:",
     "    break;",
@@ -800,7 +806,8 @@ static char const * const trailer[] =
     "#if YYDEBUG && defined(YYDBPR)",
     "  if (yydebug)",
     "  {",
-    "    fputs(\"btyacc[trial]: reduced, result is \", stderr);",
+    "    fprintf(stderr, \"btyacc[%3u,%2d%s]: after reduction, result is \",",
+    "            yystate, yydepth, (yytrial ? \",trial\" : \"\"));",
     "    YYDBPR(yyps->val);",
     "    fputc('\\n', stderr);",
     "  }",
@@ -837,8 +844,9 @@ static char const * const trailer[] =
     "    *++(yyps->psp) = yyps->pos;",
     "    yyretposn = yyps->pos;  /* return value of root position to yyposn */",
     "    if (yychar < 0)",
-    "    {",
-    "      if ((yychar = yyLex1()) < 0)",
+    "    {           ",
+    "      yychar = yyLex1();",
+    "      if (yychar < 0)",
     "      {",
     "        yychar = 0;",
     "      }",
@@ -859,8 +867,9 @@ static char const * const trailer[] =
     "      goto yyaccept;",
     "    goto yyloop;",
     "  }",
-    "",
-    "  if ((yyn = yygindex[yym]) && (yyn += yystate) >= 0 &&",
+    "\t      ",
+    "  yyn = yygindex[yym];\t      ",
+    "  if (yyn != 0 && (yyn += yystate) >= 0 &&",
     "      yyn <= YYTABLESIZE && yycheck[yyn] == yystate)",
     "  {",
     "    yystate = yytable[yyn];",
@@ -872,7 +881,7 @@ static char const * const trailer[] =
     "#if YYDEBUG",
     "  if (yydebug)",
     "  {",
-    "    fprintf(stderr, \"btyacc[%3u,%2d%s]: reduced, shifting to state %u\\n\",",
+    "    fprintf(stderr, \"btyacc[%3d,%2d%s]: reduced, shifting to state %d\\n\",",
     "            *(yyps->ssp), yydepth, (yytrial ? \",trial\" : \"\"), yystate);",
     "  }",
     "#endif",
@@ -937,12 +946,12 @@ static char const * const trailer[] =
     "      yyFreeState(&yyerrctx);",
     "    }",
     "",
-    "    for(pv=yyps->vs; pv<yyps->vsp; ++pv)",
+    "    for(pv = yyps->vs; pv < yyps->vsp; ++pv)",
     "    {",
     "      YYDELETEVAL(*pv,2);",
     "    }",
     "",
-    "    for(pp=yyps->ps; pp<yyps->psp; ++pp)",
+    "    for(pp = yyps->ps; pp < yyps->psp; ++pp)",
     "    {",
     "      YYDELETEPOSN(*pp,2);",
     "    }",
@@ -988,17 +997,17 @@ static char const * const trailer[] =
     "/* Call yylex() unless the token has already been read. */",
     "static int yyLex1(void)",
     "{",
-    "  if(yylvp < yylve)",
+    "  if (yylvp < yylve)",
     "  {",
     "    /* we're currently re-reading tokens */",
     "    yylval = *yylvp++;",
     "    yyposn = *yylpp++;",
     "    return *yylexp++;",
     "  }",
-    "  else if(yyps->save)",
+    "  else if (yyps->save)",
     "  {",
     "    /* in trial mode; save scanner results for future parse attempts */",
-    "    if(yylvp == yylvlim)",
+    "    if (yylvp == yylvlim)",
     "      yyExpand();",
     "    *yylexp = yylex();",
     "    *yylvp++ = yylval;",
@@ -1160,7 +1169,7 @@ static char const * const trailer[] =
 
 static char const * const line_position[] =
 {
-    "#line 1125 \"btyaccpa.ske\"",
+    "#line 1134 \"btyaccpa.ske\"",
     "#line %d \"%s\"",
     "",
     0
@@ -1168,35 +1177,35 @@ static char const * const line_position[] =
 
 static char const * const rflag_prefix[] =
 {
-    "#line 1128 \"btyaccpa.ske\"",
+    "#line 1137 \"btyaccpa.ske\"",
     "static",
     0
 };
 
 static char const * const not_rflag_prefix[] =
 {
-    "#line 1130 \"btyaccpa.ske\"",
+    "#line 1139 \"btyaccpa.ske\"",
     "",
     0
 };
 
 static char const * const int_table_start[] =
 {
-    "#line 1132 \"btyaccpa.ske\"",
+    "#line 1141 \"btyaccpa.ske\"",
     "%sYshort %s[%d] = {%41d,",
     0
 };
 
 static char const * const int_table_entry[] =
 {
-    "#line 1134 \"btyaccpa.ske\"",
+    "#line 1143 \"btyaccpa.ske\"",
     "%5d,",
     0
 };
 
 static char const * const int_table_end[] =
 {
-    "#line 1136 \"btyaccpa.ske\"",
+    "#line 1145 \"btyaccpa.ske\"",
     "",
     "};",
     "",
@@ -1205,7 +1214,7 @@ static char const * const int_table_end[] =
 
 static char const * const table_size[] =
 {
-    "#line 1140 \"btyaccpa.ske\"",
+    "#line 1149 \"btyaccpa.ske\"",
     "#define YYTABLESIZE %d",
     "",
     0
@@ -1213,7 +1222,7 @@ static char const * const table_size[] =
 
 static char const * const defines_file_protection_start[] =
 {
-    "#line 1143 \"btyaccpa.ske\"",
+    "#line 1152 \"btyaccpa.ske\"",
     "",
     "#ifndef _BTYACC_DEFINES_H_",
     "#define _BTYACC_DEFINES_H_",
@@ -1225,7 +1234,7 @@ static char const * const defines_file_protection_start[] =
 
 static char const * const defines_file_protection_end[] =
 {
-    "#line 1150 \"btyaccpa.ske\"",
+    "#line 1159 \"btyaccpa.ske\"",
     "",
     "",
     "#endif /* _BTYACC_DEFINES_H_ */",
@@ -1236,14 +1245,14 @@ static char const * const defines_file_protection_end[] =
 
 static char const * const token_charset[] =
 {
-    "#line 1156 \"btyaccpa.ske\"",
+    "#line 1165 \"btyaccpa.ske\"",
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$",
     0
 };
 
 static char const * const define_token[] =
 {
-    "#line 1158 \"btyaccpa.ske\"",
+    "#line 1167 \"btyaccpa.ske\"",
     "#define %-60s %5d",
     "",
     0
@@ -1251,7 +1260,7 @@ static char const * const define_token[] =
 
 static char const * const yystype_extern_decl[] =
 {
-    "#line 1161 \"btyaccpa.ske\"",
+    "#line 1170 \"btyaccpa.ske\"",
     "",
     "extern YYSTYPE yylval;",
     "",
@@ -1260,7 +1269,7 @@ static char const * const yystype_extern_decl[] =
 
 static char const * const define_default_yystype[] =
 {
-    "#line 1165 \"btyaccpa.ske\"",
+    "#line 1174 \"btyaccpa.ske\"",
     "#ifndef YYSTYPE",
     "typedef int YYSTYPE;",
     "#endif",
@@ -1270,7 +1279,7 @@ static char const * const define_default_yystype[] =
 
 static char const * const union_decl_start[] =
 {
-    "#line 1170 \"btyaccpa.ske\"",
+    "#line 1179 \"btyaccpa.ske\"",
     "",
     "typedef union",
     0
@@ -1278,7 +1287,7 @@ static char const * const union_decl_start[] =
 
 static char const * const union_decl_end[] =
 {
-    "#line 1173 \"btyaccpa.ske\"",
+    "#line 1182 \"btyaccpa.ske\"",
     " YYSTYPE;",
     "",
     " ",
@@ -1287,7 +1296,7 @@ static char const * const union_decl_end[] =
 
 static char const * const define_yymaxtoken[] =
 {
-    "#line 1177 \"btyaccpa.ske\"",
+    "#line 1186 \"btyaccpa.ske\"",
     "#define YYMAXTOKEN %5d",
     "",
     0
@@ -1295,7 +1304,7 @@ static char const * const define_yymaxtoken[] =
 
 static char const * const define_yyfinal[] =
 {
-    "#line 1180 \"btyaccpa.ske\"",
+    "#line 1189 \"btyaccpa.ske\"",
     "#define YYFINAL %5d",
     "",
     0
@@ -1303,7 +1312,7 @@ static char const * const define_yyfinal[] =
 
 static char const * const define_yydebug[] =
 {
-    "#line 1183 \"btyaccpa.ske\"",
+    "#line 1192 \"btyaccpa.ske\"",
     "#ifndef YYDEBUG",
     "#define YYDEBUG %d",
     "#endif",
@@ -1313,7 +1322,7 @@ static char const * const define_yydebug[] =
 
 static char const * const debug_yyname_strings_start[] =
 {
-    "#line 1188 \"btyaccpa.ske\"",
+    "#line 1197 \"btyaccpa.ske\"",
     "#if YYDEBUG",
     "%schar *yyname[] = {",
     "",
@@ -1321,25 +1330,6 @@ static char const * const debug_yyname_strings_start[] =
 };
 
 static char const * const debug_yyname_strings_end[] =
-{
-    "#line 1192 \"btyaccpa.ske\"",
-    "",
-    "};",
-    "#endif",
-    "",
-    0
-};
-
-static char const * const debug_yyrule_strings_start[] =
-{
-    "#line 1197 \"btyaccpa.ske\"",
-    "#if YYDEBUG",
-    "%schar *yyrule[] = {",
-    "",
-    0
-};
-
-static char const * const debug_yyrule_strings_end[] =
 {
     "#line 1201 \"btyaccpa.ske\"",
     "",
@@ -1349,30 +1339,49 @@ static char const * const debug_yyrule_strings_end[] =
     0
 };
 
-static char const * const DEFINES_FILENAME[] =
+static char const * const debug_yyrule_strings_start[] =
 {
     "#line 1206 \"btyaccpa.ske\"",
+    "#if YYDEBUG",
+    "%schar *yyrule[] = {",
+    "",
+    0
+};
+
+static char const * const debug_yyrule_strings_end[] =
+{
+    "#line 1210 \"btyaccpa.ske\"",
+    "",
+    "};",
+    "#endif",
+    "",
+    0
+};
+
+static char const * const DEFINES_FILENAME[] =
+{
+    "#line 1215 \"btyaccpa.ske\"",
     "%s%s.tab.h",
     0
 };
 
 static char const * const OUTPUT_FILENAME[] =
 {
-    "#line 1208 \"btyaccpa.ske\"",
+    "#line 1217 \"btyaccpa.ske\"",
     "%s%s.tab.c",
     0
 };
 
 static char const * const CODE_FILENAME[] =
 {
-    "#line 1210 \"btyaccpa.ske\"",
+    "#line 1219 \"btyaccpa.ske\"",
     "%s%s.code.c",
     0
 };
 
 static char const * const VERBOSE_FILENAME[] =
 {
-    "#line 1212 \"btyaccpa.ske\"",
+    "#line 1221 \"btyaccpa.ske\"",
     "%s%s.output",
     0
 };

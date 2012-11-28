@@ -1,14 +1,31 @@
 /*
-** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\push.skel
+** This file generated automatically from push.skel
 */
 
 #include "defs.h"
 
 
 
-static char const * const banner[] =
+static char const * const language[] =
 {
     "#line 2 \"push.skel\"",
+    "C",
+    "",
+    0
+};
+
+/* -*- C -*-
+
+   The banner used here should be replaced with an #ident directive if
+   the target C compiler supports #ident directives.
+
+   If the skeleton is changed, the banner should be changed so that
+   the altered version can easily be distinguished from the original.  
+*/
+
+static char const * const banner[] =
+{
+    "#line 15 \"push.skel\"",
     "/*",
     "**    \"@(#)push.skel, based on byacc 1.8 (Berkeley) 01/20/91\";",
     "*/",
@@ -45,20 +62,78 @@ static char const * const banner[] =
     "",
     "",
     "",
+    "#include <stdio.h>",
+    "#include <stdlib.h>",
+    "#include <string.h>",
+    "",
+    "/* [i_a] MSVC doesn't define TRUE in the expected places; do it here to make sure we got it 'right' */",
+    "#ifndef TRUE",
+    "  #undef FALSE",
+    "  #undef TRUE",
+    "",
+    "  #define FALSE 0",
+    "  #define TRUE (!FALSE)",
+    "#endif",
+    "",
+    "typedef short int Yshort;",
+    "",
     0
 };
 
 static char const * const tables[] =
 {
-    "#line 39 \"push.skel\"",
+    "#line 67 \"push.skel\"",
+    "",
+    "#ifdef __cplusplus",
+    "#ifndef _YACC_EXTERN_",
+    "#define _YACC_EXTERN_ \"C\"",
+    "#endif",
+    "#endif",
+    "",
+    "extern _YACC_EXTERN_ Yshort yylhs[];",
+    "extern _YACC_EXTERN_ Yshort yylen[];",
+    "",
+    "/* idx: current state; entry: non-zero if to reduce regardless of lookahead */",
+    "extern _YACC_EXTERN_ Yshort yydefred[];",
+    "",
+    "extern _YACC_EXTERN_ Yshort yydgoto[];",
+    "",
+    "/* idx: current state; entry: non-zero if shifting|reducing possible",
+    "   in this state - in that case, yycheck[entry + lookahead] indicates",
+    "   whether to perform the action for this lookahead. */",
+    "extern _YACC_EXTERN_ Yshort yysindex[];",
+    "extern _YACC_EXTERN_ Yshort yyrindex[];",
+    "",
+    "/* yycindex idx: current state; entry: non-zero if shift/reduce",
+    "   conflicts for this state - in that case, yycheck[entry + lookahead]",
+    "   indicates whether there's a conflict for this lookahead */",
+    "extern _YACC_EXTERN_ Yshort yycindex[];",
+    "extern _YACC_EXTERN_ Yshort yycheck[];",
+    "",
+    "extern _YACC_EXTERN_ Yshort yygindex[];",
+    "extern _YACC_EXTERN_ Yshort yytable[];",
+    "extern _YACC_EXTERN_ Yshort yyctable[];",
+    "",
+    "#if YYDEBUG",
+    "/* idx: token code; entry: spelling of token */",
+    "extern _YACC_EXTERN_ char *yyname[];",
+    "",
+    "extern _YACC_EXTERN_ char *yyrule[];",
+    "#endif",
     "",
     0
 };
 
 static char const * const header[] =
 {
-    "#line 41 \"push.skel\"",
-    "#define yyclearin (yychar=(-1))",
+    "#line 106 \"push.skel\"",
+    "",
+    "#ifndef YYERRCODE",
+    "#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.",
+    "#endif",
+    "#define YYEMPTY (-1)",
+    "#define yyclearin (yychar=YYEMPTY)",
+    "",
     "#define yyerrok (yyerrflag=0)",
     "/*",
     "  #ifdef YYSTACKSIZE",
@@ -74,13 +149,17 @@ static char const * const header[] =
     "    #endif",
     "  #endif",
     "*/",
-    "int yydebug;",
-    "static struct yyparsestate",
+    "",
+    "#ifdef YYDEBUG",
+    "int yydebug = 0;",
+    "#endif",
+    "",
+    "struct YYParseState_s",
     "{",
-    "    struct yyparsestate *save;",
-    "    int state;",
-    "    int errflag;",
-    "    short *ssp;",
+    "  struct YYParseState_s *save; /* Previously saved parser state */",
+    "  int           state;",
+    "  int           errflag;",
+    "  Yshort       *ssp;         /* state stack pointer */",
     "    YYSTYPE *vsp;",
     "    YYSTYPE val;",
     "    short *ss;",
@@ -88,7 +167,10 @@ static char const * const header[] =
     "    int lexeme;",
     "    unsigned short stacksize;",
     "    short ctry;",
-    "} *yypstate=0, *yypath=0;",
+    "}",
+    "",
+    "static YYParseState *yypstate=0;",
+    "static YYParseState *yypath=0;",
     "",
     "#define yyerrflag (yypstate->errflag)",
     "#define yyssp (yypstate->ssp)",
@@ -98,8 +180,13 @@ static char const * const header[] =
     "#define yyvs (yypstate->vs)",
     "#define yystacksize (yypstate->stacksize)",
     "",
-    "static YYSTYPE *yylvals=0, *yylvp=0, *yylve=0, *yylvlim=0;",
-    "static short *yylexemes=0, *yylexp=0;",
+    "static YYSTYPE *yylvals=0;",
+    "static YYSTYPE *yylvp=0;",
+    "static YYSTYPE *yylve=0;",
+    "static YYSTYPE *yylvlim=0;",
+    "",
+    "static short *yylexemes=0;",
+    "static short *yylexp=0;",
     "",
     "#define YYLEX                                                           \\",
     "    (yylvp<yylve                                                        \\",
@@ -112,7 +199,8 @@ static char const * const header[] =
     "         *yylvp++ = yylval, yylve++, *yylexp++                          \\",
     "       : yylex())",
     "",
-    "extern int yylex(), yyparse();",
+    "extern int yylex(void);",
+    "extern int yyparse(void);",
     "",
     "#define yytrial (yypstate->save)",
     "",
@@ -165,15 +253,10 @@ static char const * const header[] =
 
 static char const * const body[] =
 {
-    "#line 144 \"push.skel\"",
+    "#line 228 \"push.skel\"",
     "",
     "#ifndef YYNEWSTATE",
-    "#ifdef __oldc",
-    "static struct yyparsestate *YYNEWSTATE(size)",
-    "int size;",
-    "#else",
     "static struct yyparsestate *YYNEWSTATE(int size)",
-    "#endif /* __oldc */",
     "{",
     "    struct yyparsestate *p;",
     "",
@@ -200,7 +283,7 @@ static char const * const body[] =
     "#endif /* C++ */",
     "#endif /* YYFREESTATE */",
     "",
-    "static int yyexpand()",
+    "static int yyexpand(void)",
     "{",
     "    int p = yylvp-yylvals;",
     "    int s = yylvlim-yylvals;",
@@ -244,7 +327,8 @@ static char const * const body[] =
     "#endif",
     "int yyparse(int yychar, YYSTYPE yylval)",
     "{",
-    "    int yym, yyn, yystate, yynewerrflag;",
+    "    int yym, yyn, yynewerrflag;",
+    "    int unsigned yystate;",
     "#if YYDEBUG",
     "    char *yys;",
     "#endif",
@@ -396,7 +480,8 @@ static char const * const body[] =
     "            }",
     "            if (yychar >= 0)",
     "            {",
-    "                yylvp--, yylexp--;",
+    "                yylvp--;",
+    "\t\tyylexp--;",
     "                yychar = -1;",
     "            }",
     "            save->lexeme = yylvp - yylvals;",
@@ -410,7 +495,10 @@ static char const * const body[] =
     "                    yystate, yyctable[ctry]);",
     "#endif",
     "            if (yychar < 0)",
-    "                yylvp++, yylexp++;",
+    "            {",
+    "                yylvp++;",
+    "\t\tyylexp++;",
+    "\t    }",
     "            yychar = -1;",
     "            if (yyerrflag > 0)",
     "                --yyerrflag;",
@@ -578,7 +666,7 @@ static char const * const body[] =
 
 static char const * const trailer[] =
 {
-    "#line 552 \"push.skel\"",
+    "#line 636 \"push.skel\"",
     "",
     "    }",
     "",
@@ -688,6 +776,7 @@ static char const * const trailer[] =
 };
 
 struct section section_list_push[] = {
+	{ "language", &language[0] },
 	{ "banner", &banner[0] },
 	{ "tables", &tables[0] },
 	{ "header", &header[0] },

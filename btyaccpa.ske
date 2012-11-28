@@ -63,7 +63,7 @@ C
   #define TRUE (!FALSE)
 #endif
 
-typedef int Yshort;
+typedef short int Yshort;
 
 %% tables
 
@@ -249,8 +249,8 @@ static Yshort *yylexemes = 0;
 /* Local prototypes. */
 int yyparse(void);
 
-static int yyLex1();
-static int yyExpand();
+static int yyLex1(void);
+static int yyExpand(void);
 static void yySCopy(YYSTYPE *to, YYSTYPE *from, int size);
 static void yyPCopy(YYPOSN  *to, YYPOSN  *from, int size);
 static void yyMoreStack(YYParseState *yyps);
@@ -292,7 +292,7 @@ static void yyFreeState(YYParseState **p);
      (more error handling);
    }
  */
-int yyparse()
+int yyparse(void)
 {
   int yym, yyn, yychar, yynewerrflag;
   int unsigned yystate;
@@ -302,7 +302,8 @@ int yyparse()
 #if YYDEBUG
   char *yys;
 
-  if ((yys = getenv("YYDEBUG")))
+  yys = getenv("YYDEBUG");
+  if (yys)
   {
     yyn = *yys;
     if (yyn >= '0' && yyn <= '9')
@@ -457,7 +458,9 @@ yyloop:
       }
       if (yychar >= 0)
       {
-        --yylvp--; --yylpp; --yylexp;
+        --yylvp; 
+	--yylpp; 
+	--yylexp;
         yychar = YYEMPTY;
       }
       save->lexeme = yylvp - yylvals;
@@ -475,7 +478,9 @@ yyloop:
 #endif
       if (yychar < 0)
       {
-        ++yylvp; ++yylpp; ++yylexp;
+        ++yylvp; 
+	++yylpp; 
+	++yylexp;
       }
       yychar = YYEMPTY;
       if (yyps->errflag > 0)
@@ -517,8 +522,9 @@ yyshift:
     *++(yyps->vsp) = yylval;
     *++(yyps->psp) = yyposn;
     goto yyloop;
-  }
-  if ((yyn = yyrindex[yystate]) &&
+  }           
+  yyn = yyrindex[yystate];
+  if (yyn != 0 &&
       (yyn += yychar) >= 0 &&
       yyn <= YYTABLESIZE &&
       yycheck[yyn] == yychar)
@@ -552,7 +558,7 @@ yyerrhandler:
 #endif
     /* Memorize most forward-looking error state in case
        it's really an error. */
-    if(yyerrctx==0 || yyerrctx->lexeme<yylvp-yylvals)
+    if (yyerrctx == 0 || yyerrctx->lexeme < yylvp-yylvals)
     {
       /* Free old saved error context state */
       if(yyerrctx)
@@ -584,7 +590,8 @@ yyerrhandler:
     ctry = ++save->ctry;
     yystate = save->state;
     /* We tried shift, try reduce now */
-    if ((yyn = yyctable[ctry]) >= 0)
+    yyn = yyctable[ctry];
+    if (yyn >= 0)
     {
       goto yyreduce;
     }
@@ -645,8 +652,7 @@ yyinrecovery:
 #if YYDEBUG
         if (yydebug)
 		{
-          fprintf(stderr, "btyacc[%3d,%2d%s]: ERROR recovery shifts to "
-                 "state %d\n",
+          fprintf(stderr, "btyacc[%3d,%2d%s]: ERROR recovery shifts to state %d\n",
                   *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""),
                   yytable[yyn]);
 		}
@@ -699,12 +705,12 @@ yyinrecovery:
               yystate, yydepth, (yytrial ? ",trial" : ""), yychar, yys);
     }
 #endif
-    if(!yytrial)
+    if (!yytrial)
     {
-      YYDELETEVAL(yylval,0);
-      YYDELETEPOSN(yyposn,0);
+      YYDELETEVAL(yylval, 0);
+      YYDELETEPOSN(yyposn, 0);
     }
-    yychar = (YYEMPTY);
+    yychar = YYEMPTY;
     goto yyloop;
   }
 
@@ -766,7 +772,8 @@ yyreduce:
 #if YYDEBUG && defined(YYDBPR)
   if (yydebug)
   {
-    fputs("btyacc[trial]: reduced, result is ", stderr);
+    fprintf(stderr, "btyacc[%3u,%2d%s]: after reduction, result is ",
+            yystate, yydepth, (yytrial ? ",trial" : ""));
     YYDBPR(yyps->val);
     fputc('\n', stderr);
   }
@@ -803,8 +810,9 @@ yyreduce:
     *++(yyps->psp) = yyps->pos;
     yyretposn = yyps->pos;  /* return value of root position to yyposn */
     if (yychar < 0)
-    {
-      if ((yychar = yyLex1()) < 0)
+    {           
+      yychar = yyLex1();
+      if (yychar < 0)
       {
         yychar = 0;
       }
@@ -825,8 +833,9 @@ yyreduce:
       goto yyaccept;
     goto yyloop;
   }
-
-  if ((yyn = yygindex[yym]) && (yyn += yystate) >= 0 &&
+	      
+  yyn = yygindex[yym];	      
+  if (yyn != 0 && (yyn += yystate) >= 0 &&
       yyn <= YYTABLESIZE && yycheck[yyn] == yystate)
   {
     yystate = yytable[yyn];
@@ -838,7 +847,7 @@ yyreduce:
 #if YYDEBUG
   if (yydebug)
   {
-    fprintf(stderr, "btyacc[%3u,%2d%s]: reduced, shifting to state %u\n",
+    fprintf(stderr, "btyacc[%3d,%2d%s]: reduced, shifting to state %d\n",
             *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""), yystate);
   }
 #endif
@@ -903,12 +912,12 @@ yyabort:
       yyFreeState(&yyerrctx);
     }
 
-    for(pv=yyps->vs; pv<yyps->vsp; ++pv)
+    for(pv = yyps->vs; pv < yyps->vsp; ++pv)
     {
       YYDELETEVAL(*pv,2);
     }
 
-    for(pp=yyps->ps; pp<yyps->psp; ++pp)
+    for(pp = yyps->ps; pp < yyps->psp; ++pp)
     {
       YYDELETEPOSN(*pp,2);
     }
@@ -954,17 +963,17 @@ yyaccept:
 /* Call yylex() unless the token has already been read. */
 static int yyLex1(void)
 {
-  if(yylvp < yylve)
+  if (yylvp < yylve)
   {
     /* we're currently re-reading tokens */
     yylval = *yylvp++;
     yyposn = *yylpp++;
     return *yylexp++;
   }
-  else if(yyps->save)
+  else if (yyps->save)
   {
     /* in trial mode; save scanner results for future parse attempts */
-    if(yylvp == yylvlim)
+    if (yylvp == yylvlim)
       yyExpand();
     *yylexp = yylex();
     *yylvp++ = yylval;

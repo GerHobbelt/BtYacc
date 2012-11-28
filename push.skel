@@ -1,3 +1,16 @@
+%% language
+C
+
+%% ---
+/* -*- C -*-
+
+   The banner used here should be replaced with an #ident directive if
+   the target C compiler supports #ident directives.
+
+   If the skeleton is changed, the banner should be changed so that
+   the altered version can easily be distinguished from the original.  
+*/
+
 %% banner
 /*
 **    "@(#)push.skel, based on byacc 1.8 (Berkeley) 01/20/91";
@@ -35,10 +48,68 @@
 
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* [i_a] MSVC doesn't define TRUE in the expected places; do it here to make sure we got it 'right' */
+#ifndef TRUE
+  #undef FALSE
+  #undef TRUE
+
+  #define FALSE 0
+  #define TRUE (!FALSE)
+#endif
+
+typedef short int Yshort;
+
 %% tables
 
+#ifdef __cplusplus
+#ifndef _YACC_EXTERN_
+#define _YACC_EXTERN_ "C"
+#endif
+#endif
+
+extern _YACC_EXTERN_ Yshort yylhs[];
+extern _YACC_EXTERN_ Yshort yylen[];
+
+/* idx: current state; entry: non-zero if to reduce regardless of lookahead */
+extern _YACC_EXTERN_ Yshort yydefred[];
+
+extern _YACC_EXTERN_ Yshort yydgoto[];
+
+/* idx: current state; entry: non-zero if shifting|reducing possible
+   in this state - in that case, yycheck[entry + lookahead] indicates
+   whether to perform the action for this lookahead. */
+extern _YACC_EXTERN_ Yshort yysindex[];
+extern _YACC_EXTERN_ Yshort yyrindex[];
+
+/* yycindex idx: current state; entry: non-zero if shift/reduce
+   conflicts for this state - in that case, yycheck[entry + lookahead]
+   indicates whether there's a conflict for this lookahead */
+extern _YACC_EXTERN_ Yshort yycindex[];
+extern _YACC_EXTERN_ Yshort yycheck[];
+
+extern _YACC_EXTERN_ Yshort yygindex[];
+extern _YACC_EXTERN_ Yshort yytable[];
+extern _YACC_EXTERN_ Yshort yyctable[];
+
+#if YYDEBUG
+/* idx: token code; entry: spelling of token */
+extern _YACC_EXTERN_ char *yyname[];
+
+extern _YACC_EXTERN_ char *yyrule[];
+#endif
+
 %% header
-#define yyclearin (yychar=(-1))
+
+#ifndef YYERRCODE
+#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.
+#endif
+#define YYEMPTY (-1)
+#define yyclearin (yychar=YYEMPTY)
+
 #define yyerrok (yyerrflag=0)
 /*
   #ifdef YYSTACKSIZE
@@ -54,13 +125,17 @@
     #endif
   #endif
 */
-int yydebug;
-static struct yyparsestate
+
+#ifdef YYDEBUG
+int yydebug = 0;
+#endif
+
+struct YYParseState_s
 {
-    struct yyparsestate *save;
-    int state;
-    int errflag;
-    short *ssp;
+  struct YYParseState_s *save; /* Previously saved parser state */
+  int           state;
+  int           errflag;
+  Yshort       *ssp;         /* state stack pointer */
     YYSTYPE *vsp;
     YYSTYPE val;
     short *ss;
@@ -68,7 +143,10 @@ static struct yyparsestate
     int lexeme;
     unsigned short stacksize;
     short ctry;
-} *yypstate=0, *yypath=0;
+}
+
+static YYParseState *yypstate=0;
+static YYParseState *yypath=0;
 
 #define yyerrflag (yypstate->errflag)
 #define yyssp (yypstate->ssp)
@@ -78,8 +156,13 @@ static struct yyparsestate
 #define yyvs (yypstate->vs)
 #define yystacksize (yypstate->stacksize)
 
-static YYSTYPE *yylvals=0, *yylvp=0, *yylve=0, *yylvlim=0;
-static short *yylexemes=0, *yylexp=0;
+static YYSTYPE *yylvals=0;
+static YYSTYPE *yylvp=0;
+static YYSTYPE *yylve=0;
+static YYSTYPE *yylvlim=0;
+
+static short *yylexemes=0;
+static short *yylexp=0;
 
 #define YYLEX                                                           \
     (yylvp<yylve                                                        \
@@ -92,7 +175,8 @@ static short *yylexemes=0, *yylexp=0;
          *yylvp++ = yylval, yylve++, *yylexp++                          \
        : yylex())
 
-extern int yylex(), yyparse();
+extern int yylex(void);
+extern int yyparse(void);
 
 #define yytrial (yypstate->save)
 
@@ -143,12 +227,7 @@ extern int yylex(), yyparse();
 %% body
 
 #ifndef YYNEWSTATE
-#ifdef __oldc
-static struct yyparsestate *YYNEWSTATE(size)
-int size;
-#else
 static struct yyparsestate *YYNEWSTATE(int size)
-#endif /* __oldc */
 {
     struct yyparsestate *p;
 
@@ -175,7 +254,7 @@ static struct yyparsestate *YYNEWSTATE(int size)
 #endif /* C++ */
 #endif /* YYFREESTATE */
 
-static int yyexpand()
+static int yyexpand(void)
 {
     int p = yylvp-yylvals;
     int s = yylvlim-yylvals;
@@ -219,7 +298,8 @@ extern char *getenv();
 #endif
 int yyparse(int yychar, YYSTYPE yylval)
 {
-    int yym, yyn, yystate, yynewerrflag;
+    int yym, yyn, yynewerrflag;
+    int unsigned yystate;
 #if YYDEBUG
     char *yys;
 #endif
@@ -371,7 +451,8 @@ yyloop:
             }
             if (yychar >= 0)
             {
-                yylvp--, yylexp--;
+                yylvp--;
+		yylexp--;
                 yychar = -1;
             }
             save->lexeme = yylvp - yylvals;
@@ -385,7 +466,10 @@ yyloop:
                     yystate, yyctable[ctry]);
 #endif
             if (yychar < 0)
-                yylvp++, yylexp++;
+            {
+                yylvp++;
+		yylexp++;
+	    }
             yychar = -1;
             if (yyerrflag > 0)
                 --yyerrflag;
