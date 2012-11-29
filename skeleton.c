@@ -197,6 +197,7 @@ static char const * const header[] =
     "",
     "#define yyerrok      (yyps->errflag = 0)",
     "",
+    "",
     "#ifndef YYSTACKGROWTH",
     "#define YYSTACKGROWTH 32",
     "#endif",
@@ -265,7 +266,7 @@ static char const * const header[] =
     "/* Current parser state */",
     "static YYParseState *yyps = 0;",
     "",
-    "/* yypath!=NULL: do the full parse, starting at *yypath parser state. */",
+    "/* yypath != NULL: do the full parse, starting at *yypath parser state. */",
     "static YYParseState *yypath = 0;",
     "",
     "/* Base of the lexical value queue */",
@@ -301,16 +302,24 @@ static char const * const header[] =
     "#define yytrial (yyps->save)",
     "#define yyvsp   (yyps->vsp)",
     "#define yyval   (yyps->val)",
-    "#define yydepth (yyps->ssp - yyps->ss)",
+    "#define yydepth ((int)(yyps->ssp - yyps->ss))",
     "",
     "",
     "/* Local prototypes. */",
     "int yyparse(void);",
     "",
     "static int yyLex1(void);",
+    "",
+    "/*",
+    " * These stack allocation functions return a non-zero value on error.",
+    " */",
     "static int yyExpand(void);",
-    "static void yyMoreStack(YYParseState *yyps);",
+    "static int yyMoreStack(YYParseState *yyps);",
+    "/*",
+    " * Return NULL on error.",
+    " */",
     "static YYParseState *yyNewState(int old_size, int growth);",
+    "",
     "static void yyFreeState(YYParseState **p);",
     "",
     "#ifdef __cplusplus",
@@ -327,7 +336,7 @@ static char const * const header[] =
 
 static char const * const body[] =
 {
-    "#line 302 \"btyaccpa.ske\"",
+    "#line 311 \"btyaccpa.ske\"",
     "",
     "#ifndef YYERRCODE",
     "#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.",
@@ -367,21 +376,25 @@ static char const * const body[] =
     " */",
     "",
     "#ifndef BTYACC_SET_YYDEBUG_FROM_ENV",
+    "#define BTYACC_SET_YYDEBUG_FROM_ENV__LOCAL_DEF",
     "#define BTYACC_SET_YYDEBUG_FROM_ENV()   btyacc_set_yydebug_from_env()",
     "static void btyacc_set_yydebug_from_env(void);",
     "#endif",
     "",
     "#ifndef BTYACC_DEBUG_LOG_START",
+    "#define BTYACC_DEBUG_LOG_START__LOCAL_DEF",
     "#define BTYACC_DEBUG_LOG_START(msg)     btyacc_debug_log_start(msg)",
     "static void btyacc_debug_log_start(const char *msg);",
     "#endif",
     "",
     "#ifndef BTYACC_DEBUG_LOG_PARTIAL",
+    "#define BTYACC_DEBUG_LOG_PARTIAL__LOCAL_DEF",
     "#define BTYACC_DEBUG_LOG_PARTIAL        btyacc_debug_log_partial",
     "static void btyacc_debug_log_partial(const char *msg, ...);",
     "#endif",
     "",
     "#ifndef BTYACC_DEBUG_LOG_EOL",
+    "#define BTYACC_DEBUG_LOG_EOL__LOCAL_DEF",
     "#define BTYACC_DEBUG_LOG_EOL            btyacc_debug_log_eol",
     "static void btyacc_debug_log_eol(const char *msg, ...);",
     "#endif",
@@ -437,6 +450,7 @@ static char const * const body[] =
     "#endif",
     "",
     "  yyps = yyNewState(0, YYDEFSTACKSIZE);",
+    "  if (!yyps) goto heap_alloc_error;",
     "  yyps->save /* yytrial */ = 0;",
     "  yynerrs = 0;",
     "  yyps->errflag = 0;",
@@ -517,12 +531,13 @@ static char const * const body[] =
     "        BTYACC_DEBUG_LOG_PARTIAL(\"btyacc[%3u,%2d%s]: CONFLICT. \",",
     "                yystate, yydepth, (yytrial ? \",trial\" : \"\"));",
     "        if (yytrial)",
-    "          BTYACC_DEBUG_LOG_EOL(\"ALREADY in conflict, continuing trial parse.\\n\", stderr);",
+    "          BTYACC_DEBUG_LOG_EOL(\"ALREADY in conflict, continuing trial parse.\\n\");",
     "        else",
-    "          BTYACC_DEBUG_LOG_EOL(\"starting trial parse.\\n\", stderr);",
+    "          BTYACC_DEBUG_LOG_EOL(\"starting trial parse.\\n\");",
     "      }",
     "#endif",
     "      save = yyNewState(yyps->ssp - yyps->ss + 1, YYTRIALSTACKGROWTH);",
+    "      if (!save) goto heap_alloc_error;",
     "      save->save    = yytrial;",
     "      save->state   = yystate;",
     "      save->errflag = yyps->errflag;",
@@ -638,7 +653,8 @@ static char const * const body[] =
     "yyshift:",
     "    if (yyps->ssp >= yyps->ss + yyps->stacksize - 1)",
     "    {",
-    "      yyMoreStack(yyps);",
+    "      if (yyMoreStack(yyps))",
+    "        goto heap_alloc_error;",
     "    }",
     "    *++(yyps->ssp) = yystate;",
     "    *++(yyps->vsp) = yylval;",
@@ -674,7 +690,7 @@ static char const * const body[] =
     "    {",
     "      BTYACC_DEBUG_LOG_EOL(\"btyacc[%3u,%2d%s]: ERROR, CONFLICT BACKTRACKING to state %d, %d tokens\\n\",",
     "              yystate, yydepth, (yytrial ? \",trial\" : \"\"),",
-    "              yytrial->state, yylvp - yylvals - yytrial->lexeme);",
+    "              yytrial->state, (int)(yylvp - yylvals - yytrial->lexeme));",
     "    }",
     "#endif",
     "    /* Memorize most forward-looking error state in case",
@@ -686,6 +702,7 @@ static char const * const body[] =
     "        yyFreeState(&yyerrctx);",
     "      /* Create and fill out new saved error context state */",
     "      yyerrctx = yyNewState(yyps->ssp - yyps->ss + 1, YYTRIALSTACKGROWTH);",
+    "      if (!yyerrctx) goto heap_alloc_error;",
     "      yyerrctx->save = yytrial;",
     "      yyerrctx->state = yystate;",
     "      yyerrctx->errflag = yyps->errflag;",
@@ -789,8 +806,7 @@ static char const * const body[] =
     "#if YYDEBUG",
     "        if (yydebug)",
     "        {",
-    "          fprintf(stderr,",
-    "                  \"btyacc[%3d,%2d%s]: ERROR recovery discards this state\\n\",",
+    "          BTYACC_DEBUG_LOG_EOL(\"btyacc[%3d,%2d%s]: ERROR recovery discards this state\\n\",",
     "                  *(yyps->ssp), yydepth, (yytrial ? \",trial\" : \"\"));",
     "        }",
     "#endif",
@@ -862,7 +878,8 @@ static char const * const body[] =
     "#endif",
     "  if (yyps->ssp + 1 - yym >= yyps->ss + yyps->stacksize)",
     "  {",
-    "    yyMoreStack(yyps);",
+    "    if (yyMoreStack(yyps))",
+    "      goto heap_alloc_error;",
     "  }",
     "",
     "#ifdef _YACC_DEFAULT_ACTION_",
@@ -905,7 +922,7 @@ static char const * const body[] =
 
 static char const * const trailer[] =
 {
-    "#line 875 \"btyaccpa.ske\"",
+    "#line 892 \"btyaccpa.ske\"",
     "",
     "  default:",
     "    break;",
@@ -997,7 +1014,8 @@ static char const * const trailer[] =
     "#endif",
     "  if (yyps->ssp >= yyps->ss + yyps->stacksize - 1)",
     "  {",
-    "    yyMoreStack(yyps);",
+    "    if (yyMoreStack(yyps))",
+    "      goto heap_alloc_error;",
     "  }",
     "  *++(yyps->ssp) = yystate;",
     "  *++(yyps->vsp) = yyps->val;",
@@ -1027,7 +1045,7 @@ static char const * const trailer[] =
     "    BTYACC_DEBUG_LOG_EOL(\"btyacc[%3d,%2d%s]: CONFLICT trial successful, \"",
     "            \"backtracking to state %d, %d tokens\\n\",",
     "            yystate, yydepth, (yytrial ? \",trial\" : \"\"),",
-    "            yypath->state, yylvp - yylvals - yypath->lexeme);",
+    "            yypath->state, (int)(yylvp - yylvals - yypath->lexeme));",
     "  }",
     "#endif",
     "  if(yyerrctx)",
@@ -1048,22 +1066,30 @@ static char const * const trailer[] =
     "  goto yyloop;",
     "",
     "",
+    "heap_alloc_error:",
+    "#if YYDEBUG",
+    "  if (yydebug)",
+    "  {",
+    "    BTYACC_DEBUG_LOG_EOL(\"btyacc[%3d,--%s]: out of memory\\n\",",
+    "            yystate, (yytrial ? \",trial\" : \"\"));",
+    "  }",
+    "#endif",
     "yyabort:",
     "  {",
     "    YYSTYPE *pv;",
     "    YYPOSN *pp;",
     "",
-    "    if(yyerrctx)",
+    "    if (yyerrctx)",
     "    {",
     "      yyFreeState(&yyerrctx);",
     "    }",
     "",
-    "    for(pv = yyps->vs; pv < yyps->vsp; ++pv)",
+    "    for (pv = yyps->vs; pv < yyps->vsp; ++pv)",
     "    {",
     "      YYDELETEVAL(*pv, 2);",
     "    }",
     "",
-    "    for(pp = yyps->ps; pp < yyps->psp; ++pp)",
+    "    for (pp = yyps->ps; pp < yyps->psp; ++pp)",
     "    {",
     "      YYDELETEPOSN(*pp, 2);",
     "    }",
@@ -1086,7 +1112,7 @@ static char const * const trailer[] =
     "yyaccept:",
     "  if (yytrial)",
     "    goto yyvalid;",
-    "  if(yyerrctx)",
+    "  if (yyerrctx)",
     "  {",
     "    yyFreeState(&yyerrctx);",
     "  }",
@@ -1120,7 +1146,8 @@ static char const * const trailer[] =
     "  {",
     "    /* in trial mode; save scanner results for future parse attempts */",
     "    if (yylvp == yylvlim)",
-    "      yyExpand();",
+    "      if (yyExpand())",
+    "        return -2;",
     "    *yylexp = yylex();",
     "    *yylvp++ = yylval;",
     "    ++yylve;",
@@ -1153,6 +1180,16 @@ static char const * const trailer[] =
     "    yylvals = (YYSTYPE*)malloc(s * sizeof(yylvals[0]));",
     "    yylpsns = (YYPOSN*)malloc(s * sizeof(yylpsns[0]));",
     "    yylexemes = (Yshort*)malloc(s * sizeof(yylexemes[0]));",
+    "    if (!yylvals || !yylpsns || !yylexemes)",
+    "    {",
+    "        free(yylvals);",
+    "        free(yylpsns);",
+    "        free(yylexemes);",
+    "        yylvals = tv;",
+    "        yylpsns = tp;",
+    "        yylexemes = tl;",
+    "        return -1;",
+    "    }",
     "#endif",
     "    memcpy(yylexemes, tl, (s - YYSTACKGROWTH) * sizeof(yylexemes[0]));",
     "    yySCopy(yylvals, tv, s - YYSTACKGROWTH);",
@@ -1197,7 +1234,7 @@ static char const * const trailer[] =
     "",
     "#endif",
     "",
-    "static void yyMoreStack(YYParseState *yyps)",
+    "static int yyMoreStack(YYParseState *yyps)",
     "{",
     "  int p = yyps->ssp - yyps->ss;",
     "  Yshort  *tss = yyps->ss;",
@@ -1211,6 +1248,16 @@ static char const * const trailer[] =
     "  yyps->ss = (Yshort*)malloc(sizeof(yyps->ss[0]) * (yyps->stacksize + YYSTACKGROWTH));",
     "  yyps->vs = (YYSTYPE*)malloc(sizeof(yyps->vs[0]) * (yyps->stacksize + YYSTACKGROWTH));",
     "  yyps->ps = (YYPOSN*)malloc(sizeof(yyps->ps[0]) * (yyps->stacksize + YYSTACKGROWTH));",
+    "  if (!yyps->ss || !yyps->vs || !yyps->ps)",
+    "  {",
+    "    free(yyps->ss);",
+    "    free(yyps->vs);",
+    "    free(yyps->ps);",
+    "    yyps->ss = tss;",
+    "    yyps->vs = tvs;",
+    "    yyps->ps = tps;",
+    "    return -1;",
+    "  }",
     "#endif",
     "  memcpy(yyps->ss, tss, yyps->stacksize * sizeof(yyps->ss[0]));",
     "  yySCopy(yyps->vs, tvs, yyps->stacksize);",
@@ -1237,6 +1284,7 @@ static char const * const trailer[] =
     "    BTYACC_DEBUG_LOG_EOL(\"btyacc: stack size increased to %d\\n\", yyps->stacksize);",
     "  }",
     "#endif",
+    "  return 0;",
     "}",
     "",
     "",
@@ -1265,9 +1313,18 @@ static char const * const trailer[] =
     "  }",
     "#else",
     "  p = (YYParseState*)malloc(sizeof(p[0]));",
+    "  if (!p) return NULL;",
     "  p->ss = (Yshort*) malloc(size * sizeof(p->ss[0]));",
     "  p->vs = (YYSTYPE*)malloc(size * sizeof(p->vs[0]));",
     "  p->ps = (YYPOSN*) malloc(size * sizeof(p->ps[0]));",
+    "  if (!p->ss || !p->vs || !p->ps)",
+    "  {",
+    "    free(p->ss);",
+    "    free(p->vs);",
+    "    free(p->ps);",
+    "    free(p);",
+    "    return NULL;",
+    "  }",
     "  /*",
     "   * Keep in mind that the caller of this function will fill the items",
     "   * up to index [old_size] (not including that one)!",
@@ -1284,15 +1341,21 @@ static char const * const trailer[] =
     "  YYParseState *p = *v;",
     "",
     "#ifdef __cplusplus",
-    "  delete[] p->ss;",
-    "  delete[] p->vs;",
-    "  delete[] p->ps;",
-    "  delete p;",
+    "  if (p)",
+    "  {",
+    "    delete[] p->ss;",
+    "    delete[] p->vs;",
+    "    delete[] p->ps;",
+    "    delete p;",
+    "  }",
     "#else",
-    "  free(p->ss);",
-    "  free(p->vs);",
-    "  free(p->ps);",
-    "  free(p);",
+    "  if (p)",
+    "  {",
+    "    free(p->ss);",
+    "    free(p->vs);",
+    "    free(p->ps);",
+    "    free(p);",
+    "  }",
     "#endif",
     "",
     "  *v = 0;",
@@ -1311,6 +1374,7 @@ static char const * const trailer[] =
     " * ----------------------------------------------------------------------",
     " */",
     "",
+    "#ifdef BTYACC_SET_YYDEBUG_FROM_ENV__LOCAL_DEF",
     "static void btyacc_set_yydebug_from_env(void)",
     "{",
     "  const char *yys = getenv(\"YYDEBUG\");",
@@ -1323,12 +1387,16 @@ static char const * const trailer[] =
     "      yydebug = yyn - '0';",
     "  }",
     "}",
+    "#endif",
     "",
+    "#ifdef BTYACC_DEBUG_LOG_START__LOCAL_DEF",
     "static void btyacc_debug_log_start(const char *msg)",
     "{",
     "    fprintf(stderr, \"%s\", msg);",
     "}",
+    "#endif",
     "",
+    "#ifdef BTYACC_DEBUG_LOG_PARTIAL__LOCAL_DEF",
     "static void btyacc_debug_log_partial(const char *msg, ...)",
     "{",
     "    va_list args;",
@@ -1337,7 +1405,9 @@ static char const * const trailer[] =
     "    vfprintf(stderr, msg, args);",
     "    va_end(args);",
     "}",
+    "#endif",
     "",
+    "#ifdef BTYACC_DEBUG_LOG_EOL__LOCAL_DEF",
     "static void btyacc_debug_log_eol(const char *msg, ...)",
     "{",
     "    va_list args;",
@@ -1346,13 +1416,14 @@ static char const * const trailer[] =
     "    vfprintf(stderr, msg, args);",
     "    va_end(args);",
     "}",
+    "#endif",
     "",
     0
 };
 
 static char const * const line_position[] =
 {
-    "#line 1317 \"btyaccpa.ske\"",
+    "#line 1388 \"btyaccpa.ske\"",
     "#line %d \"%s\"",
     "",
     0
@@ -1360,21 +1431,21 @@ static char const * const line_position[] =
 
 static char const * const comment_start[] =
 {
-    "#line 1320 \"btyaccpa.ske\"",
+    "#line 1391 \"btyaccpa.ske\"",
     "/*",
     0
 };
 
 static char const * const comment_end[] =
 {
-    "#line 1322 \"btyaccpa.ske\"",
+    "#line 1393 \"btyaccpa.ske\"",
     "*/",
     0
 };
 
 static char const * const action_case_start[] =
 {
-    "#line 1324 \"btyaccpa.ske\"",
+    "#line 1395 \"btyaccpa.ske\"",
     "  case %d:",
     "",
     0
@@ -1382,7 +1453,7 @@ static char const * const action_case_start[] =
 
 static char const * const action_code[] =
 {
-    "#line 1327 \"btyaccpa.ske\"",
+    "#line 1398 \"btyaccpa.ske\"",
     "    %s;",
     "",
     "",
@@ -1391,7 +1462,7 @@ static char const * const action_code[] =
 
 static char const * const action_case_end[] =
 {
-    "#line 1331 \"btyaccpa.ske\"",
+    "#line 1402 \"btyaccpa.ske\"",
     "    break;",
     "",
     "",
@@ -1400,7 +1471,7 @@ static char const * const action_case_end[] =
 
 static char const * const action_if_not_yytrial_start[] =
 {
-    "#line 1335 \"btyaccpa.ske\"",
+    "#line 1406 \"btyaccpa.ske\"",
     "if (!yytrial)",
     "",
     0
@@ -1408,84 +1479,84 @@ static char const * const action_if_not_yytrial_start[] =
 
 static char const * const action_block_start[] =
 {
-    "#line 1338 \"btyaccpa.ske\"",
+    "#line 1409 \"btyaccpa.ske\"",
     "{",
     0
 };
 
 static char const * const action_block_end[] =
 {
-    "#line 1340 \"btyaccpa.ske\"",
+    "#line 1411 \"btyaccpa.ske\"",
     "}",
     0
 };
 
 static char const * const yyval_tag_reference[] =
 {
-    "#line 1342 \"btyaccpa.ske\"",
+    "#line 1413 \"btyaccpa.ske\"",
     "yyval.%s",
     0
 };
 
 static char const * const yyval_reference[] =
 {
-    "#line 1344 \"btyaccpa.ske\"",
+    "#line 1415 \"btyaccpa.ske\"",
     "yyval",
     0
 };
 
 static char const * const yyvsp_tag_reference[] =
 {
-    "#line 1346 \"btyaccpa.ske\"",
+    "#line 1417 \"btyaccpa.ske\"",
     "yyvsp[%d].%s",
     0
 };
 
 static char const * const yyvsp_reference[] =
 {
-    "#line 1348 \"btyaccpa.ske\"",
+    "#line 1419 \"btyaccpa.ske\"",
     "yyvsp[%d]",
     0
 };
 
 static char const * const rflag_prefix[] =
 {
-    "#line 1350 \"btyaccpa.ske\"",
+    "#line 1421 \"btyaccpa.ske\"",
     "static",
     0
 };
 
 static char const * const not_rflag_prefix[] =
 {
-    "#line 1352 \"btyaccpa.ske\"",
+    "#line 1423 \"btyaccpa.ske\"",
     "",
     0
 };
 
 static char const * const int_table_start[] =
 {
-    "#line 1354 \"btyaccpa.ske\"",
+    "#line 1425 \"btyaccpa.ske\"",
     "%sYshort %29s[%5d] = {%5d%s",
     0
 };
 
 static char const * const int_table_entry[] =
 {
-    "#line 1356 \"btyaccpa.ske\"",
+    "#line 1427 \"btyaccpa.ske\"",
     "%5d%s",
     0
 };
 
 static char const * const int_table_entry_separator[] =
 {
-    "#line 1358 \"btyaccpa.ske\"",
+    "#line 1429 \"btyaccpa.ske\"",
     ",",
     0
 };
 
 static char const * const int_table_end[] =
 {
-    "#line 1360 \"btyaccpa.ske\"",
+    "#line 1431 \"btyaccpa.ske\"",
     "",
     "};",
     "",
@@ -1494,7 +1565,7 @@ static char const * const int_table_end[] =
 
 static char const * const table_size[] =
 {
-    "#line 1364 \"btyaccpa.ske\"",
+    "#line 1435 \"btyaccpa.ske\"",
     "",
     "",
     "#define YYTABLESIZE %d",
@@ -1506,7 +1577,7 @@ static char const * const table_size[] =
 
 static char const * const defines_file_protection_start[] =
 {
-    "#line 1371 \"btyaccpa.ske\"",
+    "#line 1442 \"btyaccpa.ske\"",
     "",
     "#ifndef _BTYACC_DEFINES_H_",
     "#define _BTYACC_DEFINES_H_",
@@ -1518,7 +1589,7 @@ static char const * const defines_file_protection_start[] =
 
 static char const * const defines_file_protection_end[] =
 {
-    "#line 1378 \"btyaccpa.ske\"",
+    "#line 1449 \"btyaccpa.ske\"",
     "",
     "",
     "#endif /* _BTYACC_DEFINES_H_ */",
@@ -1529,14 +1600,14 @@ static char const * const defines_file_protection_end[] =
 
 static char const * const token_charset[] =
 {
-    "#line 1384 \"btyaccpa.ske\"",
+    "#line 1455 \"btyaccpa.ske\"",
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$",
     0
 };
 
 static char const * const define_token[] =
 {
-    "#line 1386 \"btyaccpa.ske\"",
+    "#line 1457 \"btyaccpa.ske\"",
     "#define %-60s %5d",
     "",
     0
@@ -1544,7 +1615,7 @@ static char const * const define_token[] =
 
 static char const * const yystype_extern_decl[] =
 {
-    "#line 1389 \"btyaccpa.ske\"",
+    "#line 1460 \"btyaccpa.ske\"",
     "",
     "extern YYSTYPE yylval;",
     "",
@@ -1553,7 +1624,7 @@ static char const * const yystype_extern_decl[] =
 
 static char const * const define_default_yystype[] =
 {
-    "#line 1393 \"btyaccpa.ske\"",
+    "#line 1464 \"btyaccpa.ske\"",
     "",
     "#ifndef YYSTYPE",
     "typedef int YYSTYPE;",
@@ -1576,7 +1647,7 @@ static char const * const define_default_yystype[] =
 
 static char const * const union_decl_start[] =
 {
-    "#line 1411 \"btyaccpa.ske\"",
+    "#line 1482 \"btyaccpa.ske\"",
     "",
     "typedef union",
     0
@@ -1584,7 +1655,7 @@ static char const * const union_decl_start[] =
 
 static char const * const union_decl_end[] =
 {
-    "#line 1414 \"btyaccpa.ske\"",
+    "#line 1485 \"btyaccpa.ske\"",
     " yystype_t;",
     "#define YYSTYPE yystype_t",
     "",
@@ -1594,7 +1665,7 @@ static char const * const union_decl_end[] =
 
 static char const * const define_yymaxtoken[] =
 {
-    "#line 1419 \"btyaccpa.ske\"",
+    "#line 1490 \"btyaccpa.ske\"",
     "",
     "#define YYMAXTOKEN %5d",
     "",
@@ -1604,7 +1675,7 @@ static char const * const define_yymaxtoken[] =
 
 static char const * const define_yyfinal[] =
 {
-    "#line 1424 \"btyaccpa.ske\"",
+    "#line 1495 \"btyaccpa.ske\"",
     "",
     "#define YYFINAL %5d",
     "",
@@ -1614,7 +1685,7 @@ static char const * const define_yyfinal[] =
 
 static char const * const define_yydebug[] =
 {
-    "#line 1429 \"btyaccpa.ske\"",
+    "#line 1500 \"btyaccpa.ske\"",
     "",
     "#ifndef YYDEBUG",
     "#define YYDEBUG %d",
@@ -1626,14 +1697,14 @@ static char const * const define_yydebug[] =
 
 static char const * const debug_yy_null[] =
 {
-    "#line 1436 \"btyaccpa.ske\"",
+    "#line 1507 \"btyaccpa.ske\"",
     "0",
     0
 };
 
 static char const * const debug_yyname_strings_start[] =
 {
-    "#line 1438 \"btyaccpa.ske\"",
+    "#line 1509 \"btyaccpa.ske\"",
     "",
     "#if YYDEBUG",
     "%schar const *yyname[] = {",
@@ -1643,14 +1714,14 @@ static char const * const debug_yyname_strings_start[] =
 
 static char const * const debug_yyname_strings_separator[] =
 {
-    "#line 1443 \"btyaccpa.ske\"",
+    "#line 1514 \"btyaccpa.ske\"",
     ",",
     0
 };
 
 static char const * const debug_yyname_strings_end[] =
 {
-    "#line 1445 \"btyaccpa.ske\"",
+    "#line 1516 \"btyaccpa.ske\"",
     "};",
     "#endif",
     "",
@@ -1660,7 +1731,7 @@ static char const * const debug_yyname_strings_end[] =
 
 static char const * const debug_yyrule_strings_start[] =
 {
-    "#line 1450 \"btyaccpa.ske\"",
+    "#line 1521 \"btyaccpa.ske\"",
     "",
     "#if YYDEBUG",
     "%schar const *yyrule[] = {",
@@ -1670,14 +1741,14 @@ static char const * const debug_yyrule_strings_start[] =
 
 static char const * const debug_yyrule_strings_separator[] =
 {
-    "#line 1455 \"btyaccpa.ske\"",
+    "#line 1526 \"btyaccpa.ske\"",
     ",",
     0
 };
 
 static char const * const debug_yyrule_strings_end[] =
 {
-    "#line 1457 \"btyaccpa.ske\"",
+    "#line 1528 \"btyaccpa.ske\"",
     "};",
     "#endif",
     "",
@@ -1687,28 +1758,28 @@ static char const * const debug_yyrule_strings_end[] =
 
 static char const * const DEFINES_FILENAME[] =
 {
-    "#line 1462 \"btyaccpa.ske\"",
+    "#line 1533 \"btyaccpa.ske\"",
     "%s%s.tab.h",
     0
 };
 
 static char const * const OUTPUT_FILENAME[] =
 {
-    "#line 1464 \"btyaccpa.ske\"",
+    "#line 1535 \"btyaccpa.ske\"",
     "%s%s.tab.c",
     0
 };
 
 static char const * const CODE_FILENAME[] =
 {
-    "#line 1466 \"btyaccpa.ske\"",
+    "#line 1537 \"btyaccpa.ske\"",
     "%s%s.code.c",
     0
 };
 
 static char const * const VERBOSE_FILENAME[] =
 {
-    "#line 1468 \"btyaccpa.ske\"",
+    "#line 1539 \"btyaccpa.ske\"",
     "%s%s.output",
     0
 };

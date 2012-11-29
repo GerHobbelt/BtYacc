@@ -173,6 +173,7 @@ extern _YACC_EXTERN_ char const *yyrule[];
 
 #define yyerrok      (yyps->errflag = 0)
 
+
 #ifndef YYSTACKGROWTH
 #define YYSTACKGROWTH 32
 #endif
@@ -241,7 +242,7 @@ typedef struct YYParseState_s YYParseState;
 /* Current parser state */
 static YYParseState *yyps = 0;
 
-/* yypath!=NULL: do the full parse, starting at *yypath parser state. */
+/* yypath != NULL: do the full parse, starting at *yypath parser state. */
 static YYParseState *yypath = 0;
 
 /* Base of the lexical value queue */
@@ -277,16 +278,24 @@ static Yshort *yylexemes = 0;
 #define yytrial (yyps->save)
 #define yyvsp   (yyps->vsp)
 #define yyval   (yyps->val)
-#define yydepth (yyps->ssp - yyps->ss)
+#define yydepth ((int)(yyps->ssp - yyps->ss))
 
 
 /* Local prototypes. */
 int yyparse(void);
 
 static int yyLex1(void);
+
+/*
+ * These stack allocation functions return a non-zero value on error.
+ */
 static int yyExpand(void);
-static void yyMoreStack(YYParseState *yyps);
+static int yyMoreStack(YYParseState *yyps);
+/*
+ * Return NULL on error.
+ */
 static YYParseState *yyNewState(int old_size, int growth);
+
 static void yyFreeState(YYParseState **p);
 
 #ifdef __cplusplus
@@ -338,21 +347,25 @@ static void yyPCopy(YYPOSN  *to, YYPOSN  *from, int size);
  */
 
 #ifndef BTYACC_SET_YYDEBUG_FROM_ENV
+#define BTYACC_SET_YYDEBUG_FROM_ENV__LOCAL_DEF
 #define BTYACC_SET_YYDEBUG_FROM_ENV()   btyacc_set_yydebug_from_env()
 static void btyacc_set_yydebug_from_env(void);
 #endif
 
 #ifndef BTYACC_DEBUG_LOG_START
+#define BTYACC_DEBUG_LOG_START__LOCAL_DEF
 #define BTYACC_DEBUG_LOG_START(msg)     btyacc_debug_log_start(msg)
 static void btyacc_debug_log_start(const char *msg);
 #endif
 
 #ifndef BTYACC_DEBUG_LOG_PARTIAL
+#define BTYACC_DEBUG_LOG_PARTIAL__LOCAL_DEF
 #define BTYACC_DEBUG_LOG_PARTIAL        btyacc_debug_log_partial
 static void btyacc_debug_log_partial(const char *msg, ...);
 #endif
 
 #ifndef BTYACC_DEBUG_LOG_EOL
+#define BTYACC_DEBUG_LOG_EOL__LOCAL_DEF
 #define BTYACC_DEBUG_LOG_EOL            btyacc_debug_log_eol
 static void btyacc_debug_log_eol(const char *msg, ...);
 #endif
@@ -408,6 +421,7 @@ int yyparse(void)
 #endif
 
   yyps = yyNewState(0, YYDEFSTACKSIZE);
+  if (!yyps) goto heap_alloc_error;
   yyps->save /* yytrial */ = 0;
   yynerrs = 0;
   yyps->errflag = 0;
@@ -488,12 +502,13 @@ yyloop:
         BTYACC_DEBUG_LOG_PARTIAL("btyacc[%3u,%2d%s]: CONFLICT. ",
                 yystate, yydepth, (yytrial ? ",trial" : ""));
         if (yytrial)
-          BTYACC_DEBUG_LOG_EOL("ALREADY in conflict, continuing trial parse.\n", stderr);
+          BTYACC_DEBUG_LOG_EOL("ALREADY in conflict, continuing trial parse.\n");
         else
-          BTYACC_DEBUG_LOG_EOL("starting trial parse.\n", stderr);
+          BTYACC_DEBUG_LOG_EOL("starting trial parse.\n");
       }
 #endif
       save = yyNewState(yyps->ssp - yyps->ss + 1, YYTRIALSTACKGROWTH);
+      if (!save) goto heap_alloc_error;
       save->save    = yytrial;
       save->state   = yystate;
       save->errflag = yyps->errflag;
@@ -609,7 +624,8 @@ yyloop:
 yyshift:
     if (yyps->ssp >= yyps->ss + yyps->stacksize - 1)
     {
-      yyMoreStack(yyps);
+      if (yyMoreStack(yyps))
+        goto heap_alloc_error;
     }
     *++(yyps->ssp) = yystate;
     *++(yyps->vsp) = yylval;
@@ -645,7 +661,7 @@ yyerrhandler:
     {
       BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: ERROR, CONFLICT BACKTRACKING to state %d, %d tokens\n",
               yystate, yydepth, (yytrial ? ",trial" : ""),
-              yytrial->state, yylvp - yylvals - yytrial->lexeme);
+              yytrial->state, (int)(yylvp - yylvals - yytrial->lexeme));
     }
 #endif
     /* Memorize most forward-looking error state in case
@@ -657,6 +673,7 @@ yyerrhandler:
         yyFreeState(&yyerrctx);
       /* Create and fill out new saved error context state */
       yyerrctx = yyNewState(yyps->ssp - yyps->ss + 1, YYTRIALSTACKGROWTH);
+      if (!yyerrctx) goto heap_alloc_error;
       yyerrctx->save = yytrial;
       yyerrctx->state = yystate;
       yyerrctx->errflag = yyps->errflag;
@@ -760,8 +777,7 @@ yyinrecovery:
 #if YYDEBUG
         if (yydebug)
         {
-          fprintf(stderr,
-                  "btyacc[%3d,%2d%s]: ERROR recovery discards this state\n",
+          BTYACC_DEBUG_LOG_EOL("btyacc[%3d,%2d%s]: ERROR recovery discards this state\n",
                   *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""));
         }
 #endif
@@ -833,7 +849,8 @@ yyreduce:
 #endif
   if (yyps->ssp + 1 - yym >= yyps->ss + yyps->stacksize)
   {
-    yyMoreStack(yyps);
+    if (yyMoreStack(yyps))
+      goto heap_alloc_error;
   }
 
 #ifdef _YACC_DEFAULT_ACTION_
@@ -963,7 +980,8 @@ yyreduce:
 #endif
   if (yyps->ssp >= yyps->ss + yyps->stacksize - 1)
   {
-    yyMoreStack(yyps);
+    if (yyMoreStack(yyps))
+      goto heap_alloc_error;
   }
   *++(yyps->ssp) = yystate;
   *++(yyps->vsp) = yyps->val;
@@ -993,7 +1011,7 @@ yyvalid:
     BTYACC_DEBUG_LOG_EOL("btyacc[%3d,%2d%s]: CONFLICT trial successful, "
             "backtracking to state %d, %d tokens\n",
             yystate, yydepth, (yytrial ? ",trial" : ""),
-            yypath->state, yylvp - yylvals - yypath->lexeme);
+            yypath->state, (int)(yylvp - yylvals - yypath->lexeme));
   }
 #endif
   if(yyerrctx)
@@ -1014,22 +1032,30 @@ yyvalid:
   goto yyloop;
 
 
+heap_alloc_error:
+#if YYDEBUG
+  if (yydebug)
+  {
+    BTYACC_DEBUG_LOG_EOL("btyacc[%3d,--%s]: out of memory\n",
+            yystate, (yytrial ? ",trial" : ""));
+  }
+#endif
 yyabort:
   {
     YYSTYPE *pv;
     YYPOSN *pp;
 
-    if(yyerrctx)
+    if (yyerrctx)
     {
       yyFreeState(&yyerrctx);
     }
 
-    for(pv = yyps->vs; pv < yyps->vsp; ++pv)
+    for (pv = yyps->vs; pv < yyps->vsp; ++pv)
     {
       YYDELETEVAL(*pv, 2);
     }
 
-    for(pp = yyps->ps; pp < yyps->psp; ++pp)
+    for (pp = yyps->ps; pp < yyps->psp; ++pp)
     {
       YYDELETEPOSN(*pp, 2);
     }
@@ -1052,7 +1078,7 @@ yyabort:
 yyaccept:
   if (yytrial)
     goto yyvalid;
-  if(yyerrctx)
+  if (yyerrctx)
   {
     yyFreeState(&yyerrctx);
   }
@@ -1086,7 +1112,8 @@ static int yyLex1(void)
   {
     /* in trial mode; save scanner results for future parse attempts */
     if (yylvp == yylvlim)
-      yyExpand();
+      if (yyExpand())
+        return -2;
     *yylexp = yylex();
     *yylvp++ = yylval;
     ++yylve;
@@ -1119,6 +1146,16 @@ static int yyExpand(void)
     yylvals = (YYSTYPE*)malloc(s * sizeof(yylvals[0]));
     yylpsns = (YYPOSN*)malloc(s * sizeof(yylpsns[0]));
     yylexemes = (Yshort*)malloc(s * sizeof(yylexemes[0]));
+    if (!yylvals || !yylpsns || !yylexemes)
+    {
+        free(yylvals);
+        free(yylpsns);
+        free(yylexemes);
+        yylvals = tv;
+        yylpsns = tp;
+        yylexemes = tl;
+        return -1;
+    }
 #endif
     memcpy(yylexemes, tl, (s - YYSTACKGROWTH) * sizeof(yylexemes[0]));
     yySCopy(yylvals, tv, s - YYSTACKGROWTH);
@@ -1163,7 +1200,7 @@ static void yyPCopy(YYPOSN *to, YYPOSN *from, int size)
 
 #endif
 
-static void yyMoreStack(YYParseState *yyps)
+static int yyMoreStack(YYParseState *yyps)
 {
   int p = yyps->ssp - yyps->ss;
   Yshort  *tss = yyps->ss;
@@ -1177,6 +1214,16 @@ static void yyMoreStack(YYParseState *yyps)
   yyps->ss = (Yshort*)malloc(sizeof(yyps->ss[0]) * (yyps->stacksize + YYSTACKGROWTH));
   yyps->vs = (YYSTYPE*)malloc(sizeof(yyps->vs[0]) * (yyps->stacksize + YYSTACKGROWTH));
   yyps->ps = (YYPOSN*)malloc(sizeof(yyps->ps[0]) * (yyps->stacksize + YYSTACKGROWTH));
+  if (!yyps->ss || !yyps->vs || !yyps->ps)
+  {
+    free(yyps->ss);
+    free(yyps->vs);
+    free(yyps->ps);
+    yyps->ss = tss;
+    yyps->vs = tvs;
+    yyps->ps = tps;
+    return -1;
+  }
 #endif
   memcpy(yyps->ss, tss, yyps->stacksize * sizeof(yyps->ss[0]));
   yySCopy(yyps->vs, tvs, yyps->stacksize);
@@ -1203,6 +1250,7 @@ static void yyMoreStack(YYParseState *yyps)
     BTYACC_DEBUG_LOG_EOL("btyacc: stack size increased to %d\n", yyps->stacksize);
   }
 #endif
+  return 0;
 }
 
 
@@ -1231,9 +1279,18 @@ static YYParseState *yyNewState(int old_size, int growth)
   }
 #else
   p = (YYParseState*)malloc(sizeof(p[0]));
+  if (!p) return NULL;
   p->ss = (Yshort*) malloc(size * sizeof(p->ss[0]));
   p->vs = (YYSTYPE*)malloc(size * sizeof(p->vs[0]));
   p->ps = (YYPOSN*) malloc(size * sizeof(p->ps[0]));
+  if (!p->ss || !p->vs || !p->ps)
+  {
+    free(p->ss);
+    free(p->vs);
+    free(p->ps);
+    free(p);
+    return NULL;
+  }
   /*
    * Keep in mind that the caller of this function will fill the items
    * up to index [old_size] (not including that one)!
@@ -1250,15 +1307,21 @@ static void yyFreeState(YYParseState **v)
   YYParseState *p = *v;
 
 #ifdef __cplusplus
-  delete[] p->ss;
-  delete[] p->vs;
-  delete[] p->ps;
-  delete p;
+  if (p)
+  {
+    delete[] p->ss;
+    delete[] p->vs;
+    delete[] p->ps;
+    delete p;
+  }
 #else
-  free(p->ss);
-  free(p->vs);
-  free(p->ps);
-  free(p);
+  if (p)
+  {
+    free(p->ss);
+    free(p->vs);
+    free(p->ps);
+    free(p);
+  }
 #endif
 
   *v = 0;
@@ -1277,6 +1340,7 @@ static void yyFreeState(YYParseState **v)
  * ----------------------------------------------------------------------
  */
 
+#ifdef BTYACC_SET_YYDEBUG_FROM_ENV__LOCAL_DEF
 static void btyacc_set_yydebug_from_env(void)
 {
   const char *yys = getenv("YYDEBUG");
@@ -1289,12 +1353,16 @@ static void btyacc_set_yydebug_from_env(void)
       yydebug = yyn - '0';
   }
 }
+#endif
 
+#ifdef BTYACC_DEBUG_LOG_START__LOCAL_DEF
 static void btyacc_debug_log_start(const char *msg)
 {
     fprintf(stderr, "%s", msg);
 }
+#endif
 
+#ifdef BTYACC_DEBUG_LOG_PARTIAL__LOCAL_DEF
 static void btyacc_debug_log_partial(const char *msg, ...)
 {
     va_list args;
@@ -1303,7 +1371,9 @@ static void btyacc_debug_log_partial(const char *msg, ...)
     vfprintf(stderr, msg, args);
     va_end(args);
 }
+#endif
 
+#ifdef BTYACC_DEBUG_LOG_EOL__LOCAL_DEF
 static void btyacc_debug_log_eol(const char *msg, ...)
 {
     va_list args;
@@ -1312,6 +1382,7 @@ static void btyacc_debug_log_eol(const char *msg, ...)
     vfprintf(stderr, msg, args);
     va_end(args);
 }
+#endif
 
 %% line_position
 #line %d "%s"
