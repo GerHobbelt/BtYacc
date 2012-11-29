@@ -33,7 +33,7 @@ int yylex(void)
     } while (ch == ' ' || ch == '\n' || ch == '\t');
     if (ch == EOF || ch == '\x04' /* Control-D */ )
         return 0;
-    printf("lex -> $%02X (%c)\n", ch, (isprint(ch) ? ch : '?'));
+    printf("lex -> $%02X '%c'\n", ch, (isprint(ch) ? ch : '?'));
     return ch;
 }
 
