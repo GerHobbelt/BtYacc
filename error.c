@@ -77,7 +77,7 @@ void open_error(char const * filename)
 }
 
 
-void unexpected_EOF()
+void unexpected_EOF(void)
 {
   FileError("unexpected end-of-file");
   done(1);
@@ -163,12 +163,12 @@ void errorv(int unsigned lineno, char const * line, char const * cptr, char cons
 
 void unsupported_feature(int unsigned lineno, char const * line, char const * cptr) {
   error(lineno, line, cptr, "unsupported feature: %s", cptr);
-  exit(1);
+  done(1);
 }
 
 void syntax_error(int unsigned lineno, char const * line, char const * cptr) {
   error(lineno, line, cptr, "syntax error");
-  exit(1);
+  done(1);
 }
 
 void syntax_error_ex(int unsigned lineno, char const * line, char const * cptr, char const *msg, ...) {
@@ -177,32 +177,32 @@ void syntax_error_ex(int unsigned lineno, char const * line, char const * cptr, 
   va_start(args, msg);
   errorv(lineno, line, cptr, "syntax error: ", msg, args);
   va_end(args);
-  exit(1);
+  done(1);
 }
 
 void unterminated_comment(int unsigned lineno, char const * line, char const * cptr) {
   error(lineno, line, cptr, "unmatched /*");
-  exit(1);
+  done(1);
 }
 
 void unterminated_string(int unsigned lineno, char const * line, char const * cptr) {
   error(lineno, line, cptr, "unterminated string");
-  exit(1);
+  done(1);
 }
 
 void unterminated_text(int unsigned lineno, char const * line, char const * cptr) {
   error(lineno, line, cptr, "unmatched %%{");
-  exit(1);
+  done(1);
 }
 
 void unterminated_union(int unsigned lineno, char const * line, char const * cptr) {
   error(lineno, line, cptr, "unterminated %%union");
-  exit(1);
+  done(1);
 }
 
 void over_unionized(char const * cptr) {
   error(lineno, line, cptr, "too many %%union declarations");
-  exit(1);
+  done(1);
 }
 
 void illegal_tag(int unsigned lineno, char const * line, char const * cptr) {
@@ -237,11 +237,11 @@ void terminal_start(char const * s) {
   error(lineno, 0, 0, "the start symbol %s is a token", s);
 }
 
-void restarted_warning() {
+void restarted_warning(void) {
   FileError("the start symbol has been redeclared");
 }
 
-void no_grammar() {
+void no_grammar(void) {
   error(lineno, 0, 0, "no grammar has been specified");
 }
 
@@ -249,7 +249,7 @@ void terminal_lhs(int unsigned lineno) {
   error(lineno, 0, 0, "a token appears on the lhs of a production");
 }
 
-void prec_redeclared() {
+void prec_redeclared(void) {
   error(lineno, 0, 0, "conflicting %%prec specifiers");
 }
 
@@ -261,7 +261,7 @@ void unterminated_arglist(int unsigned lineno, char const * line, char const * c
   error(lineno, line, cptr, "unterminated argument list");
 }
 
-void bad_formals() {
+void bad_formals(void) {
   error(lineno, 0, 0, "bad formal argument list");
 }
 
@@ -276,7 +276,7 @@ void dollar_error(int unsigned lineno, char const * line, char const * cptr) {
   error(lineno, line, cptr, "illegal $-name");
 }
 
-void untyped_lhs() {
+void untyped_lhs(void) {
   error(lineno, 0, 0, "$$ is untyped");
 }
 
@@ -288,7 +288,7 @@ void unknown_rhs(int i) {
   error(lineno, 0, 0, "$%d is untyped (out of range)", i);
 }
 
-void default_action_warning() {
+void default_action_warning(void) {
   FileError("the default action assigns an undefined value to $$");
 }
 
@@ -303,3 +303,14 @@ void undefined_symbol_warning(char const * s) {
      abort();
   }
 }
+
+void table_too_large_error(int high) {
+  FileError("Table is longer than %d elements (actual size: %d). It's not gonna fly.", MAXSHORT, high);
+  done(1);
+}
+
+void unknown_section_name_error(char const *section_name) {
+  error(0, 0, 0, "Cannot find section '%s' in your skeleton file\n", section_name);
+  done(1);
+}
+

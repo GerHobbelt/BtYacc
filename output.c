@@ -3,13 +3,16 @@
 #endif
 
 #include "defs.h"
+#include "log.h"
 #include "write.h"
+#include "mstring.h"
 
 static int nvectors = 0;
 static int nentries = 0;
 static Yshort **froms = NULL;
 static Yshort **tos = NULL;
-static Yshort *conflicts = NULL, nconflicts = 0;
+static Yshort *conflicts = NULL;
+static int nconflicts = 0;
 static Yshort *tally = NULL;
 static Yshort *width = NULL;
 static Yshort *state_count = NULL;
@@ -45,6 +48,47 @@ static char const *get_rflag_prefix(void)
 	return str;
 }
 
+static char const *convert_to_C_string(char const *s)
+{
+	char *ret = MALLOC(strlen(s) * 4 + 3);
+	char *d = ret;
+
+	if (!ret) no_space();
+
+	for (;;)
+	{
+		switch (*s++)
+		{
+		case '\'':
+			*d++ = '\'';
+			continue;
+
+		case '"':
+			*d++ = '\\';
+			*d++ = '"';
+			continue;
+
+		default:
+			if (isprint(s[-1]))
+			{
+				*d++ = s[-1];
+			}
+			else
+			{
+				sprintf(d, "\\x%02X", (s[-1] & 0xFF));
+				d += strlen(d);
+			}
+			continue;
+
+		case 0:
+			*d = 0;
+			break;
+		}
+		break;
+	}
+	return ret;
+}
+
 static char const *count_newlines(unsigned int outfile_idx, char const *str)
 {
 	char const *s = str;
@@ -68,11 +112,10 @@ static void print_one_table(FILE *outfile, unsigned int outfile_idx, char const 
     BtYacc_printf(outfile, count_newlines(outfile_idx, get_section("int_table_start")),
                 count_newlines(outfile_idx, get_rflag_prefix()),
 				name,
-				item_count,
-                (data ? data[0] : 0));
-
+				(item_count ? item_count : 1),
+                (data ? data[0] : 0),
+				(item_count > 1 ? get_section("int_table_entry_separator") : ""));
     j = 10;
-
     for (i = 1; i < item_count; ++i)
     {
         if (j >= 10)
@@ -82,9 +125,12 @@ static void print_one_table(FILE *outfile, unsigned int outfile_idx, char const 
             j = 1;
         }
         else
+		{
             ++j;
+		}
 
-        BtYacc_printf(outfile, count_newlines(outfile_idx, get_section("int_table_entry")), data[i]);
+        BtYacc_printf(outfile, count_newlines(outfile_idx, get_section("int_table_entry")), data[i], 
+				(i < item_count - 1 ? get_section("int_table_entry_separator") : "")); /* no trailing comma for last array element: some languages don't like that */
     }
     BtYacc_puts(count_newlines(outfile_idx, get_section("int_table_end")), outfile);
 }
@@ -187,108 +233,162 @@ static void token_actions(void)
     register Yshort *actionrow, *r, *s;
     register action *p;
 
-    actionrow = NEW2(3*ntokens, Yshort);
-    for (i = 0; i < nstates; ++i) {
-        if (parser[i]) {
-            for (j = 0; j < 3*ntokens; ++j)
-            actionrow[j] = 0;
+    actionrow = NEW2(3 * ntokens, Yshort);
+    for (i = 0; i < nstates; ++i) 
+	{
+        if (parser[i]) 
+		{
+            for (j = 0; j < 3 * ntokens; ++j)
+				actionrow[j] = 0;
 
             shiftcount = 0;
             reducecount = 0;
             conflictcount = 0;
             csym = -1;
             cbase = nconflicts;
-            for (p = parser[i]; p; p = p->next) {
-                if (csym != -1 && csym != p->symbol) {
+            for (p = parser[i]; p; p = p->next) 
+			{
+                if (csym != -1 && csym != p->symbol) 
+				{
                     ++conflictcount;
                     conflicts[nconflicts++] = -1;
                     j = find_conflict_base(cbase);
-                    actionrow[csym + 2*ntokens] = j + 1;
-                    if (j == cbase) {
-                        cbase = nconflicts; }
-                    else {
-                        if (conflicts[cbase] == -1) ++cbase;
+                    actionrow[csym + 2 * ntokens] = j + 1;
+                    if (j == cbase) 
+					{
+                        cbase = nconflicts; 
+					}
+                    else 
+					{
+                        if (conflicts[cbase] == -1) 
+							++cbase;
 
-                        nconflicts = cbase; }
-                    csym = -1; }
-                if (p->suppressed == 0) {
-                    if (p->action_code == SHIFT) {
+                        nconflicts = cbase; 
+					}
+                    csym = -1; 
+				}
+                if (p->suppressed == 0) 
+				{
+                    if (p->action_code == SHIFT) 
+					{
                         ++shiftcount;
-                        actionrow[p->symbol] = p->number; }
+                        actionrow[p->symbol] = p->number; 
+					}
                     else if (p->action_code == REDUCE &&
-                             p->number != defred[i]) {
+                             p->number != defred[i]) 
+					{
                         ++reducecount;
-                        actionrow[p->symbol + ntokens] = p->number; } }
-                else if (p->suppressed == 1) {
+                        actionrow[p->symbol + ntokens] = p->number; 
+					} 
+				}
+                else if (p->suppressed == 1) 
+				{
                     csym = p->symbol;
-                    if (p->action_code == SHIFT) {
-                        conflicts[nconflicts++] = p->number; }
+                    if (p->action_code == SHIFT) 
+					{
+                        conflicts[nconflicts++] = p->number; 
+					}
                     else if (p->action_code == REDUCE &&
-                             p->number != defred[i]) {
-                        if (cbase == nconflicts) {
-                            if (cbase) --cbase;
-                            else       conflicts[nconflicts++] = -1; }
-                        conflicts[nconflicts++] = p->number - 2; } } }
-            if (csym != -1) {
+                             p->number != defred[i]) 
+					{
+                        if (cbase == nconflicts) 
+						{
+                            if (cbase) 
+								--cbase;
+                            else       
+								conflicts[nconflicts++] = -1; 
+						}
+                        conflicts[nconflicts++] = p->number - 2; 
+					} 
+				} 
+			}
+            if (csym != -1) 
+			{
                 ++conflictcount;
                 conflicts[nconflicts++] = -1;
                 j = find_conflict_base(cbase);
-                actionrow[csym + 2*ntokens] = j + 1;
-                if (j == cbase) {
-                    cbase = nconflicts; }
-                else {
-                    if (conflicts[cbase] == -1) ++cbase;
+                actionrow[csym + 2 * ntokens] = j + 1;
+                if (j == cbase) 
+				{
+                    cbase = nconflicts; 
+				}
+                else 
+				{
+                    if (conflicts[cbase] == -1) 
+						++cbase;
 
-                    nconflicts = cbase; } }
+                    nconflicts = cbase; 
+				}
+			}
 
             tally[i] = shiftcount;
-            tally[nstates+i] = reducecount;
-            tally[2*nstates+i] = conflictcount;
+            tally[nstates + i] = reducecount;
+            tally[2 * nstates + i] = conflictcount;
             width[i] = 0;
-            width[nstates+i] = 0;
-            width[2*nstates+i] = 0;
-            if (shiftcount > 0) {
+            width[nstates + i] = 0;
+            width[2 * nstates + i] = 0;
+            if (shiftcount > 0) 
+			{
                 froms[i] = r = NEW2(shiftcount, Yshort);
                 tos[i] = s = NEW2(shiftcount, Yshort);
                 min = MAXSHORT;
                 max = 0;
-                for (j = 0; j < ntokens; ++j) {
-                    if (actionrow[j]) {
+                for (j = 0; j < ntokens; ++j) 
+				{
+                    if (actionrow[j]) 
+					{
                         if (min > symbol_value[j])
                             min = symbol_value[j];
                         if (max < symbol_value[j])
                             max = symbol_value[j];
                         *r++ = symbol_value[j];
-                        *s++ = actionrow[j]; } }
-                width[i] = max - min + 1; }
-            if (reducecount > 0) {
-                froms[nstates+i] = r = NEW2(reducecount, Yshort);
-                tos[nstates+i] = s = NEW2(reducecount, Yshort);
+                        *s++ = actionrow[j]; 
+					} 
+				}
+                width[i] = max - min + 1; 
+			}
+            if (reducecount > 0) 
+			{
+                froms[nstates + i] = r = NEW2(reducecount, Yshort);
+                tos[nstates + i] = s = NEW2(reducecount, Yshort);
                 min = MAXSHORT;
                 max = 0;
-                for (j = 0; j < ntokens; ++j) {
-                    if (actionrow[ntokens+j]) {
+                for (j = 0; j < ntokens; ++j) 
+				{
+                    if (actionrow[ntokens+j]) 
+					{
                         if (min > symbol_value[j])
                             min = symbol_value[j];
                         if (max < symbol_value[j])
                             max = symbol_value[j];
                         *r++ = symbol_value[j];
-                        *s++ = actionrow[ntokens+j] - 2; } }
-                width[nstates+i] = max - min + 1; }
-            if (conflictcount > 0) {
-                froms[2*nstates+i] = r = NEW2(conflictcount, Yshort);
-                tos[2*nstates+i] = s = NEW2(conflictcount, Yshort);
+                        *s++ = actionrow[ntokens+j] - 2; 
+					} 
+				}
+                width[nstates+i] = max - min + 1; 
+			}
+            if (conflictcount > 0) 
+			{
+                froms[2 * nstates + i] = r = NEW2(conflictcount, Yshort);
+                tos[2 * nstates + i] = s = NEW2(conflictcount, Yshort);
                 min = MAXSHORT;
                 max = 0;
-                for (j = 0; j < ntokens; ++j) {
-                    if (actionrow[2*ntokens+j]) {
+                for (j = 0; j < ntokens; ++j) 
+				{
+                    if (actionrow[2 * ntokens + j]) 
+					{
                         if (min > symbol_value[j])
                             min = symbol_value[j];
                         if (max < symbol_value[j])
                             max = symbol_value[j];
                         *r++ = symbol_value[j];
-                        *s++ = actionrow[2*ntokens+j] - 1; } }
-                width[2*nstates+i] = max - min + 1; } } }
+                        *s++ = actionrow[2 * ntokens + j] - 1; 
+					} 
+				}
+                width[2 * nstates + i] = max - min + 1; 
+			} 
+		} 
+	}
     FREE(actionrow);
 }
 
@@ -315,7 +415,7 @@ static void save_column(int symbol, int default_state)
     }
     if (count == 0) return;
 
-    symno = symbol_value[symbol] + 3*nstates;
+    symno = symbol_value[symbol] + 3 * nstates;
 
     froms[symno] = sp1 = sp = NEW2(count, Yshort);
     tos[symno] = sp2 = NEW2(count, Yshort);
@@ -475,14 +575,14 @@ static void sort_actions(void)
 
 void output_actions(void)
 {
-    nvectors = 3*nstates + nvars;
+    nvectors = 3 * nstates + nvars;
 
     froms = NEW2(nvectors, Yshort *);
     tos = NEW2(nvectors, Yshort *);
     tally = NEW2(nvectors, Yshort);
     width = NEW2(nvectors, Yshort);
-    if (SRtotal+RRtotal)
-        conflicts = NEW2(4*(SRtotal+RRtotal), Yshort);
+    if (SRtotal + RRtotal)
+        conflicts = NEW2(4 * (SRtotal + RRtotal), Yshort);
     else
         conflicts = 0;
     nconflicts = 0;
@@ -494,7 +594,8 @@ void output_actions(void)
     FREE(accessing_symbol);
 
     goto_actions();
-    FREE(goto_map + ntokens);
+	goto_map += ntokens;
+    FREE(goto_map);
     FREE(from_state);
     FREE(to_state);
 
@@ -667,11 +768,11 @@ void output_table(void)
     ++outline[CODE_FILE];
 
     if (tflag)
-        BtYacc_printf(stderr, "YYTABLESIZE: %d\n", high);
+        BtYacc_logf("YYTABLESIZE: %d\n", high);
 
-    if(high >= MAXSHORT) {
-      BtYacc_printf(stderr, "Table is longer than %d elements. It's not gonna fly.\n", MAXSHORT);
-      exit(1);
+    if (high >= MAXSHORT) 
+	{
+		table_too_large_error(high);
     }
 
     BtYacc_printf(code_file, get_section("table_size"), high);
@@ -742,13 +843,13 @@ void output_defines(void)
 
     open_output_files();
 
-    if (dflag) {
-      BtYacc_printf(defines_file, count_newlines(DEFINES_FILE, get_section("defines_file_protection_start")));
-    }
-
     /* VM: Print to either code file or defines file but not to both */
     dc_file = dflag ? defines_file : code_file;
     dc_f_idx = dflag ? DEFINES_FILE : CODE_FILE;
+
+    if (dflag || 1) {
+      BtYacc_printf(dc_file, count_newlines(dc_f_idx, get_section("defines_file_protection_start")));
+    }
 
     for (i = 2; i < ntokens; ++i)
     {
@@ -815,6 +916,9 @@ void output_defines(void)
 
 	BtYacc_printf(dc_file, count_newlines(dc_f_idx, get_section("define_token")), "YYERRCODE", symbol_value[1]);
 
+	outline[dc_f_idx] += 3;
+	BtYacc_puts("\n\n\n", dc_file);
+
     if (dflag && unionized)
     {
         if (fclose(union_file))
@@ -825,7 +929,8 @@ void output_defines(void)
 
         union_file = fopen(union_file_name, "r");
         if (union_file == NULL) open_error(union_file_name);
-        while ((c = getc(union_file)) != EOF) {
+        while ((c = getc(union_file)) != EOF) 
+		{
 		  if (c == '\n')
 	          ++outline[DEFINES_FILE];
           BtYacc_putc(c, defines_file);
@@ -834,32 +939,19 @@ void output_defines(void)
 		BtYacc_puts(count_newlines(DEFINES_FILE, get_section("yystype_extern_decl")), defines_file);
     }
 
-    if (dflag) {
-      BtYacc_printf(defines_file, count_newlines(DEFINES_FILE, get_section("defines_file_protection_end")));
+    if (dflag || 1) {
+      BtYacc_printf(dc_file, count_newlines(dc_f_idx, get_section("defines_file_protection_end")));
     }
 }
 
 
-void output_stored_text(void)
+static void output_templated_text(FILE *in)
 {
     register int c;
-    register FILE *in;
     register int state; /* 0=middle of line, 1=start of line, 2=seen '#' */
-
-    open_output_files();
 
     state = 1;
 
-    if (fclose(text_file))
-    {
-       perror("output_stored_text: fclose");
-       abort();
-    }
-
-    text_file = fopen(text_file_name, "r");
-    if (text_file == NULL)
-        open_error(text_file_name);
-    in = text_file;
     if ((c = getc(in)) == EOF)
         return;
     do
@@ -880,6 +972,28 @@ void output_stored_text(void)
             state = 2;
             continue;
 		}
+        else if (c == '\x01')
+		{
+            // read rule # from input:
+			int rule_nr = 0;
+			
+			for (;;)
+			{
+				c = getc(in);
+				if (c == EOF) fatal("internal error while processing rule template element");
+
+				if (c == '\x1f')
+				{
+					char const *descr = get_rule_description(rule_nr);
+				    BtYacc_printf(code_file, "%s", descr);
+					FREE(descr);
+					break;
+				}
+				rule_nr *= 10;
+				rule_nr += (c - '0');
+			}
+            continue;
+		}
         else
 		{
 			if (state == 2)
@@ -897,6 +1011,29 @@ void output_stored_text(void)
 	    ++outline[CODE_FILE];
 		BtYacc_puts("#\n", code_file);
 	}
+    else if (state != 1)
+    {
+        ++outline[CODE_FILE];
+        BtYacc_putc('\n', code_file);
+    }
+}
+
+
+void output_stored_text(void)
+{
+    open_output_files();
+
+    if (fclose(text_file))
+    {
+       perror("output_stored_text: fclose");
+       abort();
+    }
+
+    text_file = fopen(text_file_name, "r");
+    if (text_file == NULL)
+        open_error(text_file_name);
+
+	output_templated_text(text_file);
 
 	if (!lflag)
     {
@@ -909,7 +1046,7 @@ void output_stored_text(void)
 void output_debug(void)
 {
     register int i, j, k, max;
-    char **symnam, *s;
+    char **symnam;
 
     open_output_files();
 
@@ -944,195 +1081,65 @@ void output_debug(void)
     j = 0;
     for (i = 0; i <= max; ++i)
     {
-        if ((s = symnam[i]))
-        {
-            if (s[0] == '"')
-            {
-                k = 7;
-                while (*++s != '"')
-                {
-                    ++k;
-                    if (*s == '\\')
-                    {
-                        k += 2;
-                        if (*++s == '\\')
-                            ++k;
-                    }
-                }
-                j += k;
-                if (j > 80)
-                {
-                    ++outline[OUTPUT_FILE];
-                    BtYacc_putc('\n', output_file);
-                    j = k;
-                }
+		const char *s = symnam[i];
+		const char *sep = (i < max ? get_section("debug_yyname_strings_separator") : "");
+		const char *m;
+		int quoted = 1;
 
-                BtYacc_puts("\"\\\"", output_file);
-                s = symnam[i];
-                while (*++s != '"')
-                {
-                    if (*s == '\\')
-                    {
-                        BtYacc_puts("\\\\", output_file);
-
-                        if (*++s == '\\')
-                            BtYacc_puts("\\\\", output_file);
-                        else
-                            BtYacc_putc(*s, output_file);
-                    }
-                    else
-                        BtYacc_putc(*s, output_file);
-                }
-
-                BtYacc_puts("\\\"\",", output_file);
-            }
-            else if (s[0] == '\'')
-            {
-                if (s[1] == '"')
-                {
-                    j += 7;
-                    if (j > 80)
-                    {
-                        ++outline[OUTPUT_FILE];
-                        BtYacc_putc('\n', output_file);
-                        j = 7;
-                    }
-
-                    BtYacc_puts("\"'\\\"'\",", output_file);
-                }
-                else
-                {
-                    k = 5;
-                    while (*++s != '\'')
-                    {
-                        ++k;
-                        if (*s == '\\')
-                        {
-                            k += 2;
-                            if (*++s == '\\')
-                                ++k;
-                        }
-                    }
-                    j += k;
-                    if (j > 80)
-                    {
-                        ++outline[OUTPUT_FILE];
-                        BtYacc_putc('\n', output_file);
-                        j = k;
-                    }
-
-                    BtYacc_puts("\"'", output_file);
-                    s = symnam[i];
-                    while (*++s != '\'')
-                    {
-                        if (*s == '\\')
-                        {
-                            BtYacc_puts("\\\\", output_file);
-
-                            if (*++s == '\\')
-                                BtYacc_puts("\\\\", output_file);
-                            else
-                                BtYacc_putc(*s, output_file);
-                        }
-                        else
-                            BtYacc_putc(*s, output_file);
-                    }
-
-                    BtYacc_puts("'\",", output_file);
-                }
-            }
-            else
-            {
-                k = (int)strlen(s) + 3;
-                j += k;
-                if (j > 80)
-                {
-                    ++outline[OUTPUT_FILE];
-                    BtYacc_putc('\n', output_file);
-                    j = k;
-                }
-
-                BtYacc_putc('"', output_file);
-
-                do 
-				{ 
-					BtYacc_putc(*s, output_file); 
-				} while (*++s);
-
-                BtYacc_puts("\",", output_file);
-            }
-        }
-        else
-        {
-            j += 2;
-            if (j > 80)
-            {
-                ++outline[OUTPUT_FILE];
-                BtYacc_putc('\n', output_file);
-                j = 2;
-            }
-
-            BtYacc_puts("0,", output_file);
-        }
+		if (s)
+		{
+			s = convert_to_C_string(s);
+		}
+		else
+		{
+			s = get_section("debug_yy_null");
+			quoted = 0;
+		}
+        k = strlen(s) + 2 * quoted;
+		m = strrchr(sep, '\n');
+		if (m)
+		{
+			j = strlen(m + 1);
+		}
+		else
+		{
+			k += strlen(sep);
+			j += k;
+			if (j > 80)
+			{
+				++outline[OUTPUT_FILE];
+				BtYacc_putc('\n', output_file);
+				j = k;
+			}
+		}
+		BtYacc_printf(output_file, "%s%s%s%s", (quoted ? "\"" : ""), s, (quoted ? "\"" : ""), count_newlines(OUTPUT_FILE, sep));
     }
 
+	if (j > 0)
+	{
+		++outline[OUTPUT_FILE];
+		BtYacc_putc('\n', output_file);
+	}
 	BtYacc_printf(output_file, count_newlines(OUTPUT_FILE, get_section("debug_yyname_strings_end")));
     FREE(symnam);
 
 	BtYacc_printf(output_file, count_newlines(OUTPUT_FILE, get_section("debug_yyrule_strings_start")), get_rflag_prefix());
 
-    for (i = 2; i < nrules; ++i)
+	for (i = 2; i < nrules; ++i)
     {
-        BtYacc_printf(output_file, "\"%s :", symbol_name[rlhs[i]]);
+		const char *s = convert_to_C_string(symbol_name[rlhs[i]]);
+		const char *sep = (i < nrules - 1 ? get_section("debug_yyname_strings_separator") : "");
+
+        BtYacc_printf(output_file, "\"%s :", s);
 
         for (j = rrhs[i]; ritem[j] > 0; ++j)
         {
-            s = symbol_name[ritem[j]];
-            if (s[0] == '"')
-            {
-                BtYacc_puts(" \\\"", output_file);
+            s = convert_to_C_string(symbol_name[ritem[j]]);
 
-                while (*++s != '"')
-                {
-                    if (*s == '\\')
-                    {
-                        if (s[1] == '\\')
-                            BtYacc_puts("\\\\\\\\", output_file);
-                        else
-                            BtYacc_printf(output_file, "\\\\%c", s[1]);
-                        ++s;
-                    }
-                    else
-                        BtYacc_putc(*s, output_file);
-                }
-
-                BtYacc_puts("\\\"", output_file);
-            }
-            else if (s[0] == '\'')
-            {
-                if (s[1] == '"')
-                    BtYacc_puts(" '\\\"'", output_file);
-                else if (s[1] == '\\')
-                {
-                    if (s[2] == '\\')
-                        BtYacc_puts(" '\\\\\\\\", output_file);
-                    else
-                        BtYacc_printf(output_file, " '\\\\%c", s[2]);
-
-                    s += 2;
-                    while (*++s != '\'')
-                        BtYacc_putc(*s, output_file);
-
-                    BtYacc_putc('\'', output_file);
-                }
-                else
-                    BtYacc_printf(output_file, " '%c'", s[1]);
-            }
-            else
-                BtYacc_printf(output_file, " %s", s);
-        }
-        ++outline[OUTPUT_FILE];
-        BtYacc_puts("\",\n", output_file);
+            BtYacc_printf(output_file, " %s", s);
+		}
+		++outline[OUTPUT_FILE];
+		BtYacc_printf(output_file, "\"%s\n", count_newlines(OUTPUT_FILE, sep));
     }
 
 	BtYacc_printf(output_file, count_newlines(OUTPUT_FILE, get_section("debug_yyrule_strings_end")));
@@ -1217,12 +1224,7 @@ void output_trailing_text(void)
 
 void output_semantic_actions(void)
 {
-    register int c, last;
-    register int state; /* 0=middle of line, 1=start of line, 2=seen '#' */
-
     open_output_files();
-
-    state = 1;
 
     if (fclose(action_file))
     {
@@ -1234,52 +1236,7 @@ void output_semantic_actions(void)
     if (action_file == NULL)
         open_error(action_file_name);
 
-    if ((c = getc(action_file)) == EOF)
-        return;
-
-    do
-	{
-        last = c;
-        if (c == '\n')
-		{
-            ++outline[CODE_FILE];
-            if (state == 2)
-			{
-                BtYacc_printf(code_file, line_format, outline[CODE_FILE] + 1, code_file_name);
-                state = 1;
-                continue;
-			}
-            state = 1;
-		}
-        else if (state == 1 && c == '#')
-		{
-            state = 2;
-			continue;
-		}
-        else
-		{
-			if (state == 2)
-			{
-				BtYacc_putc('#', code_file);
-			}
-            state = 0;
-		}
-
-        BtYacc_putc(c, code_file);
-    } while ((c = getc(action_file)) != EOF);
-
-	if (state == 2)
-	{
-        ++outline[CODE_FILE];
-		BtYacc_puts("#\n", code_file);
-		last = 0;
-	}
-
-    if (last != '\n')
-    {
-        ++outline[CODE_FILE];
-        BtYacc_putc('\n', code_file);
-    }
+	output_templated_text(action_file);
 
     if (!lflag)
     {
@@ -1338,16 +1295,7 @@ void write_section(char const * section_name)
 
     open_output_files();
 
-    for (sl = &active_section_list[0]; sl->name; ++sl) {
-      if(strcmp(sl->name,section_name) == 0) {
-        break;
-      }
-    }
-    if (sl->name == 0) {
-      BtYacc_printf(stderr, "Cannot find section '%s' in your skeleton file\n", section_name);
-      exit(1);
-    }
-
+    sl = lookup_section_name(section_name);
     section = sl->ptr;
     for (i = lflag ? 1 : 0; section[i]; ++i)
     {
@@ -1356,6 +1304,24 @@ void write_section(char const * section_name)
     }
 }
 
+
+struct section *lookup_section_name(char const * section_name)
+{
+    struct section *sl;
+
+    for (sl = &active_section_list[0]; sl->name; ++sl) 
+	{
+      if (strcmp(sl->name, section_name) == 0) 
+	  {
+        break;
+      }
+    }
+    if (sl->name == 0) 
+	{
+	  unknown_section_name_error(section_name);
+	}
+	return sl;
+}
 
 
 char const *get_section(char const * section_name)
@@ -1368,15 +1334,7 @@ char const *get_section(char const * section_name)
 
     /* open_output_files(); */
 
-    for (sl = &active_section_list[0]; sl->name; ++sl) {
-      if(strcmp(sl->name,section_name) == 0) {
-        break;
-      }
-    }
-    if (sl->name == 0) {
-      BtYacc_printf(stderr, "Cannot find section '%s' in your skeleton file\n", section_name);
-      exit(1);
-    }
+    sl = lookup_section_name(section_name);
 
 	if (sl->cached_multiline_ptr)
 	{
@@ -1402,3 +1360,25 @@ char const *get_section(char const * section_name)
 
 	return sl->cached_multiline_ptr;
 }
+
+
+char const *get_rule_description(int rule_nr)
+{
+    register int j;
+	struct mstring *buf = msnew();
+	const char *s = convert_to_C_string(symbol_name[rlhs[rule_nr]]);
+
+	if (!buf) no_space();
+
+	msprintf(buf, "%s :", s);
+
+    for (j = rrhs[rule_nr]; ritem[j] > 0; ++j)
+    {
+        s = convert_to_C_string(symbol_name[ritem[j]]);
+
+        msprintf(buf, " %s", s);
+	}
+	return msdone(buf);
+}
+
+

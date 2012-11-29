@@ -1,6 +1,16 @@
 %%
 S: error
 %%
-main(){printf("yyparse() = %d\n",yyparse());}
-yylex(){return-1;}
-yyerror(s)char*s;{printf("%s\n",s);}
+int main(void)
+{
+	printf("yyparse() = %d\n", yyparse());
+	return 0;
+}
+int yylex(void)
+{
+	return -1;
+}
+void yyerror(char const *s)
+{
+	printf("%s\n", s);
+}

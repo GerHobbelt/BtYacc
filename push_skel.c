@@ -1,5 +1,5 @@
 /*
-** This file generated automatically from push.skel
+** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\push.skel
 */
 
 #include "defs.h"
@@ -357,7 +357,7 @@ static char const * const body[] =
     "            yys = yyname[yychar];",
     "        if (!yys)",
     "            yys = \"illegal-symbol\";",
-    "        printf(\"yydebug: state %d, input %d (%s)\", yystate,",
+    "        printf(\"yydebug: state %d, input %d (%s) \", yystate,",
     "                yychar, yys);",
     "#ifdef YYDBPR",
     "        printf(\"<\");",
@@ -400,7 +400,7 @@ static char const * const body[] =
     "                yys = yyname[yychar];",
     "            if (!yys)",
     "                yys = \"illegal-symbol\";",
-    "            printf(\"yydebug: state %d, reading %d (%s)\", yystate,",
+    "            printf(\"yydebug: state %d, reading %d (%s) \", yystate,",
     "                    yychar, yys);",
     "#ifdef YYDBPR",
     "            printf(\"<\");",
@@ -636,7 +636,7 @@ static char const * const body[] =
     "#if YYDEBUG",
     "    if (yydebug)",
     "    {",
-    "        printf(\"yydebug: state %d, reducing by rule %d (%s)\",",
+    "        printf(\"yydebug: state %d, reducing by rule %d (%s) \",",
     "            yystate, yyn, yyrule[yyn]);",
     "#ifdef YYDBPR",
     "        if (yym)",
@@ -783,3 +783,6 @@ struct section section_list_push[] = {
 	{ "body", &body[0] },
 	{ "trailer", &trailer[0] },
 	{ 0, 0 } };
+
+unsigned int section_list_push_count = 6;
+

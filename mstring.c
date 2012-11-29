@@ -26,16 +26,23 @@ int             len;
     va_end(args);
 
     len = (int)strlen(buf);
-    if (len > (int)(s->end - s->ptr)) {
+    if (len > (int)(s->end - s->ptr)) 
+	{
         int     cp = (int)(s->ptr - s->base), cl = (int)(s->end - s->base), nl = cl;
         while (len > (nl - cp))
             nl = nl + nl + TAIL;
-        if ((s->base = realloc(s->base, nl))) {
+		s->base = realloc(s->base, nl);
+        if (s->base) 
+		{
             s->ptr = s->base + cp;
-            s->end = s->base + nl; }
-        else {
+            s->end = s->base + nl; 
+		}
+        else 
+		{
             s->ptr = s->end = 0;
-            return; } }
+            return; 
+		} 
+	}
     memcpy(s->ptr, buf, len);
     s->ptr += len;
 }
@@ -43,14 +50,21 @@ int             len;
 int mputchar(struct mstring *s, int ch)
 {
     if (!s || !s->base) return ch;
-    if (s->ptr == s->end) {
+    if (s->ptr == s->end) 
+	{
         int len = (int)(s->end - s->base);
-        if ((s->base = realloc(s->base, len+len+TAIL))) {
+		s->base = realloc(s->base, len+len+TAIL);
+        if (s->base) 
+		{
             s->ptr = s->base + len;
-            s->end = s->base + len+len+TAIL; }
-        else {
+            s->end = s->base + len+len+TAIL; 
+		}
+        else 
+		{
             s->ptr = s->end = 0;
-            return ch; } }
+            return ch; 
+		} 
+	}
     *s->ptr++ = ch;
     return ch;
 }
@@ -60,19 +74,24 @@ struct mstring *msnew(void) {
 
     if (n && (n->base = n->ptr = malloc(START)))
         n->end = n->base + START;
-    else {
+    else 
+	{
         free(n);
-        n = 0; }
+        n = 0; 
+	}
     return n;
 }
 
 char *msdone(struct mstring *s)
 {
-char    *r = 0;
-    if (s) {
+	char    *r = 0;
+
+    if (s) 
+	{
         mputc(s, 0);
         r = s->base;
-        free(s); }
+        free(s); 
+	}
     return r;
 }
 

@@ -3,6 +3,7 @@
 #endif
 
 #include "defs.h"
+#include "log.h"
 
 Yshort *itemset = NULL;
 Yshort *itemsetend = NULL;
@@ -16,20 +17,20 @@ void finalize_closure(void)
 {
   FREE(itemset);
   FREE(ruleset);
-  FREE(first_derives + ntokens * WORDSIZE(nrules));
+  first_derives += ntokens * WORDSIZE(nrules);
+  FREE(first_derives);
 }
 
 
-#ifdef  DEBUG
 
 static void print_closure(int n)
 {
   register Yshort *isp;
 
-  printf("\n\nn = %d\n\n", n);
+  BtYacc_logf("\n\nclosure: n = %d\n\n", n);
 
   for (isp = itemset; isp < itemsetend; ++isp)
-    printf("   %d\n", *isp);
+    BtYacc_logf("   %d\n", *isp);
 }
 
 
@@ -40,11 +41,11 @@ static void print_EFF(void)
     register unsigned word;
     register unsigned mask;
 
-    printf("\n\nEpsilon Free Firsts\n");
+    BtYacc_logf("\n\nEpsilon Free Firsts\n");
 
     for (i = start_symbol; i < nsyms; ++i)
     {
-        printf("\n%s", symbol_name[i]);
+        BtYacc_logf("\n%-30s : ", symbol_name[i]);
         rowp = EFF + ((i - start_symbol) * WORDSIZE(nvars));
         word = *rowp++;
 
@@ -52,7 +53,7 @@ static void print_EFF(void)
         for (j = 0; j < nvars; ++j)
         {
             if (word & mask)
-                printf("  %s", symbol_name[start_symbol + j]);
+                BtYacc_logf("  %s", symbol_name[start_symbol + j]);
 
             mask <<= 1;
             if (mask == 0)
@@ -72,20 +73,31 @@ static void print_first_derives(void)
   register unsigned *rp;
   register unsigned cword;
   register unsigned mask;
+  int kp;
 
-  printf("\n\n\nFirst Derives\n");
+  BtYacc_logf("\n\n\nFirst Derives\n");
 
   for (i = start_symbol; i < nsyms; ++i)
     {
-      printf("\n%s derives\n", symbol_name[i]);
+      BtYacc_logf("\n%-30s derives\n", symbol_name[i]);
+	  assert(i >= ntokens);
       rp = first_derives + i * WORDSIZE(nrules);
       cword = *rp++;
       mask = 1;
+	  kp = 0;
 
       for (j = 0; j <= nrules; ++j)
         {
           if (cword & mask)
-            printf("   %d\n", j);
+		  {
+            BtYacc_logf(" %5d", j);
+			kp++;
+			if (kp == 10) 
+			{
+				BtYacc_logf("\n");
+				kp = 0;
+			}
+		  }
 
           mask <<= 1;
           if (mask == 0)
@@ -94,12 +106,16 @@ static void print_first_derives(void)
               mask = 1;
             }
         }
+
+		if (kp) 
+		{
+			BtYacc_logf("\n");
+		}
     }
 
   fflush(stdout);
 }
 
-#endif
 
 
 static void set_EFF(void)
@@ -133,9 +149,8 @@ static void set_EFF(void)
 
     reflexive_transitive_closure(EFF, nvars);
 
-#ifdef  DEBUG
-    print_EFF();
-#endif
+	if (tflag > 1)
+		print_EFF();
 }
 
 
@@ -155,7 +170,8 @@ void set_first_derives(void)
 
   rulesetsize = WORDSIZE(nrules);
   varsetsize = WORDSIZE(nvars);
-  first_derives = NEW2(nvars * rulesetsize, unsigned) - ntokens * rulesetsize;
+  first_derives = NEW2(nvars * rulesetsize, unsigned);
+  first_derives -= ntokens * rulesetsize;
 
   set_EFF();
 
@@ -190,9 +206,8 @@ void set_first_derives(void)
       rrow += rulesetsize;
     }
 
-#ifdef  DEBUG
-  print_first_derives();
-#endif
+	if (tflag > 1)
+		print_first_derives();
 
   FREE(EFF);
 }
@@ -226,6 +241,7 @@ void closure(Yshort* nucleus, int n)
         symbol = ritem[*csp];
         if (ISVAR(symbol))
         {
+		    assert(symbol >= ntokens);
             dsp = first_derives + symbol * rulesetsize;
             rsp = ruleset;
             while (rsp < rsend)
@@ -265,8 +281,7 @@ void closure(Yshort* nucleus, int n)
     while (csp < csend)
         *itemsetend++ = *csp++;
 
-#ifdef  DEBUG
-  print_closure(n);
-#endif
+	if (tflag > 1)
+		print_closure(n);
 }
 

@@ -159,8 +159,10 @@ static void set_goto_map(void)
   register int state2;
   register int state1;
 
-  goto_map = NEW2(nvars + 1, Yshort) - ntokens;
-  temp_map = NEW2(nvars + 1, Yshort) - ntokens;
+  goto_map = NEW2(nvars + 1, Yshort);
+  goto_map -= ntokens;
+  temp_map = NEW2(nvars + 1, Yshort);
+  temp_map -= ntokens;
 
   ngotos = 0;
   for (sp = first_shift; sp; sp = sp->next)
@@ -212,7 +214,8 @@ static void set_goto_map(void)
         }
     }
 
-  FREE(temp_map + ntokens);
+  temp_map += ntokens;
+  FREE(temp_map);
 }
 
 

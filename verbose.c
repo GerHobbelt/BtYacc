@@ -15,7 +15,7 @@ void verbose(void)
 
     if (!vflag) return;
 
-    null_rules = (Yshort *) MALLOC(nrules*sizeof(Yshort));
+    null_rules = (Yshort *) MALLOC(nrules * sizeof(null_rules[0]));
     if (null_rules == 0) no_space();
 
     BtYacc_puts("\f\n", verbose_file);

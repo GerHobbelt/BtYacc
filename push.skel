@@ -328,7 +328,7 @@ int yyparse(int yychar, YYSTYPE yylval)
             yys = yyname[yychar];
         if (!yys)
             yys = "illegal-symbol";
-        printf("yydebug: state %d, input %d (%s)", yystate,
+        printf("yydebug: state %d, input %d (%s) ", yystate,
                 yychar, yys);
 #ifdef YYDBPR
         printf("<");
@@ -371,7 +371,7 @@ yyloop:
                 yys = yyname[yychar];
             if (!yys)
                 yys = "illegal-symbol";
-            printf("yydebug: state %d, reading %d (%s)", yystate,
+            printf("yydebug: state %d, reading %d (%s) ", yystate,
                     yychar, yys);
 #ifdef YYDBPR
             printf("<");
@@ -607,7 +607,7 @@ yyreduce:
 #if YYDEBUG
     if (yydebug)
     {
-        printf("yydebug: state %d, reducing by rule %d (%s)",
+        printf("yydebug: state %d, reducing by rule %d (%s) ",
             yystate, yyn, yyrule[yyn]);
 #ifdef YYDBPR
         if (yym)

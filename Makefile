@@ -2,10 +2,10 @@
 # Makefile for BtYacc.
 #
 
-# Edited for Debian GNU/Linux.
+# Edited for Debian GNU/Linux/MSys.
 DESTDIR =
 
-VERSION       = 3.0
+VERSION       = 3.0.5
 
 DEST	      = .
 
@@ -47,9 +47,9 @@ $(PROGRAM):     $(OBJS) $(LIBS)
 
 clean:;		rm -f $(OBJS)
 
-clobber:;	rm -f $(OBJS) $(PROGRAM)
+clobber:;	rm -f $(OBJS) $(PROGRAM) $(PROGRAM).exe
 
-distclean:;	rm -f $(OBJS) $(PROGRAM) skeleton.c push_skel.c *.zip *.gz
+distclean:;	rm -f $(OBJS) $(PROGRAM) $(PROGRAM).exe skeleton.c push_skel.c *.zip *.gz
 
 depend:;	mkmf -f $(MAKEFILE) PROGRAM=$(PROGRAM) DEST=$(DEST)
 

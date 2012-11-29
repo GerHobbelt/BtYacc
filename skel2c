@@ -42,6 +42,7 @@ BEGIN {
 
 		sec_id_name = section;
 		gsub(/\!/, "not_", sec_id_name);
+		gsub(/\./, "_", sec_id_name);
 
         secnamelist[nsec] = sec_id_name;
         nsec = nsec + 1;
@@ -88,6 +89,7 @@ END   {
 		{
             printf "\t{ \"%s\", &%s[0] },\n", seclist[i], secnamelist[i];
 		}
-        printf "\t{ 0, 0 } };\n"
+        printf "\t{ 0, 0 } };\n\n"
+        printf "unsigned int section_list_%s_count = %u;\n\n", fname_as_varname, nsec;
     }
 }

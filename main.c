@@ -22,7 +22,7 @@ char lflag = 0;
 char rflag = 0;
 char tflag = 0;
 char vflag = 0;
-int Eflag = 0;
+char Eflag = 0;
 
 char *target_dir = NULL;
 char *file_prefix = NULL;
@@ -68,9 +68,9 @@ FILE *verbose_file = NULL;      /*  y.output                                    
 
 int nitems = 0;
 int nrules = 0;
-int nsyms = 0;
-int ntokens = 0;
-int nvars = 0;
+int nsyms = 0;					/* the total number of TERMinals and non-terminals */
+int ntokens = 0;                /* the total number of TERMinals */
+int nvars = 0;                  /* the total number of non-terminals */
 
 int   start_symbol = 0;
 char  **symbol_name = NULL;
@@ -79,7 +79,7 @@ Yshort *symbol_prec = NULL;
 char  *symbol_assoc = NULL;
 
 Yshort *ritem = NULL;
-Yshort *rlhs = NULL;
+Yshort *rlhs = NULL;           /* array of left-hand side token for rules (rule number is the array index) */
 Yshort *rrhs = NULL;
 Yshort *rprec = NULL;
 char  *rassoc = NULL;
@@ -169,7 +169,9 @@ static void signal_setup(void)
 #endif
 
 
-static SPLINT_NO_RETURN void usage(void)
+static SPLINT_NO_RETURN void usage(void) GCC_NO_RETURN;
+
+static void usage(void)
 {
   BtYacc_logf("usage: %s [OPTIONS] file\n", myname);
   BtYacc_logf(
@@ -185,7 +187,7 @@ static SPLINT_NO_RETURN void usage(void)
             "  -S x.skel    Select parser skeleton\n"
             "  -t           Include debugging code in generated parser\n"
             "  -v           Write description of parser to `y.output'\n");
-  exit(1);
+  done(1);
 }
 
 
@@ -225,7 +227,7 @@ static void getargs(int argc, char **argv)
 
         case 'b':
             if (*++s)
-                 file_prefix = s;
+                file_prefix = s;
             else if (++i < argc)
                 file_prefix = argv[i];
             else
@@ -234,7 +236,7 @@ static void getargs(int argc, char **argv)
 
         case 'p':
             if (*++s)
-                 name_prefix = s;
+                name_prefix = s;
             else if (++i < argc)
                 name_prefix = argv[i];
             else
@@ -247,22 +249,29 @@ static void getargs(int argc, char **argv)
 
         case 'D':
             /* Find the preprocessor variable */
-            { char **ps;
-              char *var_name = s + 1;
+            { 
+			  char **ps;
+              char *var_name = NULL;
               extern char *defd_vars[];
 
-              for (ps = &defd_vars[0]; *ps; ++ps) {
-                if(strcmp(*ps,var_name)==0) {
+              if (*++s)
+                var_name = s;
+              else if (++i < argc)
+                var_name = argv[i];
+              else
+                usage();
+
+              for (ps = &defd_vars[0]; *ps; ++ps) 
+			  {
+                if (strcmp(*ps, var_name) == 0) 
+				{
                   error(lineno, 0, 0, "Preprocessor variable %s already defined", var_name);
                 }
               }
-              *ps = (char *)MALLOC(strlen(var_name)+1);
+              *ps = strdup(var_name);
 
               if (*ps == 0)
                  no_space();
-
-              strcpy(*ps, var_name);
-              *++ps = NULL;
             }
             continue;
 
@@ -288,11 +297,11 @@ static void getargs(int argc, char **argv)
             break;
 
         case 't':
-            tflag = 1;
+            tflag++;
             break;
 
         case 'v':
-            vflag = 1;
+            vflag++;
             break;
 
         case 'S':
@@ -328,11 +337,11 @@ static void getargs(int argc, char **argv)
                 break;
 
             case 't':
-                tflag = 1;
+                tflag++;
                 break;
 
             case 'v':
-                vflag = 1;
+                vflag++;
                 break;
 
             default:
@@ -362,7 +371,8 @@ no_more_options:;
         s = strrchr(s2, ':');
         if (!s) s = s2; else s++;
 
-        if ((s2 = strrchr(s, '.')))
+		s2 = strrchr(s, '.');
+        if (s2)
           *s2 = 0;
 
         memmove(file_prefix, s, strlen(s) + 1);
@@ -526,33 +536,7 @@ static char *getenv_tempdir(void)
     return tmpdir;
 }
 
-static void create_union_file(void)
-{
-    size_t i, len;
-    char* tmpdir = getenv_tempdir();
-
-    len = strlen(tmpdir);
-    i = len + (sizeof(temp_form));
-
-    union_file_name = (char *)MALLOC(i);
-
-    if (union_file_name == 0)
-       no_space();
-
-    strcpy(union_file_name, tmpdir);
-
-    if (len)
-    {
-        union_file_name[len] = DIR_CHAR;
-        ++len;
-    }
-
-    strcpy(union_file_name + len, temp_form);
-    union_file_name[len + 5] = 'u';
-    union_file = create_temporary_file(union_file_name);
-}
-
-void create_files(void)
+void create_temporary_files(void)
 {
     size_t i, len;
     char* tmpdir = getenv_tempdir();
@@ -570,24 +554,40 @@ void create_files(void)
     if (text_file_name == 0)
        no_space();
 
+    union_file_name = (char *)MALLOC(i);
+
+    if (union_file_name == 0)
+       no_space();
+
     strcpy(action_file_name, tmpdir);
     strcpy(text_file_name, tmpdir);
+    strcpy(union_file_name, tmpdir);
 
     if (len)
     {
         action_file_name[len] = DIR_CHAR;
         text_file_name[len] = DIR_CHAR;
+        union_file_name[len] = DIR_CHAR;
         ++len;
     }
 
     strcpy(action_file_name + len, temp_form);
     strcpy(text_file_name + len, temp_form);
+    strcpy(union_file_name + len, temp_form);
 
     action_file_name[len + 5] = 'a';
     text_file_name[len + 5] = 't';
+    union_file_name[len + 5] = 'u';
 
     action_file = create_temporary_file(action_file_name);
     text_file = create_temporary_file(text_file_name);
+    union_file = create_temporary_file(union_file_name);
+}
+
+
+void create_output_files(void)
+{
+    size_t len;
 
     len = strlen(file_prefix) + strlen(target_dir);
 
@@ -638,12 +638,24 @@ static void open_input_files(void)
 }
 
 
-void open_output_files(void)
+void open_temporary_files(void)
 {
     /* do this only once, first time is on demand, i.e. as late as possible */
-    if (!action_file && !text_file && !verbose_file && !defines_file && !output_file && !code_file)
+	if (!action_file && !text_file && !union_file)
     {
-        create_files();
+        create_temporary_files();
+    }
+}
+
+
+void open_output_files(void)
+{
+	open_temporary_files();
+
+    /* do this only once, first time is on demand, i.e. as late as possible */
+    if (!verbose_file && !defines_file && !output_file && !code_file)
+    {
+        create_output_files();
 
         if (vflag)
         {
@@ -657,8 +669,6 @@ void open_output_files(void)
             defines_file = fopen(defines_file_name, "w");
             if (defines_file == 0)
                 open_error(defines_file_name);
-
-            create_union_file();
         }
 
         output_file = fopen(output_file_name, "w");
@@ -683,13 +693,6 @@ void open_output_files(void)
 
 struct section *active_section_list = NULL;
 
-#ifdef _DEBUG
-void atexit_handler(void)
-{
-	printf("atexit!");
-}
-#endif
-
 int main(int argc, char **argv)
 {
 #ifdef BTYACC_USE_SIGNAL_HANDLING
@@ -699,10 +702,6 @@ int main(int argc, char **argv)
     active_section_list = section_list_btyaccpa;
     getargs(argc, argv);
 	line_format = get_section("line_position");
-
-#ifdef _DEBUG
-	atexit(atexit_handler);
-#endif
 
     BTYACC_INTERRUPTION_CHECK();
     open_input_files();

@@ -60,22 +60,22 @@
 
 #if defined(__MSDOS__) /* || defined(WIN32) || defined(__WIN32) */
 #define BITS_PER_WORD   16
-#define LOG2_BPW    4
+#define LOG2_BPW		4
 #define MAXSHORT        ((int)0x7FFF)
 #define MINSHORT        ((int)0x8000)
 #define MAXTABLE        4000
 #else    /* Real computers... */
 #define BITS_PER_WORD   32
-#define LOG2_BPW    5
+#define LOG2_BPW		5
 #define MAXSHORT        ((int)0x7FFFFFFF)
 #define MINSHORT        ((int)0x80000000)
 #define MAXTABLE        120000
 #endif
-#define BITS_PER_WORD_1 (BITS_PER_WORD-1)
+#define BITS_PER_WORD_1 (BITS_PER_WORD - 1)
 
-#define WORDSIZE(n) (((n)+(BITS_PER_WORD_1))/BITS_PER_WORD)
-#define BIT(r, n)   ((((r)[(n)>>LOG2_BPW])>>((n)&BITS_PER_WORD_1))&1)
-#define SETBIT(r, n) ((r)[(n)>>LOG2_BPW]|=((unsigned)1<<((n)&BITS_PER_WORD_1)))
+#define WORDSIZE(n)		(((n) + (BITS_PER_WORD_1)) / BITS_PER_WORD)
+#define BIT(r, n)		((((r)[(n) >> LOG2_BPW]) >> ((n) & BITS_PER_WORD_1)) & 1)
+#define SETBIT(r, n)	((r)[(n) >> LOG2_BPW] |= ((unsigned)1 << ((n) & BITS_PER_WORD_1)))
 
 /* VM: this is a 32-bit replacement for original 16-bit short */
 typedef int Yshort;
@@ -174,13 +174,13 @@ REDUCE = 2
 
 /*  storage allocation macros  */
 
-#define CALLOC(k,n)     (calloc((unsigned)(k),(unsigned)(n)))
-#define FREE(x)         (free((char*)(x)))
-#define MALLOC(n)       (malloc((unsigned)(n)))
+#define CALLOC(k,n)     calloc((unsigned)(k), (unsigned)(n))
+#define FREE(x)         do { free((char*)(x)); x = 0; } while (0)
+#define MALLOC(n)       malloc((unsigned)(n))
 #define NEW(t)          ((t*)allocate(sizeof(t)))
-#define NEW2(n,t)       ((t*)allocate((unsigned)((n)*sizeof(t))))
-#define REALLOC(p,n)    (realloc((char*)(p),(unsigned)(n)))
-#define RENEW(p,n,t)    ((t*)realloc((char*)(p),(unsigned)((n)*sizeof(t))))
+#define NEW2(n,t)       ((t*)allocate((unsigned)((n) * sizeof(t))))
+#define REALLOC(p,n)    (realloc((char*)(p), (unsigned)(n)))
+#define RENEW(p,n,t)    ((t*)realloc((char*)(p), (unsigned)((n) * sizeof(t))))
 
 
 /*  the structure of a symbol table entry  */
@@ -261,8 +261,9 @@ struct section {
 	char const * cached_multiline_ptr;
 };
 
-extern struct section section_list_push[];
 extern struct section section_list_btyaccpa[];
+extern unsigned int section_list_btyaccpa_count;
+
 extern struct section *active_section_list;
 
 
@@ -273,6 +274,8 @@ extern char lflag;
 extern char rflag;
 extern char tflag;
 extern char vflag;
+extern char Eflag;
+
 
 extern char *myname;
 extern char *target_dir;
@@ -442,6 +445,8 @@ void unknown_rhs(int);
 void default_action_warning(void);
 void undefined_goal(char const * s);
 void undefined_symbol_warning(char const * s);
+void table_too_large_error(int high);
+void unknown_section_name_error(char const *section_name);
 
 /* lalr.c */
 void lalr(void);
@@ -467,7 +472,9 @@ void BtYacc_stop_test(void);
 #endif
 
 char *allocate(unsigned);
-void create_files(void);
+void create_temporary_files(void);
+void create_output_files(void);
+void open_temporary_files(void);
 void open_output_files(void);
 int main(int, char **);
 
@@ -502,7 +509,9 @@ void free_itemsets(void);
 void free_shifts(void);
 void free_reductions(void);
 void write_section(char const * section_name);
+struct section *lookup_section_name(char const * section_name);
 char const *get_section(char const * section_name);
+char const *get_rule_description(int rule_nr);
 
 /* reader.c */
 int cachec(int);
@@ -517,9 +526,9 @@ void copy_comment(FILE *, FILE *);
 void copy_text(void);
 void copy_union(void);
 int hexval(int);
-bucket *get_literal(void);
+bucket *get_literal(int store_literal);
 int is_reserved(char const * name);
-bucket *get_name(void);
+bucket *get_name(int store_name);
 int get_number(void);
 char *get_tag(void);
 void declare_tokens(int);

@@ -455,6 +455,7 @@
     <None Include="skel2c" />
     <None Include="test\ansiC.y" />
     <None Include="test\ansiC2.y" />
+    <None Include="test\bison-mysterious-reduce-reduce.y" />
     <None Include="test\empty.y" />
     <None Include="test\error.y" />
     <None Include="test\firebird.y" />

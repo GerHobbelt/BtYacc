@@ -35,7 +35,7 @@ C
 
 #if HAS_MSVC_2005_ISO_RTL
 #pragma warning(disable : 4996)
-// Or just turn off warnings about the newly deprecated CRT functions.
+/* Or just turn off warnings about the newly deprecated CRT functions. */
 #ifndef _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE
 #endif
@@ -52,6 +52,7 @@ C
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 
 /* [i_a] MSVC doesn't define TRUE in the expected places; do it here to make sure we got it 'right' */
@@ -99,9 +100,9 @@ extern _YACC_EXTERN_ Yshort yyctable[];
 
 #if YYDEBUG
 /* idx: token code; entry: spelling of token */
-extern _YACC_EXTERN_ char *yyname[];
+extern _YACC_EXTERN_ char const *yyname[];
 
-extern _YACC_EXTERN_ char *yyrule[];
+extern _YACC_EXTERN_ char const *yyrule[];
 #endif
 
 %% header
@@ -113,23 +114,47 @@ extern _YACC_EXTERN_ char *yyrule[];
 /* YYPOSN is user-defined text position type. */
 #ifndef YYPOSN
 #define YYPOSN int
-#endif
 
+#ifdef __cplusplus
+#define YYPOSN_ZERO(yyposn)		yyposn = 0
+#endif
+#endif /* YYPOSN */
+
+/* 
+ * YYREDUCEPOSNFUNC is a overridable function with the following prototype: 
+ * 
+ *   void YYREDUCEPOSNFUNC(YYPOSN action_yyposn, YYPOSN *yyposn_stack, YYSTYPE *yylval_stack, int rule_stack_size, int stack_size, int lexed_token, YYPOSN current_yyposn, ... ** yyval ~ $$ by default ** );
+ * 
+ * where yylval_stack[0] and yyposn_stack[0] point at the yylval/yyposn values 
+ * for $1 of the reduction rule, while yylval_stack[rule_stack_size - 1] and 
+ * yyposn_stack[rule_stack_size - 1] would point at the yylval/yyposn for $$
+ * of the same rule.
+ * 
+ * The 'stack_size' indicates the depth of the yylval/yyposn stacks, where the 
+ * entire stack would then span the range [rule_stack_size - 1 - stack_size] 
+ * to [rule_stack_size - 1].
+ * 
+ * 
+ * YYREDUCEPOSNFUNC() would be able to accept an arbitrary number of parameters, 
+ * depending on your YYREDUCEPOSNFUNCARG define override. The default 
+ * YYREDUCEPOSNFUNCARG define equals the YYSTYPE value for the last reduction, 
+ * i.e. the $$ value for that rule.
+ */
 #ifdef YYREDUCEPOSNFUNC
-#define YYCALLREDUCEPOSN(e)                                                 \
-    if(reduce_posn)                                                         \
-    {                                                                       \
-      YYREDUCEPOSNFUNC(yyps->pos, &(yyps->psp)[1-yym], &(yyps->vsp)[1-yym], \
-               yym, yyps->psp - yyps->ps, yychar, yyposn, e);               \
-      reduce_posn = 0;                                                      \
+#define YYCALLREDUCEPOSN(e)                                                     \
+    if (reduce_posn)                                                            \
+    {                                                                           \
+      YYREDUCEPOSNFUNC(yyps->pos, &(yyps->psp)[1 - yym], &(yyps->vsp)[1 - yym], \
+               yym, yyps->psp - yyps->ps, yychar, yyposn, e);                   \
+      reduce_posn = 0;                                                          \
     }
 
-#ifndef YYCALLREDUCEPOSNARG
-#define YYCALLREDUCEPOSNARG (yyps->val)
+#ifndef YYREDUCEPOSNFUNCARG
+#define YYREDUCEPOSNFUNCARG (yyps->val)
 #endif
 
 
-#define YYPOSNARG(n) ((yyps->psp)[1-yym+(n)-1])
+#define YYPOSNARG(n) (yyps->psp[1 - yym + (n) - 1])
 #define YYPOSNOUT    (yyps->pos)
 #endif
 
@@ -143,10 +168,10 @@ extern _YACC_EXTERN_ char *yyrule[];
 #define YYDELETEPOSN(v, t)
 #endif
 
-#define YYEMPTY (-1)
-#define yyclearin (yychar=YYEMPTY)
+#define YYEMPTY      (-1)
+#define yyclearin    (yychar = YYEMPTY)
 
-#define yyerrok (yyps->errflag=0)
+#define yyerrok      (yyps->errflag = 0)
 
 #ifndef YYSTACKGROWTH
 #define YYSTACKGROWTH 32
@@ -155,6 +180,15 @@ extern _YACC_EXTERN_ char *yyrule[];
 #ifndef YYDEFSTACKSIZE
 #define YYDEFSTACKSIZE 12
 #endif
+
+#ifndef YYLEXDEFSTACKSIZE
+#define YYLEXDEFSTACKSIZE (32 > YYSTACKGROWTH ? 32 : YYSTACKGROWTH)
+#endif
+
+#ifndef YYTRIALSTACKGROWTH
+#define YYTRIALSTACKGROWTH (4 > YYSTACKGROWTH ? 4 : YYSTACKGROWTH)
+#endif
+
 
 #ifdef YYDEBUG
 int yydebug = 0;
@@ -175,13 +209,13 @@ YYPOSN  yyretposn;
 #define YYERROR  goto yyerrlab
 #define YYVALID                                      \
             do {                                     \
-                if (yyps->save)                      \
+                if (yytrial)                         \
                     goto yyvalid;                    \
             } while(0)
 #define YYVALID_NESTED                               \
             do {                                     \
-                if (yyps->save                       \
-                    && yyps->save->save == 0)        \
+                if (yytrial                          \
+                    && yytrial->save == 0)           \
                     goto yyvalid;                    \
             } while(0)
 
@@ -251,76 +285,135 @@ int yyparse(void);
 
 static int yyLex1(void);
 static int yyExpand(void);
+static void yyMoreStack(YYParseState *yyps);
+static YYParseState *yyNewState(int old_size, int growth);
+static void yyFreeState(YYParseState **p);
+
+#ifdef __cplusplus
 static void yySCopy(YYSTYPE *to, YYSTYPE *from, int size);
 static void yyPCopy(YYPOSN  *to, YYPOSN  *from, int size);
-static void yyMoreStack(YYParseState *yyps);
-static YYParseState *yyNewState(int size);
-static void yyFreeState(YYParseState **p);
+#else
+#define yySCopy(to, from, size)			memcpy(to, from, (size) * sizeof((to)[0]))
+#define yyPCopy(to, from, size)			memcpy(to, from, (size) * sizeof((to)[0]))
+#endif
 
 
 %% body
 
+#ifndef YYERRCODE
+#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.
+#endif
 
 /*
-   Parser function. Roughly looks like this:
+ * Define's which could have been overridden by the user: 
+ *   
+ * 
+ * yydebug LOGGING OUTPUT (default to stderr)
+ * 
+ * A yyparse() yydebug session starts with a single call to
+ *   BTYACC_SET_YYDEBUG_FROM_ENV
+ * followed by a single call to
+ *   BTYACC_DEBUG_LOG_START
+ * when yydebug has been turned ON in the BTYACC_SET_YYDEBUG_FROM_ENV call.
+ * 
+ * When yydebug has been turned ON, the yyparse() run will then go and write 
+ * one or more 'log lines' a.k.a. log report events:
+ * 
+ * Any log line consists of zero or more calls to 
+ *   BTYACC_DEBUG_LOG_PARTIAL
+ * followed by one call to
+ *   BTYACC_DEBUG_LOG_EOL
+ * which is like BTYACC_DEBUG_LOG_PARTIAL but includes the line terminator (LF) 
+ * and concludes this yydebug log report event.
+ * 
+ * 
+ * DEVELOPER NOTE
+ * --------------
+ * 
+ * When you provide your own custom implementation of these functions, this 
+ * combination of functions may help you to cache the logged parts up to the 
+ * invocation of BTYACC_DEBUG_LOG_EOL at which time you may send the entire 
+ * concatenated log message to the destination, e.g. a syslog server (which 
+ * would want to receive the entire line in a single string/message).
+ */
 
-   int yyparse()
-   {
-   yyloop:
-     if (reduce_possible) goto yyreduce;
-     read_token;
-     if (conflict)
-     {
-       handle_conflict;
-       goto yyshift; or goto yyreduce;
-     }
-     if (shift_possible)
-     {
-   yyshift:
-       do_shift;
-       goto yyloop;
-     }
-     if (reduce_possible) goto yyreduce;
+#ifndef BTYACC_SET_YYDEBUG_FROM_ENV
+#define BTYACC_SET_YYDEBUG_FROM_ENV()	btyacc_set_yydebug_from_env()
+static void btyacc_set_yydebug_from_env(void);
+#endif
 
-     (error handling);
-     goto yyloop;
+#ifndef BTYACC_DEBUG_LOG_START
+#define BTYACC_DEBUG_LOG_START(msg)		btyacc_debug_log_start(msg)
+static void btyacc_debug_log_start(const char *msg);
+#endif
 
-   yyreduce:
-     BIG_CHUNK_OF_RULE_ACTIONS;
-     goto yyloop;
+#ifndef BTYACC_DEBUG_LOG_PARTIAL
+#define BTYACC_DEBUG_LOG_PARTIAL		btyacc_debug_log_partial
+static void btyacc_debug_log_partial(const char *msg, ...);
+#endif
 
-     (more error handling);
-   }
+#ifndef BTYACC_DEBUG_LOG_EOL
+#define BTYACC_DEBUG_LOG_EOL		btyacc_debug_log_eol
+static void btyacc_debug_log_partial(const char *msg, ...);
+#endif
+
+
+/*
+ *    Parser function. Roughly looks like this:
+ * 
+ *    int yyparse(void)
+ *    {
+ *    yyloop:
+ *      if (reduce_possible) goto yyreduce;
+ *      read_token;
+ *      if (conflict)
+ *      {
+ *        handle_conflict;
+ *        goto yyshift; or goto yyreduce;
+ *      }
+ *      if (shift_possible)
+ *      {
+ *    yyshift:
+ *        do_shift;
+ *        goto yyloop;
+ *      }
+ *      if (reduce_possible) goto yyreduce;
+ * 
+ *      (error handling);
+ *      goto yyloop;
+ * 
+ *    yyreduce:
+ *      BIG_CHUNK_OF_RULE_ACTIONS;
+ *      goto yyloop;
+ * 
+ *      (more error handling);
+ *    }
  */
 int yyparse(void)
 {
   int yym, yyn, yychar, yynewerrflag;
   int unsigned yystate;
   YYParseState *yyerrctx = 0;
+
+#ifdef YYREDUCEPOSNFUNC
   int reduce_posn;
+#endif
 
 #if YYDEBUG
-  char *yys;
+  char const *yys;
 
-  yys = getenv("YYDEBUG");
-  if (yys)
-  {
-    yyn = *yys;
-    if (yyn >= '0' && yyn <= '9')
-      yydebug = yyn - '0';
-  }
+  BTYACC_SET_YYDEBUG_FROM_ENV();
   if (yydebug)
   {
-    fputs("btyacc[<current state>,<nr of symbols on state stack>]\n",
-          stderr);
+	BTYACC_DEBUG_LOG_START("btyacc[<current state>,<nr of symbols on state stack>]\n");
   }
 #endif
 
-  yyps = yyNewState(YYDEFSTACKSIZE);
-  yyps->save = 0;
+  yyps = yyNewState(0, YYDEFSTACKSIZE);
+  yyps->save /* yytrial */ = 0;
   yynerrs = 0;
   yyps->errflag = 0;
-  yychar = (YYEMPTY);
+  yychar = YYEMPTY;
 
   yyps->ssp = yyps->ss;
   yyps->vsp = yyps->vs;
@@ -339,7 +432,8 @@ yyloop:
   if (yychar < 0)
   {
     yychar = yyLex1();
-    if (yychar < 0) yychar = 0;
+    if (yychar < 0) 
+		yychar = 0;
 #if YYDEBUG
     if (yydebug)
     {
@@ -351,7 +445,7 @@ yyloop:
       fprintf(stderr, "btyacc[%3u,%2d%s]: read token %d (%s)",
               yystate, yydepth, (yytrial ? ",trial" : ""), yychar, yys);
 #ifdef YYDBPR
-      fputc('<', stderr);
+      fputs(" <", stderr);
       YYDBPR(yylval);
       fputc('>', stderr);
 #endif
@@ -373,8 +467,8 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        fprintf(stderr, "btyacc[%3u,%2d%s]: CONFLICT: following successful "
-                "trial parse\n", yystate, yydepth, (yytrial ? ",trial" :""));
+        fprintf(stderr, "btyacc[%3u,%2d%s]: CONFLICT: following successful trial parse\n", 
+				yystate, yydepth, (yytrial ? ",trial" :""));
       }
 #endif
       /* Switch to the next conflict context */
@@ -394,20 +488,20 @@ yyloop:
       {
         fprintf(stderr, "btyacc[%3u,%2d%s]: CONFLICT. ",
                 yystate, yydepth, (yytrial ? ",trial" : ""));
-        if(yyps->save)
+        if (yytrial)
           fputs("ALREADY in conflict, continuing trial parse.\n", stderr);
         else
           fputs("starting trial parse.\n", stderr);
       }
 #endif
-      save = yyNewState(yyps->ssp - yyps->ss);
-      save->save    = yyps->save;
+      save = yyNewState(yyps->ssp - yyps->ss + 1, YYTRIALSTACKGROWTH);
+      save->save    = yytrial;
       save->state   = yystate;
       save->errflag = yyps->errflag;
       save->ssp     = save->ss + (yyps->ssp - yyps->ss);
       save->vsp     = save->vs + (yyps->vsp - yyps->vs);
       save->psp     = save->ps + (yyps->psp - yyps->ps);
-      memcpy(save->ss, yyps->ss, (yyps->ssp - yyps->ss + 1)*sizeof(Yshort));
+      memcpy(save->ss, yyps->ss, (yyps->ssp - yyps->ss + 1) * sizeof(save->ss[0]));
       yySCopy(save->vs, yyps->vs, (yyps->ssp - yyps->ss + 1));
       yyPCopy(save->ps, yyps->ps, (yyps->ssp - yyps->ss + 1));
       ctry = yytable[yyn];
@@ -423,23 +517,23 @@ yyloop:
         ++ctry;
       }
       save->ctry = ctry;
-      if (yyps->save == 0)
+      if (yytrial == 0)
       {
         /* If this is a first conflict in the stack, start saving lexemes */
         if (!yylexemes)
         {
 #ifdef __cplusplus
-          yylexemes = new Yshort[YYSTACKGROWTH];
-          yylvals = new YYSTYPE[YYSTACKGROWTH];
-          yylvlim = yylvals + YYSTACKGROWTH;
-          yylpsns = new YYPOSN[YYSTACKGROWTH];
-          yylplim = yylpsns + YYSTACKGROWTH;
+          yylexemes = new Yshort[YYLEXDEFSTACKSIZE];
+          yylvals = new YYSTYPE[YYLEXDEFSTACKSIZE];
+          yylvlim = yylvals + YYLEXDEFSTACKSIZE;
+          yylpsns = new YYPOSN[YYLEXDEFSTACKSIZE];
+          yylplim = yylpsns + YYLEXDEFSTACKSIZE;
 #else
-          yylexemes = (Yshort*)malloc((YYSTACKGROWTH) * sizeof(Yshort));
-          yylvals = (YYSTYPE*)malloc((YYSTACKGROWTH) * sizeof(YYSTYPE));
-          yylvlim = yylvals + YYSTACKGROWTH;
-          yylpsns = (YYPOSN*)malloc((YYSTACKGROWTH) * sizeof(YYPOSN));
-          yylplim = yylpsns + YYSTACKGROWTH;
+          yylexemes = (Yshort*)malloc(YYLEXDEFSTACKSIZE * sizeof(yylexemes[0]));
+          yylvals = (YYSTYPE*)malloc(YYLEXDEFSTACKSIZE * sizeof(yylvals[0]));
+          yylvlim = yylvals + YYLEXDEFSTACKSIZE;
+          yylpsns = (YYPOSN*)malloc(YYLEXDEFSTACKSIZE * sizeof(yylpsns[0]));
+          yylplim = yylpsns + YYLEXDEFSTACKSIZE;
 #endif
         }
         if (yylvp == yylve)
@@ -459,12 +553,12 @@ yyloop:
       if (yychar >= 0)
       {
         --yylvp; 
-	--yylpp; 
-	--yylexp;
+		--yylpp; 
+		--yylexp;
         yychar = YYEMPTY;
       }
       save->lexeme = yylvp - yylvals;
-      yyps->save = save;
+      yyps->save /* yytrial */ = save;
     }
 
     if (yytable[yyn] == ctry)
@@ -479,8 +573,8 @@ yyloop:
       if (yychar < 0)
       {
         ++yylvp; 
-	++yylpp; 
-	++yylexp;
+		++yylpp; 
+		++yylexp;
       }
       yychar = YYEMPTY;
       if (yyps->errflag > 0)
@@ -543,36 +637,35 @@ yyerrlab:
   yynewerrflag = 0;
 
 yyerrhandler:
-  while (yyps->save)
+  while (yytrial)
   {
     int ctry;
-    YYParseState *save = yyps->save;
+    YYParseState *save = yytrial;
 #if YYDEBUG
     if (yydebug)
 	{
-      fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR, "
-              "CONFLICT BACKTRACKING to state %d, %d tokens\n",
+      fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR, CONFLICT BACKTRACKING to state %d, %d tokens\n",
               yystate, yydepth, (yytrial ? ",trial" : ""),
-              yyps->save->state, yylvp - yylvals - yyps->save->lexeme);
+              yytrial->state, yylvp - yylvals - yytrial->lexeme);
 	}
 #endif
     /* Memorize most forward-looking error state in case
        it's really an error. */
-    if (yyerrctx == 0 || yyerrctx->lexeme < yylvp-yylvals)
+    if (yyerrctx == 0 || yyerrctx->lexeme < yylvp - yylvals)
     {
       /* Free old saved error context state */
       if(yyerrctx)
         yyFreeState(&yyerrctx);
       /* Create and fill out new saved error context state */
-      yyerrctx = yyNewState(yyps->ssp - yyps->ss);
-      yyerrctx->save = yyps->save;
+      yyerrctx = yyNewState(yyps->ssp - yyps->ss + 1, YYTRIALSTACKGROWTH);
+      yyerrctx->save = yytrial;
       yyerrctx->state = yystate;
       yyerrctx->errflag = yyps->errflag;
       yyerrctx->ssp = yyerrctx->ss + (yyps->ssp - yyps->ss);
       yyerrctx->vsp = yyerrctx->vs + (yyps->vsp - yyps->vs);
       yyerrctx->psp = yyerrctx->ps + (yyps->psp - yyps->ps);
       memcpy (yyerrctx->ss, yyps->ss,
-             (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));
+             (yyps->ssp - yyps->ss + 1) * sizeof(yyps->ss[0]));
       yySCopy(yyerrctx->vs, yyps->vs, (yyps->ssp - yyps->ss + 1));
       yyPCopy(yyerrctx->ps, yyps->ps, (yyps->ssp - yyps->ss + 1));
       yyerrctx->lexeme = yylvp - yylvals;
@@ -584,7 +677,7 @@ yyerrhandler:
     yyps->ssp = yyps->ss + (save->ssp - save->ss);
     yyps->vsp = yyps->vs + (save->vsp - save->vs);
     yyps->psp = yyps->ps + (save->psp - save->ps);
-    memcpy (yyps->ss, save->ss, (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));
+    memcpy (yyps->ss, save->ss, (yyps->ssp - yyps->ss + 1) * sizeof(yyps->ss[0]));
     yySCopy(yyps->vs, save->vs,  yyps->vsp - yyps->vs + 1);
     yyPCopy(yyps->ps, save->ps,  yyps->psp - yyps->ps + 1);
     ctry = ++save->ctry;
@@ -595,17 +688,17 @@ yyerrhandler:
     {
       goto yyreduce;
     }
-    yyps->save = save->save;
+    yyps->save /* yytrial */ = save->save;
     yyFreeState(&save);
 
     /* Nothing left on the stack -- error */
-    if (!yyps->save)
+    if (!yytrial)
     {
 #if YYDEBUG
       if (yydebug)
       {
-        fprintf(stder, "btyacc[%s]: trial parse FAILED, entering ERROR mode\n",
-              (yytrial ? "trial" : ""));
+        fprintf(stderr, "btyacc[%3u,%2d%s]:%s parse FAILED, entering ERROR mode\n",
+              yystate, yydepth, (yytrial ? ",trial" : ""), (yytrial ? " trial" : ""));
       }
 #endif
       /* Restore state as it was in the most forward-advanced error */
@@ -619,7 +712,7 @@ yyerrhandler:
       yyps->vsp = yyps->vs + (yyerrctx->vsp - yyerrctx->vs);
       yyps->psp = yyps->ps + (yyerrctx->psp - yyerrctx->ps);
       memcpy (yyps->ss, yyerrctx->ss,
-              (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));
+              (yyps->ssp - yyps->ss + 1) * sizeof(yyps->ss[0]));
       yySCopy(yyps->vs, yyerrctx->vs,  yyps->vsp - yyps->vs + 1);
       yyPCopy(yyps->ps, yyerrctx->ps,  yyps->psp - yyps->ps + 1);
       yystate = yyerrctx->state;
@@ -679,8 +772,8 @@ yyinrecovery:
         }
         if (!yytrial)
         {
-          YYDELETEVAL(yyps->vsp[0],1);
-          YYDELETEPOSN(yyps->psp[0],1);
+          YYDELETEVAL(yyps->vsp[0], 1);
+          YYDELETEPOSN(yyps->psp[0], 1);
         }
         --(yyps->ssp);
         --(yyps->vsp);
@@ -700,8 +793,7 @@ yyinrecovery:
         yys = yyname[yychar];
       if (!yys)
         yys = "illegal-symbol";
-      fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR recovery discards token "
-              "%d (%s)\n",
+      fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR recovery discards token %d (%s)\n",
               yystate, yydepth, (yytrial ? ",trial" : ""), yychar, yys);
     }
 #endif
@@ -723,15 +815,15 @@ yyreduce:
     fprintf(stderr, "btyacc[%3u,%2d%s]: reducing by rule %d (%s)",
             yystate, yydepth, (yytrial ? ",trial" : ""), yyn, yyrule[yyn]);
 #ifdef YYDBPR
-    if (yym)
+    if (yym > 0)
     {
       int i;
-      fputc('<', stderr);
+      fputs(" <", stderr);
       for (i = yym; i > 0; --i)
       {
         if (i != yym)
-          printf(", ");
-        YYDBPR((yyps->vsp)[1-i]);
+          fprintf(stderr, ", ");
+        YYDBPR(yyps->vsp[1 - i]);
       }
       fputc('>', stderr);
     }
@@ -746,19 +838,35 @@ yyreduce:
 
 #ifdef _YACC_DEFAULT_ACTION_
   /* "$$ = NULL" default action */
+#ifdef __cplusplus
+  // C++: YYSTYPE can be an arbitrary class, so we need to explicitly zero it:
+  YYSTYPE_ZERO(yyps->val);
+#else
   memset(&yyps->val, 0, sizeof(yyps->val));
+#endif
 #else
   /* RA: bison compatibility: default action is '$$ = $1;' */
   if (yym > 0)
-    yyps->val = (yyps->vsp)[1 - yym];
+  {
+    yyps->val = yyps->vsp[1 - yym];
+  }
 #endif
 
-  /* Default reduced position is NULL -- no position at all. No
-     position will be assigned at trial time and if no position
-     handling is present */
+  /*
+   * Default reduced position is NULL -- no position at all. No
+   * position will be assigned at trial time and if no position
+   * handling is present 
+   */
+#ifdef __cplusplus
+  /* C++: YYPOSN can be an arbitrary class, so we need to explicitly zero it: */
+  YYPOSN_ZERO(yyps->pos);
+#else
   memset(&yyps->pos, 0, sizeof(yyps->pos));
+#endif
 
+#ifdef YYREDUCEPOSNFUNC
   reduce_posn = 1;
+#endif
 
   switch (yyn)
   {
@@ -769,7 +877,8 @@ yyreduce:
     break;
   }
 
-#if YYDEBUG && defined(YYDBPR)
+#if YYDEBUG
+#if defined(YYDBPR)
   if (yydebug)
   {
     fprintf(stderr, "btyacc[%3u,%2d%s]: after reduction, result is ",
@@ -778,10 +887,11 @@ yyreduce:
     fputc('\n', stderr);
   }
 #endif
+#endif
 
   /* Perform user-defined position reduction */
 #ifdef YYREDUCEPOSNFUNC
-  if(!yytrial)
+  if (!yytrial)
   {
     YYCALLREDUCEPOSN(YYREDUCEPOSNFUNCARG);
   }
@@ -798,8 +908,7 @@ yyreduce:
 #if YYDEBUG
     if (yydebug)
     {
-      fprintf(stderr,
-              "btyacc[  0,%2d%s]: reduced, shifting to final state %d\n",
+      fprintf(stderr, "btyacc[  0,%2d%s]: reduced, shifting to final state %d\n",
               yydepth, (yytrial ? ",trial" : ""), YYFINAL);
     }
 #endif
@@ -861,17 +970,19 @@ yyreduce:
   goto yyloop;
 
 
-  /* Reduction declares that this path is valid.
-     Set yypath and do a full parse */
+  /*
+   * Reduction declares that this path is valid.
+   * Set yypath and do a full parse.
+   */
 yyvalid:
   if (yypath)
   {
     goto yyabort;
   }
-  while (yyps->save)
+  while (yytrial)
   {
-    YYParseState *save = yyps->save;
-    yyps->save = save->save;
+    YYParseState *save = yytrial;
+    yyps->save /* yytrial */ = save->save;
     save->save = yypath;
     yypath = save;
   }
@@ -892,7 +1003,7 @@ yyvalid:
   yyps->ssp = yyps->ss + (yypath->ssp - yypath->ss);
   yyps->vsp = yyps->vs + (yypath->vsp - yypath->vs);
   yyps->psp = yyps->ps + (yypath->psp - yypath->ps);
-  memcpy (yyps->ss, yypath->ss, (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));
+  memcpy (yyps->ss, yypath->ss, (yyps->ssp - yyps->ss + 1) * sizeof(yyps->ss[0]));
   yySCopy(yyps->vs, yypath->vs,  yyps->vsp - yyps->vs + 1);
   yyPCopy(yyps->ps, yypath->ps,  yyps->psp - yyps->ps + 1);
   yylvp = yylvals + yypath->lexeme;
@@ -914,12 +1025,12 @@ yyabort:
 
     for(pv = yyps->vs; pv < yyps->vsp; ++pv)
     {
-      YYDELETEVAL(*pv,2);
+      YYDELETEVAL(*pv, 2);
     }
 
     for(pp = yyps->ps; pp < yyps->psp; ++pp)
     {
-      YYDELETEPOSN(*pp,2);
+      YYDELETEPOSN(*pp, 2);
     }
 
     while (yyps)
@@ -938,7 +1049,7 @@ yyabort:
   }
 
 yyaccept:
-  if (yyps->save)
+  if (yytrial)
     goto yyvalid;
   if(yyerrctx)
   {
@@ -970,7 +1081,7 @@ static int yyLex1(void)
     yyposn = *yylpp++;
     return *yylexp++;
   }
-  else if (yyps->save)
+  else if (yytrial)
   {
     /* in trial mode; save scanner results for future parse attempts */
     if (yylvp == yylvlim)
@@ -1004,13 +1115,13 @@ static int yyExpand(void)
     yylpsns = new YYPOSN[s];
     yylexemes = new Yshort[s];
 #else
-    yylvals = (YYSTYPE*)malloc(s * sizeof(YYSTYPE));
-    yylpsns = (YYPOSN*)malloc(s * sizeof(YYPOSN));
-    yylexemes = (Yshort*)malloc(s * sizeof(Yshort));
+    yylvals = (YYSTYPE*)malloc(s * sizeof(yylvals[0]));
+    yylpsns = (YYPOSN*)malloc(s * sizeof(yylpsns[0]));
+    yylexemes = (Yshort*)malloc(s * sizeof(yylexemes[0]));
 #endif
-    memcpy(yylexemes, tl, (s-YYSTACKGROWTH)*sizeof(Yshort));
-    yySCopy(yylvals, tv, s-YYSTACKGROWTH);
-    yyPCopy(yylpsns, tp, s-YYSTACKGROWTH);
+    memcpy(yylexemes, tl, (s - YYSTACKGROWTH) * sizeof(yylexemes[0]));
+    yySCopy(yylvals, tv, s - YYSTACKGROWTH);
+    yyPCopy(yylpsns, tp, s - YYSTACKGROWTH);
 #ifdef __cplusplus
     delete[] tl;
     delete[] tv;
@@ -1029,10 +1140,12 @@ static int yyExpand(void)
   return 0;
 }
 
+#ifdef __cplusplus
+
 static void yySCopy(YYSTYPE *to, YYSTYPE *from, int size)
 {
   int i;
-  for (i = size-1; i >= 0; --i)
+  for (i = size - 1; i >= 0; --i)
   {
     to[i] = from[i];
   }
@@ -1041,11 +1154,13 @@ static void yySCopy(YYSTYPE *to, YYSTYPE *from, int size)
 static void yyPCopy(YYPOSN *to, YYPOSN *from, int size)
 {
   int i;
-  for (i = size-1; i >= 0; --i)
+  for (i = size - 1; i >= 0; --i)
   {
     to[i] = from[i];
   }
 }
+
+#endif
 
 static void yyMoreStack(YYParseState *yyps)
 {
@@ -1058,11 +1173,11 @@ static void yyMoreStack(YYParseState *yyps)
   yyps->vs = new YYSTYPE[yyps->stacksize + YYSTACKGROWTH];
   yyps->ps = new YYPOSN [yyps->stacksize + YYSTACKGROWTH];
 #else
-  yyps->ss = (Yshort*)malloc(sizeof(Yshort)*(yyps->stacksize + YYSTACKGROWTH));
-  yyps->vs = (YYSTYPE*)malloc(sizeof(YYSTYPE)*(yyps->stacksize + YYSTACKGROWTH));
-  yyps->ps = (YYPOSN*)malloc(sizeof(YYPOSN)*(yyps->stacksize + YYSTACKGROWTH));
+  yyps->ss = (Yshort*)malloc(sizeof(yyps->ss[0]) * (yyps->stacksize + YYSTACKGROWTH));
+  yyps->vs = (YYSTYPE*)malloc(sizeof(yyps->vs[0]) * (yyps->stacksize + YYSTACKGROWTH));
+  yyps->ps = (YYPOSN*)malloc(sizeof(yyps->ps[0]) * (yyps->stacksize + YYSTACKGROWTH));
 #endif
-  memcpy(yyps->ss, tss, yyps->stacksize * sizeof(Yshort));
+  memcpy(yyps->ss, tss, yyps->stacksize * sizeof(yyps->ss[0]));
   yySCopy(yyps->vs, tvs, yyps->stacksize);
   yyPCopy(yyps->ps, tps, yyps->stacksize);
   yyps->stacksize += YYSTACKGROWTH;
@@ -1090,24 +1205,42 @@ static void yyMoreStack(YYParseState *yyps)
 }
 
 
-static YYParseState *yyNewState(int size)
+static YYParseState *yyNewState(int old_size, int growth)
 {
   YYParseState *p;
+  int size = old_size + growth;
 
 #ifdef __cplusplus
   p = new YYParseState;
-  p->ss = new Yshort [size + 4];
-  p->vs = new YYSTYPE[size + 4];
-  p->ps = new YYPOSN [size + 4];
+  p->ss = new Yshort [size];
+  p->vs = new YYSTYPE[size];
+  p->ps = new YYPOSN [size];
+
+  /*
+   * C++: YYSTYPE and YYPOSN can be arbitrary classes, so we need to 
+   *      explicitly zero them
+   *
+   * However, keep in mind that the caller of this function will fill the items 
+   * up to index [old_size] (not including that one)!
+   */
+  for (int i = old_size; i < size; i++)
+  {
+	  YYSTYPE_ZERO(p->vs[i]);
+	  YYPOSN_ZERO(p->ps[i]);
+  }
 #else
-  p = (YYParseState*)malloc(sizeof(YYParseState));
-  p->ss = (Yshort*) malloc((size + 4) * sizeof(Yshort));
-  p->vs = (YYSTYPE*)malloc((size + 4) * sizeof(YYSTYPE));
-  p->ps = (YYPOSN*) malloc((size + 4) * sizeof(YYPOSN));
+  p = (YYParseState*)malloc(sizeof(p[0]));
+  p->ss = (Yshort*) malloc(size * sizeof(p->ss[0]));
+  p->vs = (YYSTYPE*)malloc(size * sizeof(p->vs[0]));
+  p->ps = (YYPOSN*) malloc(size * sizeof(p->ps[0]));
+  /*
+   * Keep in mind that the caller of this function will fill the items 
+   * up to index [old_size] (not including that one)!
+   */
+  memset(&p->vs[old_size], 0, (size - old_size) * sizeof(p->vs[0]));
+  memset(&p->ps[old_size], 0, (size - old_size) * sizeof(p->ps[0]));
 #endif
-  p->stacksize = size+4;
-  memset(&p->vs[0], 0, (size+4)*sizeof(YYSTYPE));
-  memset(&p->ps[0], 0, (size+4)*sizeof(YYPOSN));
+  p->stacksize = size;
   return p;
 }
 
@@ -1130,23 +1263,97 @@ static void yyFreeState(YYParseState **v)
   *v = 0;
 }
 
+/*
+ * ----------------------------------------------------------------------
+ * Several functions which can be overridden by the user when she has set 
+ * up the proper #define's.
+ * 
+ * Note:
+ * 
+ * We assume that the compiler is smart enough to discard these local 
+ * functions when their references through the #define's have been 
+ * overridden.
+ * ----------------------------------------------------------------------
+ */
+
+static void btyacc_set_yydebug_from_env(void)
+{
+  const char *yys = getenv("YYDEBUG");
+  char yyn;
+
+  if (yys)
+  {
+    yyn = *yys;
+    if (yyn >= '0' && yyn <= '9')
+      yydebug = yyn - '0';
+  }
+}
+
+static void btyacc_debug_log_start(const char *msg)
+{
+	fprintf(stderr, "%s", msg);
+}
+
+static void btyacc_debug_log_partial(const char *msg, ...)
+{
+	
+}
+
+static void btyacc_debug_log_partial(const char *msg, ...);
+
 %% line_position
 #line %d "%s"
 
+%% comment_start
+/*
+%% comment_end
+*/
+%% action_case_start
+  case %d:
+
+%% action_code
+    %s;
+	
+
+%% action_case_end
+	break;
+	
+
+%% action_if_!yytrial_start
+if (!yytrial)
+	
+%% action_block_start
+{
+%% action_block_end
+}
+%% yyval.tag_reference
+yyval.%s
+%% yyval_reference
+yyval
+%% yyvsp.tag_reference
+yyvsp[%d].%s
+%% yyvsp_reference
+yyvsp[%d]
 %% rflag_prefix
 static
 %% !rflag_prefix
 
 %% int_table_start
-%sYshort %s[%d] = {%41d,
+%sYshort %29s[%5d] = {%5d%s
 %% int_table_entry
-%5d,
+%5d%s
+%% int_table_entry_separator
+,
 %% int_table_end
 
 };
 
 %% table_size
+
+
 #define YYTABLESIZE %d
+
+
 
 %% defines_file_protection_start
 
@@ -1171,45 +1378,73 @@ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$
 extern YYSTYPE yylval;
 
 %% define_default_yystype
+
 #ifndef YYSTYPE
 typedef int YYSTYPE;
+
+#ifdef __cplusplus
+#define YYSTYPE_ZERO(yylval)		yylval = 0
 #endif
+
+/* 
+ * Since we know the yylval type, we can also provide a default yydebug log function now:
+ */
+#ifndef YYDBPR
+#define YYDBPR(yystype)    BTYACC_DEBUG_LOG_PARTIAL("%d", (yystype))
+#endif
+#endif /* YYSTYPE */
+
 
 %% union_decl_start
 
 typedef union
 %% union_decl_end
- YYSTYPE;
-
+ yystype_t;
+#define YYSTYPE yystype_t
  
+
 %% define_yymaxtoken
+
 #define YYMAXTOKEN %5d
 
+
 %% define_yyfinal
+
 #define YYFINAL %5d
 
+
 %% define_yydebug
+
 #ifndef YYDEBUG
 #define YYDEBUG %d
 #endif
 
+
+%% debug_yy_null
+0
 %% debug_yyname_strings_start
+
 #if YYDEBUG
-%schar *yyname[] = {
+%schar const *yyname[] = {
 
+%% debug_yyname_strings_separator
+,
 %% debug_yyname_strings_end
-
 };
 #endif
+
 
 %% debug_yyrule_strings_start
+
 #if YYDEBUG
-%schar *yyrule[] = {
+%schar const *yyrule[] = {
 
+%% debug_yyrule_strings_separator
+,
 %% debug_yyrule_strings_end
-
 };
 #endif
+
 
 %% DEFINES_FILENAME
 %s%s.tab.h

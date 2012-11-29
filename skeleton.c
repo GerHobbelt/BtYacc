@@ -1,5 +1,5 @@
 /*
-** This file generated automatically from btyaccpa.ske
+** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\btyaccpa.ske
 */
 
 #include "defs.h"
@@ -49,7 +49,7 @@ static char const * const banner[] =
     "",
     "#if HAS_MSVC_2005_ISO_RTL",
     "#pragma warning(disable : 4996)",
-    "// Or just turn off warnings about the newly deprecated CRT functions.",
+    "/* Or just turn off warnings about the newly deprecated CRT functions. */",
     "#ifndef _CRT_SECURE_NO_DEPRECATE",
     "#define _CRT_SECURE_NO_DEPRECATE",
     "#endif",
@@ -66,6 +66,7 @@ static char const * const banner[] =
     "",
     "#include <stdio.h>",
     "#include <stdlib.h>",
+    "#include <stdarg.h>",
     "#include <string.h>",
     "",
     "/* [i_a] MSVC doesn't define TRUE in the expected places; do it here to make sure we got it 'right' */",
@@ -84,7 +85,7 @@ static char const * const banner[] =
 
 static char const * const tables[] =
 {
-    "#line 69 \"btyaccpa.ske\"",
+    "#line 70 \"btyaccpa.ske\"",
     "",
     "#ifdef __cplusplus",
     "#ifndef _YACC_EXTERN_",
@@ -118,9 +119,9 @@ static char const * const tables[] =
     "",
     "#if YYDEBUG",
     "/* idx: token code; entry: spelling of token */",
-    "extern _YACC_EXTERN_ char *yyname[];",
+    "extern _YACC_EXTERN_ char const *yyname[];",
     "",
-    "extern _YACC_EXTERN_ char *yyrule[];",
+    "extern _YACC_EXTERN_ char const *yyrule[];",
     "#endif",
     "",
     0
@@ -128,7 +129,7 @@ static char const * const tables[] =
 
 static char const * const header[] =
 {
-    "#line 108 \"btyaccpa.ske\"",
+    "#line 109 \"btyaccpa.ske\"",
     "",
     "#ifndef YYERRCODE",
     "#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.",
@@ -137,23 +138,47 @@ static char const * const header[] =
     "/* YYPOSN is user-defined text position type. */",
     "#ifndef YYPOSN",
     "#define YYPOSN int",
-    "#endif",
     "",
+    "#ifdef __cplusplus",
+    "#define YYPOSN_ZERO(yyposn)\t\tyyposn = 0",
+    "#endif",
+    "#endif /* YYPOSN */",
+    "",
+    "/* ",
+    " * YYREDUCEPOSNFUNC is a overridable function with the following prototype: ",
+    " * ",
+    " *   void YYREDUCEPOSNFUNC(YYPOSN action_yyposn, YYPOSN *yyposn_stack, YYSTYPE *yylval_stack, int rule_stack_size, int stack_size, int lexed_token, YYPOSN current_yyposn, ... ** yyval ~ $$ by default ** );",
+    " * ",
+    " * where yylval_stack[0] and yyposn_stack[0] point at the yylval/yyposn values ",
+    " * for $1 of the reduction rule, while yylval_stack[rule_stack_size - 1] and ",
+    " * yyposn_stack[rule_stack_size - 1] would point at the yylval/yyposn for $$",
+    " * of the same rule.",
+    " * ",
+    " * The 'stack_size' indicates the depth of the yylval/yyposn stacks, where the ",
+    " * entire stack would then span the range [rule_stack_size - 1 - stack_size] ",
+    " * to [rule_stack_size - 1].",
+    " * ",
+    " * ",
+    " * YYREDUCEPOSNFUNC() would be able to accept an arbitrary number of parameters, ",
+    " * depending on your YYREDUCEPOSNFUNCARG define override. The default ",
+    " * YYREDUCEPOSNFUNCARG define equals the YYSTYPE value for the last reduction, ",
+    " * i.e. the $$ value for that rule.",
+    " */",
     "#ifdef YYREDUCEPOSNFUNC",
-    "#define YYCALLREDUCEPOSN(e)                                                 \\",
-    "    if(reduce_posn)                                                         \\",
-    "    {                                                                       \\",
-    "      YYREDUCEPOSNFUNC(yyps->pos, &(yyps->psp)[1-yym], &(yyps->vsp)[1-yym], \\",
-    "               yym, yyps->psp - yyps->ps, yychar, yyposn, e);               \\",
-    "      reduce_posn = 0;                                                      \\",
+    "#define YYCALLREDUCEPOSN(e)                                                     \\",
+    "    if (reduce_posn)                                                            \\",
+    "    {                                                                           \\",
+    "      YYREDUCEPOSNFUNC(yyps->pos, &(yyps->psp)[1 - yym], &(yyps->vsp)[1 - yym], \\",
+    "               yym, yyps->psp - yyps->ps, yychar, yyposn, e);                   \\",
+    "      reduce_posn = 0;                                                          \\",
     "    }",
     "",
-    "#ifndef YYCALLREDUCEPOSNARG",
-    "#define YYCALLREDUCEPOSNARG (yyps->val)",
+    "#ifndef YYREDUCEPOSNFUNCARG",
+    "#define YYREDUCEPOSNFUNCARG (yyps->val)",
     "#endif",
     "",
     "",
-    "#define YYPOSNARG(n) ((yyps->psp)[1-yym+(n)-1])",
+    "#define YYPOSNARG(n) (yyps->psp[1 - yym + (n) - 1])",
     "#define YYPOSNOUT    (yyps->pos)",
     "#endif",
     "",
@@ -167,10 +192,10 @@ static char const * const header[] =
     "#define YYDELETEPOSN(v, t)",
     "#endif",
     "",
-    "#define YYEMPTY (-1)",
-    "#define yyclearin (yychar=YYEMPTY)",
+    "#define YYEMPTY      (-1)",
+    "#define yyclearin    (yychar = YYEMPTY)",
     "",
-    "#define yyerrok (yyps->errflag=0)",
+    "#define yyerrok      (yyps->errflag = 0)",
     "",
     "#ifndef YYSTACKGROWTH",
     "#define YYSTACKGROWTH 32",
@@ -179,6 +204,15 @@ static char const * const header[] =
     "#ifndef YYDEFSTACKSIZE",
     "#define YYDEFSTACKSIZE 12",
     "#endif",
+    "",
+    "#ifndef YYLEXDEFSTACKSIZE",
+    "#define YYLEXDEFSTACKSIZE (32 > YYSTACKGROWTH ? 32 : YYSTACKGROWTH)",
+    "#endif",
+    "",
+    "#ifndef YYTRIALSTACKGROWTH",
+    "#define YYTRIALSTACKGROWTH (4 > YYSTACKGROWTH ? 4 : YYSTACKGROWTH)",
+    "#endif",
+    "",
     "",
     "#ifdef YYDEBUG",
     "int yydebug = 0;",
@@ -199,13 +233,13 @@ static char const * const header[] =
     "#define YYERROR  goto yyerrlab",
     "#define YYVALID                                      \\",
     "            do {                                     \\",
-    "                if (yyps->save)                      \\",
+    "                if (yytrial)                         \\",
     "                    goto yyvalid;                    \\",
     "            } while(0)",
     "#define YYVALID_NESTED                               \\",
     "            do {                                     \\",
-    "                if (yyps->save                       \\",
-    "                    && yyps->save->save == 0)        \\",
+    "                if (yytrial                          \\",
+    "                    && yytrial->save == 0)           \\",
     "                    goto yyvalid;                    \\",
     "            } while(0)",
     "",
@@ -275,11 +309,17 @@ static char const * const header[] =
     "",
     "static int yyLex1(void);",
     "static int yyExpand(void);",
+    "static void yyMoreStack(YYParseState *yyps);",
+    "static YYParseState *yyNewState(int old_size, int growth);",
+    "static void yyFreeState(YYParseState **p);",
+    "",
+    "#ifdef __cplusplus",
     "static void yySCopy(YYSTYPE *to, YYSTYPE *from, int size);",
     "static void yyPCopy(YYPOSN  *to, YYPOSN  *from, int size);",
-    "static void yyMoreStack(YYParseState *yyps);",
-    "static YYParseState *yyNewState(int size);",
-    "static void yyFreeState(YYParseState **p);",
+    "#else",
+    "#define yySCopy(to, from, size)\t\t\tmemcpy(to, from, (size) * sizeof((to)[0]))",
+    "#define yyPCopy(to, from, size)\t\t\tmemcpy(to, from, (size) * sizeof((to)[0]))",
+    "#endif",
     "",
     "",
     0
@@ -287,69 +327,122 @@ static char const * const header[] =
 
 static char const * const body[] =
 {
-    "#line 262 \"btyaccpa.ske\"",
+    "#line 302 \"btyaccpa.ske\"",
+    "",
+    "#ifndef YYERRCODE",
+    "#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.",
+    "#endif",
+    "",
+    "/*",
+    " * Define's which could have been overridden by the user: ",
+    " *   ",
+    " * ",
+    " * yydebug LOGGING OUTPUT (default to stderr)",
+    " * ",
+    " * A yyparse() yydebug session starts with a single call to",
+    " *   BTYACC_SET_YYDEBUG_FROM_ENV",
+    " * followed by a single call to",
+    " *   BTYACC_DEBUG_LOG_START",
+    " * when yydebug has been turned ON in the BTYACC_SET_YYDEBUG_FROM_ENV call.",
+    " * ",
+    " * When yydebug has been turned ON, the yyparse() run will then go and write ",
+    " * one or more 'log lines' a.k.a. log report events:",
+    " * ",
+    " * Any log line consists of zero or more calls to ",
+    " *   BTYACC_DEBUG_LOG_PARTIAL",
+    " * followed by one call to",
+    " *   BTYACC_DEBUG_LOG_EOL",
+    " * which is like BTYACC_DEBUG_LOG_PARTIAL but includes the line terminator (LF) ",
+    " * and concludes this yydebug log report event.",
+    " * ",
+    " * ",
+    " * DEVELOPER NOTE",
+    " * --------------",
+    " * ",
+    " * When you provide your own custom implementation of these functions, this ",
+    " * combination of functions may help you to cache the logged parts up to the ",
+    " * invocation of BTYACC_DEBUG_LOG_EOL at which time you may send the entire ",
+    " * concatenated log message to the destination, e.g. a syslog server (which ",
+    " * would want to receive the entire line in a single string/message).",
+    " */",
+    "",
+    "#ifndef BTYACC_SET_YYDEBUG_FROM_ENV",
+    "#define BTYACC_SET_YYDEBUG_FROM_ENV()\tbtyacc_set_yydebug_from_env()",
+    "static void btyacc_set_yydebug_from_env(void);",
+    "#endif",
+    "",
+    "#ifndef BTYACC_DEBUG_LOG_START",
+    "#define BTYACC_DEBUG_LOG_START(msg)\t\tbtyacc_debug_log_start(msg)",
+    "static void btyacc_debug_log_start(const char *msg);",
+    "#endif",
+    "",
+    "#ifndef BTYACC_DEBUG_LOG_PARTIAL",
+    "#define BTYACC_DEBUG_LOG_PARTIAL\t\tbtyacc_debug_log_partial",
+    "static void btyacc_debug_log_partial(const char *msg, ...);",
+    "#endif",
+    "",
+    "#ifndef BTYACC_DEBUG_LOG_EOL",
+    "#define BTYACC_DEBUG_LOG_EOL\t\tbtyacc_debug_log_eol",
+    "static void btyacc_debug_log_partial(const char *msg, ...);",
+    "#endif",
     "",
     "",
     "/*",
-    "   Parser function. Roughly looks like this:",
-    "",
-    "   int yyparse()",
-    "   {",
-    "   yyloop:",
-    "     if (reduce_possible) goto yyreduce;",
-    "     read_token;",
-    "     if (conflict)",
-    "     {",
-    "       handle_conflict;",
-    "       goto yyshift; or goto yyreduce;",
-    "     }",
-    "     if (shift_possible)",
-    "     {",
-    "   yyshift:",
-    "       do_shift;",
-    "       goto yyloop;",
-    "     }",
-    "     if (reduce_possible) goto yyreduce;",
-    "",
-    "     (error handling);",
-    "     goto yyloop;",
-    "",
-    "   yyreduce:",
-    "     BIG_CHUNK_OF_RULE_ACTIONS;",
-    "     goto yyloop;",
-    "",
-    "     (more error handling);",
-    "   }",
+    " *    Parser function. Roughly looks like this:",
+    " * ",
+    " *    int yyparse(void)",
+    " *    {",
+    " *    yyloop:",
+    " *      if (reduce_possible) goto yyreduce;",
+    " *      read_token;",
+    " *      if (conflict)",
+    " *      {",
+    " *        handle_conflict;",
+    " *        goto yyshift; or goto yyreduce;",
+    " *      }",
+    " *      if (shift_possible)",
+    " *      {",
+    " *    yyshift:",
+    " *        do_shift;",
+    " *        goto yyloop;",
+    " *      }",
+    " *      if (reduce_possible) goto yyreduce;",
+    " * ",
+    " *      (error handling);",
+    " *      goto yyloop;",
+    " * ",
+    " *    yyreduce:",
+    " *      BIG_CHUNK_OF_RULE_ACTIONS;",
+    " *      goto yyloop;",
+    " * ",
+    " *      (more error handling);",
+    " *    }",
     " */",
     "int yyparse(void)",
     "{",
     "  int yym, yyn, yychar, yynewerrflag;",
     "  int unsigned yystate;",
     "  YYParseState *yyerrctx = 0;",
+    "",
+    "#ifdef YYREDUCEPOSNFUNC",
     "  int reduce_posn;",
+    "#endif",
     "",
     "#if YYDEBUG",
-    "  char *yys;",
+    "  char const *yys;",
     "",
-    "  yys = getenv(\"YYDEBUG\");",
-    "  if (yys)",
-    "  {",
-    "    yyn = *yys;",
-    "    if (yyn >= '0' && yyn <= '9')",
-    "      yydebug = yyn - '0';",
-    "  }",
+    "  BTYACC_SET_YYDEBUG_FROM_ENV();",
     "  if (yydebug)",
     "  {",
-    "    fputs(\"btyacc[<current state>,<nr of symbols on state stack>]\\n\",",
-    "          stderr);",
+    "\tBTYACC_DEBUG_LOG_START(\"btyacc[<current state>,<nr of symbols on state stack>]\\n\");",
     "  }",
     "#endif",
     "",
-    "  yyps = yyNewState(YYDEFSTACKSIZE);",
-    "  yyps->save = 0;",
+    "  yyps = yyNewState(0, YYDEFSTACKSIZE);",
+    "  yyps->save /* yytrial */ = 0;",
     "  yynerrs = 0;",
     "  yyps->errflag = 0;",
-    "  yychar = (YYEMPTY);",
+    "  yychar = YYEMPTY;",
     "",
     "  yyps->ssp = yyps->ss;",
     "  yyps->vsp = yyps->vs;",
@@ -368,7 +461,8 @@ static char const * const body[] =
     "  if (yychar < 0)",
     "  {",
     "    yychar = yyLex1();",
-    "    if (yychar < 0) yychar = 0;",
+    "    if (yychar < 0) ",
+    "\t\tyychar = 0;",
     "#if YYDEBUG",
     "    if (yydebug)",
     "    {",
@@ -380,7 +474,7 @@ static char const * const body[] =
     "      fprintf(stderr, \"btyacc[%3u,%2d%s]: read token %d (%s)\",",
     "              yystate, yydepth, (yytrial ? \",trial\" : \"\"), yychar, yys);",
     "#ifdef YYDBPR",
-    "      fputc('<', stderr);",
+    "      fputs(\" <\", stderr);",
     "      YYDBPR(yylval);",
     "      fputc('>', stderr);",
     "#endif",
@@ -402,8 +496,8 @@ static char const * const body[] =
     "#if YYDEBUG",
     "      if (yydebug)",
     "      {",
-    "        fprintf(stderr, \"btyacc[%3u,%2d%s]: CONFLICT: following successful \"",
-    "                \"trial parse\\n\", yystate, yydepth, (yytrial ? \",trial\" :\"\"));",
+    "        fprintf(stderr, \"btyacc[%3u,%2d%s]: CONFLICT: following successful trial parse\\n\", ",
+    "\t\t\t\tyystate, yydepth, (yytrial ? \",trial\" :\"\"));",
     "      }",
     "#endif",
     "      /* Switch to the next conflict context */",
@@ -423,20 +517,20 @@ static char const * const body[] =
     "      {",
     "        fprintf(stderr, \"btyacc[%3u,%2d%s]: CONFLICT. \",",
     "                yystate, yydepth, (yytrial ? \",trial\" : \"\"));",
-    "        if(yyps->save)",
+    "        if (yytrial)",
     "          fputs(\"ALREADY in conflict, continuing trial parse.\\n\", stderr);",
     "        else",
     "          fputs(\"starting trial parse.\\n\", stderr);",
     "      }",
     "#endif",
-    "      save = yyNewState(yyps->ssp - yyps->ss);",
-    "      save->save    = yyps->save;",
+    "      save = yyNewState(yyps->ssp - yyps->ss + 1, YYTRIALSTACKGROWTH);",
+    "      save->save    = yytrial;",
     "      save->state   = yystate;",
     "      save->errflag = yyps->errflag;",
     "      save->ssp     = save->ss + (yyps->ssp - yyps->ss);",
     "      save->vsp     = save->vs + (yyps->vsp - yyps->vs);",
     "      save->psp     = save->ps + (yyps->psp - yyps->ps);",
-    "      memcpy(save->ss, yyps->ss, (yyps->ssp - yyps->ss + 1)*sizeof(Yshort));",
+    "      memcpy(save->ss, yyps->ss, (yyps->ssp - yyps->ss + 1) * sizeof(save->ss[0]));",
     "      yySCopy(save->vs, yyps->vs, (yyps->ssp - yyps->ss + 1));",
     "      yyPCopy(save->ps, yyps->ps, (yyps->ssp - yyps->ss + 1));",
     "      ctry = yytable[yyn];",
@@ -452,23 +546,23 @@ static char const * const body[] =
     "        ++ctry;",
     "      }",
     "      save->ctry = ctry;",
-    "      if (yyps->save == 0)",
+    "      if (yytrial == 0)",
     "      {",
     "        /* If this is a first conflict in the stack, start saving lexemes */",
     "        if (!yylexemes)",
     "        {",
     "#ifdef __cplusplus",
-    "          yylexemes = new Yshort[YYSTACKGROWTH];",
-    "          yylvals = new YYSTYPE[YYSTACKGROWTH];",
-    "          yylvlim = yylvals + YYSTACKGROWTH;",
-    "          yylpsns = new YYPOSN[YYSTACKGROWTH];",
-    "          yylplim = yylpsns + YYSTACKGROWTH;",
+    "          yylexemes = new Yshort[YYLEXDEFSTACKSIZE];",
+    "          yylvals = new YYSTYPE[YYLEXDEFSTACKSIZE];",
+    "          yylvlim = yylvals + YYLEXDEFSTACKSIZE;",
+    "          yylpsns = new YYPOSN[YYLEXDEFSTACKSIZE];",
+    "          yylplim = yylpsns + YYLEXDEFSTACKSIZE;",
     "#else",
-    "          yylexemes = (Yshort*)malloc((YYSTACKGROWTH) * sizeof(Yshort));",
-    "          yylvals = (YYSTYPE*)malloc((YYSTACKGROWTH) * sizeof(YYSTYPE));",
-    "          yylvlim = yylvals + YYSTACKGROWTH;",
-    "          yylpsns = (YYPOSN*)malloc((YYSTACKGROWTH) * sizeof(YYPOSN));",
-    "          yylplim = yylpsns + YYSTACKGROWTH;",
+    "          yylexemes = (Yshort*)malloc(YYLEXDEFSTACKSIZE * sizeof(yylexemes[0]));",
+    "          yylvals = (YYSTYPE*)malloc(YYLEXDEFSTACKSIZE * sizeof(yylvals[0]));",
+    "          yylvlim = yylvals + YYLEXDEFSTACKSIZE;",
+    "          yylpsns = (YYPOSN*)malloc(YYLEXDEFSTACKSIZE * sizeof(yylpsns[0]));",
+    "          yylplim = yylpsns + YYLEXDEFSTACKSIZE;",
     "#endif",
     "        }",
     "        if (yylvp == yylve)",
@@ -488,12 +582,12 @@ static char const * const body[] =
     "      if (yychar >= 0)",
     "      {",
     "        --yylvp; ",
-    "\t--yylpp; ",
-    "\t--yylexp;",
+    "\t\t--yylpp; ",
+    "\t\t--yylexp;",
     "        yychar = YYEMPTY;",
     "      }",
     "      save->lexeme = yylvp - yylvals;",
-    "      yyps->save = save;",
+    "      yyps->save /* yytrial */ = save;",
     "    }",
     "",
     "    if (yytable[yyn] == ctry)",
@@ -508,8 +602,8 @@ static char const * const body[] =
     "      if (yychar < 0)",
     "      {",
     "        ++yylvp; ",
-    "\t++yylpp; ",
-    "\t++yylexp;",
+    "\t\t++yylpp; ",
+    "\t\t++yylexp;",
     "      }",
     "      yychar = YYEMPTY;",
     "      if (yyps->errflag > 0)",
@@ -572,36 +666,35 @@ static char const * const body[] =
     "  yynewerrflag = 0;",
     "",
     "yyerrhandler:",
-    "  while (yyps->save)",
+    "  while (yytrial)",
     "  {",
     "    int ctry;",
-    "    YYParseState *save = yyps->save;",
+    "    YYParseState *save = yytrial;",
     "#if YYDEBUG",
     "    if (yydebug)",
     "\t{",
-    "      fprintf(stderr, \"btyacc[%3u,%2d%s]: ERROR, \"",
-    "              \"CONFLICT BACKTRACKING to state %d, %d tokens\\n\",",
+    "      fprintf(stderr, \"btyacc[%3u,%2d%s]: ERROR, CONFLICT BACKTRACKING to state %d, %d tokens\\n\",",
     "              yystate, yydepth, (yytrial ? \",trial\" : \"\"),",
-    "              yyps->save->state, yylvp - yylvals - yyps->save->lexeme);",
+    "              yytrial->state, yylvp - yylvals - yytrial->lexeme);",
     "\t}",
     "#endif",
     "    /* Memorize most forward-looking error state in case",
     "       it's really an error. */",
-    "    if (yyerrctx == 0 || yyerrctx->lexeme < yylvp-yylvals)",
+    "    if (yyerrctx == 0 || yyerrctx->lexeme < yylvp - yylvals)",
     "    {",
     "      /* Free old saved error context state */",
     "      if(yyerrctx)",
     "        yyFreeState(&yyerrctx);",
     "      /* Create and fill out new saved error context state */",
-    "      yyerrctx = yyNewState(yyps->ssp - yyps->ss);",
-    "      yyerrctx->save = yyps->save;",
+    "      yyerrctx = yyNewState(yyps->ssp - yyps->ss + 1, YYTRIALSTACKGROWTH);",
+    "      yyerrctx->save = yytrial;",
     "      yyerrctx->state = yystate;",
     "      yyerrctx->errflag = yyps->errflag;",
     "      yyerrctx->ssp = yyerrctx->ss + (yyps->ssp - yyps->ss);",
     "      yyerrctx->vsp = yyerrctx->vs + (yyps->vsp - yyps->vs);",
     "      yyerrctx->psp = yyerrctx->ps + (yyps->psp - yyps->ps);",
     "      memcpy (yyerrctx->ss, yyps->ss,",
-    "             (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));",
+    "             (yyps->ssp - yyps->ss + 1) * sizeof(yyps->ss[0]));",
     "      yySCopy(yyerrctx->vs, yyps->vs, (yyps->ssp - yyps->ss + 1));",
     "      yyPCopy(yyerrctx->ps, yyps->ps, (yyps->ssp - yyps->ss + 1));",
     "      yyerrctx->lexeme = yylvp - yylvals;",
@@ -613,7 +706,7 @@ static char const * const body[] =
     "    yyps->ssp = yyps->ss + (save->ssp - save->ss);",
     "    yyps->vsp = yyps->vs + (save->vsp - save->vs);",
     "    yyps->psp = yyps->ps + (save->psp - save->ps);",
-    "    memcpy (yyps->ss, save->ss, (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));",
+    "    memcpy (yyps->ss, save->ss, (yyps->ssp - yyps->ss + 1) * sizeof(yyps->ss[0]));",
     "    yySCopy(yyps->vs, save->vs,  yyps->vsp - yyps->vs + 1);",
     "    yyPCopy(yyps->ps, save->ps,  yyps->psp - yyps->ps + 1);",
     "    ctry = ++save->ctry;",
@@ -624,17 +717,17 @@ static char const * const body[] =
     "    {",
     "      goto yyreduce;",
     "    }",
-    "    yyps->save = save->save;",
+    "    yyps->save /* yytrial */ = save->save;",
     "    yyFreeState(&save);",
     "",
     "    /* Nothing left on the stack -- error */",
-    "    if (!yyps->save)",
+    "    if (!yytrial)",
     "    {",
     "#if YYDEBUG",
     "      if (yydebug)",
     "      {",
-    "        fprintf(stder, \"btyacc[%s]: trial parse FAILED, entering ERROR mode\\n\",",
-    "              (yytrial ? \"trial\" : \"\"));",
+    "        fprintf(stderr, \"btyacc[%3u,%2d%s]:%s parse FAILED, entering ERROR mode\\n\",",
+    "              yystate, yydepth, (yytrial ? \",trial\" : \"\"), (yytrial ? \" trial\" : \"\"));",
     "      }",
     "#endif",
     "      /* Restore state as it was in the most forward-advanced error */",
@@ -648,7 +741,7 @@ static char const * const body[] =
     "      yyps->vsp = yyps->vs + (yyerrctx->vsp - yyerrctx->vs);",
     "      yyps->psp = yyps->ps + (yyerrctx->psp - yyerrctx->ps);",
     "      memcpy (yyps->ss, yyerrctx->ss,",
-    "              (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));",
+    "              (yyps->ssp - yyps->ss + 1) * sizeof(yyps->ss[0]));",
     "      yySCopy(yyps->vs, yyerrctx->vs,  yyps->vsp - yyps->vs + 1);",
     "      yyPCopy(yyps->ps, yyerrctx->ps,  yyps->psp - yyps->ps + 1);",
     "      yystate = yyerrctx->state;",
@@ -708,8 +801,8 @@ static char const * const body[] =
     "        }",
     "        if (!yytrial)",
     "        {",
-    "          YYDELETEVAL(yyps->vsp[0],1);",
-    "          YYDELETEPOSN(yyps->psp[0],1);",
+    "          YYDELETEVAL(yyps->vsp[0], 1);",
+    "          YYDELETEPOSN(yyps->psp[0], 1);",
     "        }",
     "        --(yyps->ssp);",
     "        --(yyps->vsp);",
@@ -729,8 +822,7 @@ static char const * const body[] =
     "        yys = yyname[yychar];",
     "      if (!yys)",
     "        yys = \"illegal-symbol\";",
-    "      fprintf(stderr, \"btyacc[%3u,%2d%s]: ERROR recovery discards token \"",
-    "              \"%d (%s)\\n\",",
+    "      fprintf(stderr, \"btyacc[%3u,%2d%s]: ERROR recovery discards token %d (%s)\\n\",",
     "              yystate, yydepth, (yytrial ? \",trial\" : \"\"), yychar, yys);",
     "    }",
     "#endif",
@@ -752,15 +844,15 @@ static char const * const body[] =
     "    fprintf(stderr, \"btyacc[%3u,%2d%s]: reducing by rule %d (%s)\",",
     "            yystate, yydepth, (yytrial ? \",trial\" : \"\"), yyn, yyrule[yyn]);",
     "#ifdef YYDBPR",
-    "    if (yym)",
+    "    if (yym > 0)",
     "    {",
     "      int i;",
-    "      fputc('<', stderr);",
+    "      fputs(\" <\", stderr);",
     "      for (i = yym; i > 0; --i)",
     "      {",
     "        if (i != yym)",
-    "          printf(\", \");",
-    "        YYDBPR((yyps->vsp)[1-i]);",
+    "          fprintf(stderr, \", \");",
+    "        YYDBPR(yyps->vsp[1 - i]);",
     "      }",
     "      fputc('>', stderr);",
     "    }",
@@ -775,19 +867,35 @@ static char const * const body[] =
     "",
     "#ifdef _YACC_DEFAULT_ACTION_",
     "  /* \"$$ = NULL\" default action */",
+    "#ifdef __cplusplus",
+    "  // C++: YYSTYPE can be an arbitrary class, so we need to explicitly zero it:",
+    "  YYSTYPE_ZERO(yyps->val);",
+    "#else",
     "  memset(&yyps->val, 0, sizeof(yyps->val));",
+    "#endif",
     "#else",
     "  /* RA: bison compatibility: default action is '$$ = $1;' */",
     "  if (yym > 0)",
-    "    yyps->val = (yyps->vsp)[1 - yym];",
+    "  {",
+    "    yyps->val = yyps->vsp[1 - yym];",
+    "  }",
     "#endif",
     "",
-    "  /* Default reduced position is NULL -- no position at all. No",
-    "     position will be assigned at trial time and if no position",
-    "     handling is present */",
+    "  /*",
+    "   * Default reduced position is NULL -- no position at all. No",
+    "   * position will be assigned at trial time and if no position",
+    "   * handling is present ",
+    "   */",
+    "#ifdef __cplusplus",
+    "  /* C++: YYPOSN can be an arbitrary class, so we need to explicitly zero it: */",
+    "  YYPOSN_ZERO(yyps->pos);",
+    "#else",
     "  memset(&yyps->pos, 0, sizeof(yyps->pos));",
+    "#endif",
     "",
+    "#ifdef YYREDUCEPOSNFUNC",
     "  reduce_posn = 1;",
+    "#endif",
     "",
     "  switch (yyn)",
     "  {",
@@ -797,13 +905,14 @@ static char const * const body[] =
 
 static char const * const trailer[] =
 {
-    "#line 767 \"btyaccpa.ske\"",
+    "#line 875 \"btyaccpa.ske\"",
     "",
     "  default:",
     "    break;",
     "  }",
     "",
-    "#if YYDEBUG && defined(YYDBPR)",
+    "#if YYDEBUG",
+    "#if defined(YYDBPR)",
     "  if (yydebug)",
     "  {",
     "    fprintf(stderr, \"btyacc[%3u,%2d%s]: after reduction, result is \",",
@@ -812,10 +921,11 @@ static char const * const trailer[] =
     "    fputc('\\n', stderr);",
     "  }",
     "#endif",
+    "#endif",
     "",
     "  /* Perform user-defined position reduction */",
     "#ifdef YYREDUCEPOSNFUNC",
-    "  if(!yytrial)",
+    "  if (!yytrial)",
     "  {",
     "    YYCALLREDUCEPOSN(YYREDUCEPOSNFUNCARG);",
     "  }",
@@ -832,8 +942,7 @@ static char const * const trailer[] =
     "#if YYDEBUG",
     "    if (yydebug)",
     "    {",
-    "      fprintf(stderr,",
-    "              \"btyacc[  0,%2d%s]: reduced, shifting to final state %d\\n\",",
+    "      fprintf(stderr, \"btyacc[  0,%2d%s]: reduced, shifting to final state %d\\n\",",
     "              yydepth, (yytrial ? \",trial\" : \"\"), YYFINAL);",
     "    }",
     "#endif",
@@ -895,17 +1004,19 @@ static char const * const trailer[] =
     "  goto yyloop;",
     "",
     "",
-    "  /* Reduction declares that this path is valid.",
-    "     Set yypath and do a full parse */",
+    "  /*",
+    "   * Reduction declares that this path is valid.",
+    "   * Set yypath and do a full parse.",
+    "   */",
     "yyvalid:",
     "  if (yypath)",
     "  {",
     "    goto yyabort;",
     "  }",
-    "  while (yyps->save)",
+    "  while (yytrial)",
     "  {",
-    "    YYParseState *save = yyps->save;",
-    "    yyps->save = save->save;",
+    "    YYParseState *save = yytrial;",
+    "    yyps->save /* yytrial */ = save->save;",
     "    save->save = yypath;",
     "    yypath = save;",
     "  }",
@@ -926,7 +1037,7 @@ static char const * const trailer[] =
     "  yyps->ssp = yyps->ss + (yypath->ssp - yypath->ss);",
     "  yyps->vsp = yyps->vs + (yypath->vsp - yypath->vs);",
     "  yyps->psp = yyps->ps + (yypath->psp - yypath->ps);",
-    "  memcpy (yyps->ss, yypath->ss, (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));",
+    "  memcpy (yyps->ss, yypath->ss, (yyps->ssp - yyps->ss + 1) * sizeof(yyps->ss[0]));",
     "  yySCopy(yyps->vs, yypath->vs,  yyps->vsp - yyps->vs + 1);",
     "  yyPCopy(yyps->ps, yypath->ps,  yyps->psp - yyps->ps + 1);",
     "  yylvp = yylvals + yypath->lexeme;",
@@ -948,12 +1059,12 @@ static char const * const trailer[] =
     "",
     "    for(pv = yyps->vs; pv < yyps->vsp; ++pv)",
     "    {",
-    "      YYDELETEVAL(*pv,2);",
+    "      YYDELETEVAL(*pv, 2);",
     "    }",
     "",
     "    for(pp = yyps->ps; pp < yyps->psp; ++pp)",
     "    {",
-    "      YYDELETEPOSN(*pp,2);",
+    "      YYDELETEPOSN(*pp, 2);",
     "    }",
     "",
     "    while (yyps)",
@@ -972,7 +1083,7 @@ static char const * const trailer[] =
     "  }",
     "",
     "yyaccept:",
-    "  if (yyps->save)",
+    "  if (yytrial)",
     "    goto yyvalid;",
     "  if(yyerrctx)",
     "  {",
@@ -1004,7 +1115,7 @@ static char const * const trailer[] =
     "    yyposn = *yylpp++;",
     "    return *yylexp++;",
     "  }",
-    "  else if (yyps->save)",
+    "  else if (yytrial)",
     "  {",
     "    /* in trial mode; save scanner results for future parse attempts */",
     "    if (yylvp == yylvlim)",
@@ -1038,13 +1149,13 @@ static char const * const trailer[] =
     "    yylpsns = new YYPOSN[s];",
     "    yylexemes = new Yshort[s];",
     "#else",
-    "    yylvals = (YYSTYPE*)malloc(s * sizeof(YYSTYPE));",
-    "    yylpsns = (YYPOSN*)malloc(s * sizeof(YYPOSN));",
-    "    yylexemes = (Yshort*)malloc(s * sizeof(Yshort));",
+    "    yylvals = (YYSTYPE*)malloc(s * sizeof(yylvals[0]));",
+    "    yylpsns = (YYPOSN*)malloc(s * sizeof(yylpsns[0]));",
+    "    yylexemes = (Yshort*)malloc(s * sizeof(yylexemes[0]));",
     "#endif",
-    "    memcpy(yylexemes, tl, (s-YYSTACKGROWTH)*sizeof(Yshort));",
-    "    yySCopy(yylvals, tv, s-YYSTACKGROWTH);",
-    "    yyPCopy(yylpsns, tp, s-YYSTACKGROWTH);",
+    "    memcpy(yylexemes, tl, (s - YYSTACKGROWTH) * sizeof(yylexemes[0]));",
+    "    yySCopy(yylvals, tv, s - YYSTACKGROWTH);",
+    "    yyPCopy(yylpsns, tp, s - YYSTACKGROWTH);",
     "#ifdef __cplusplus",
     "    delete[] tl;",
     "    delete[] tv;",
@@ -1063,10 +1174,12 @@ static char const * const trailer[] =
     "  return 0;",
     "}",
     "",
+    "#ifdef __cplusplus",
+    "",
     "static void yySCopy(YYSTYPE *to, YYSTYPE *from, int size)",
     "{",
     "  int i;",
-    "  for (i = size-1; i >= 0; --i)",
+    "  for (i = size - 1; i >= 0; --i)",
     "  {",
     "    to[i] = from[i];",
     "  }",
@@ -1075,11 +1188,13 @@ static char const * const trailer[] =
     "static void yyPCopy(YYPOSN *to, YYPOSN *from, int size)",
     "{",
     "  int i;",
-    "  for (i = size-1; i >= 0; --i)",
+    "  for (i = size - 1; i >= 0; --i)",
     "  {",
     "    to[i] = from[i];",
     "  }",
     "}",
+    "",
+    "#endif",
     "",
     "static void yyMoreStack(YYParseState *yyps)",
     "{",
@@ -1092,11 +1207,11 @@ static char const * const trailer[] =
     "  yyps->vs = new YYSTYPE[yyps->stacksize + YYSTACKGROWTH];",
     "  yyps->ps = new YYPOSN [yyps->stacksize + YYSTACKGROWTH];",
     "#else",
-    "  yyps->ss = (Yshort*)malloc(sizeof(Yshort)*(yyps->stacksize + YYSTACKGROWTH));",
-    "  yyps->vs = (YYSTYPE*)malloc(sizeof(YYSTYPE)*(yyps->stacksize + YYSTACKGROWTH));",
-    "  yyps->ps = (YYPOSN*)malloc(sizeof(YYPOSN)*(yyps->stacksize + YYSTACKGROWTH));",
+    "  yyps->ss = (Yshort*)malloc(sizeof(yyps->ss[0]) * (yyps->stacksize + YYSTACKGROWTH));",
+    "  yyps->vs = (YYSTYPE*)malloc(sizeof(yyps->vs[0]) * (yyps->stacksize + YYSTACKGROWTH));",
+    "  yyps->ps = (YYPOSN*)malloc(sizeof(yyps->ps[0]) * (yyps->stacksize + YYSTACKGROWTH));",
     "#endif",
-    "  memcpy(yyps->ss, tss, yyps->stacksize * sizeof(Yshort));",
+    "  memcpy(yyps->ss, tss, yyps->stacksize * sizeof(yyps->ss[0]));",
     "  yySCopy(yyps->vs, tvs, yyps->stacksize);",
     "  yyPCopy(yyps->ps, tps, yyps->stacksize);",
     "  yyps->stacksize += YYSTACKGROWTH;",
@@ -1124,24 +1239,42 @@ static char const * const trailer[] =
     "}",
     "",
     "",
-    "static YYParseState *yyNewState(int size)",
+    "static YYParseState *yyNewState(int old_size, int growth)",
     "{",
     "  YYParseState *p;",
+    "  int size = old_size + growth;",
     "",
     "#ifdef __cplusplus",
     "  p = new YYParseState;",
-    "  p->ss = new Yshort [size + 4];",
-    "  p->vs = new YYSTYPE[size + 4];",
-    "  p->ps = new YYPOSN [size + 4];",
+    "  p->ss = new Yshort [size];",
+    "  p->vs = new YYSTYPE[size];",
+    "  p->ps = new YYPOSN [size];",
+    "",
+    "  /*",
+    "   * C++: YYSTYPE and YYPOSN can be arbitrary classes, so we need to ",
+    "   *      explicitly zero them",
+    "   *",
+    "   * However, keep in mind that the caller of this function will fill the items ",
+    "   * up to index [old_size] (not including that one)!",
+    "   */",
+    "  for (int i = old_size; i < size; i++)",
+    "  {",
+    "\t  YYSTYPE_ZERO(p->vs[i]);",
+    "\t  YYPOSN_ZERO(p->ps[i]);",
+    "  }",
     "#else",
-    "  p = (YYParseState*)malloc(sizeof(YYParseState));",
-    "  p->ss = (Yshort*) malloc((size + 4) * sizeof(Yshort));",
-    "  p->vs = (YYSTYPE*)malloc((size + 4) * sizeof(YYSTYPE));",
-    "  p->ps = (YYPOSN*) malloc((size + 4) * sizeof(YYPOSN));",
+    "  p = (YYParseState*)malloc(sizeof(p[0]));",
+    "  p->ss = (Yshort*) malloc(size * sizeof(p->ss[0]));",
+    "  p->vs = (YYSTYPE*)malloc(size * sizeof(p->vs[0]));",
+    "  p->ps = (YYPOSN*) malloc(size * sizeof(p->ps[0]));",
+    "  /*",
+    "   * Keep in mind that the caller of this function will fill the items ",
+    "   * up to index [old_size] (not including that one)!",
+    "   */",
+    "  memset(&p->vs[old_size], 0, (size - old_size) * sizeof(p->vs[0]));",
+    "  memset(&p->ps[old_size], 0, (size - old_size) * sizeof(p->ps[0]));",
     "#endif",
-    "  p->stacksize = size+4;",
-    "  memset(&p->vs[0], 0, (size+4)*sizeof(YYSTYPE));",
-    "  memset(&p->ps[0], 0, (size+4)*sizeof(YYPOSN));",
+    "  p->stacksize = size;",
     "  return p;",
     "}",
     "",
@@ -1164,48 +1297,183 @@ static char const * const trailer[] =
     "  *v = 0;",
     "}",
     "",
+    "/*",
+    " * ----------------------------------------------------------------------",
+    " * Several functions which can be overridden by the user when she has set ",
+    " * up the proper #define's.",
+    " * ",
+    " * Note:",
+    " * ",
+    " * We assume that the compiler is smart enough to discard these local ",
+    " * functions when their references through the #define's have been ",
+    " * overridden.",
+    " * ----------------------------------------------------------------------",
+    " */",
+    "",
+    "static void btyacc_set_yydebug_from_env(void)",
+    "{",
+    "  const char *yys = getenv(\"YYDEBUG\");",
+    "  char yyn;",
+    "",
+    "  if (yys)",
+    "  {",
+    "    yyn = *yys;",
+    "    if (yyn >= '0' && yyn <= '9')",
+    "      yydebug = yyn - '0';",
+    "  }",
+    "}",
+    "",
+    "static void btyacc_debug_log_start(const char *msg)",
+    "{",
+    "\tfprintf(stderr, \"%s\", msg);",
+    "}",
+    "",
+    "static void btyacc_debug_log_partial(const char *msg, ...)",
+    "{",
+    "\t",
+    "}",
+    "",
+    "static void btyacc_debug_log_partial(const char *msg, ...);",
+    "",
     0
 };
 
 static char const * const line_position[] =
 {
-    "#line 1134 \"btyaccpa.ske\"",
+    "#line 1305 \"btyaccpa.ske\"",
     "#line %d \"%s\"",
     "",
     0
 };
 
+static char const * const comment_start[] =
+{
+    "#line 1308 \"btyaccpa.ske\"",
+    "/*",
+    0
+};
+
+static char const * const comment_end[] =
+{
+    "#line 1310 \"btyaccpa.ske\"",
+    "*/",
+    0
+};
+
+static char const * const action_case_start[] =
+{
+    "#line 1312 \"btyaccpa.ske\"",
+    "  case %d:",
+    "",
+    0
+};
+
+static char const * const action_code[] =
+{
+    "#line 1315 \"btyaccpa.ske\"",
+    "    %s;",
+    "\t",
+    "",
+    0
+};
+
+static char const * const action_case_end[] =
+{
+    "#line 1319 \"btyaccpa.ske\"",
+    "\tbreak;",
+    "\t",
+    "",
+    0
+};
+
+static char const * const action_if_not_yytrial_start[] =
+{
+    "#line 1323 \"btyaccpa.ske\"",
+    "if (!yytrial)",
+    "\t",
+    0
+};
+
+static char const * const action_block_start[] =
+{
+    "#line 1326 \"btyaccpa.ske\"",
+    "{",
+    0
+};
+
+static char const * const action_block_end[] =
+{
+    "#line 1328 \"btyaccpa.ske\"",
+    "}",
+    0
+};
+
+static char const * const yyval_tag_reference[] =
+{
+    "#line 1330 \"btyaccpa.ske\"",
+    "yyval.%s",
+    0
+};
+
+static char const * const yyval_reference[] =
+{
+    "#line 1332 \"btyaccpa.ske\"",
+    "yyval",
+    0
+};
+
+static char const * const yyvsp_tag_reference[] =
+{
+    "#line 1334 \"btyaccpa.ske\"",
+    "yyvsp[%d].%s",
+    0
+};
+
+static char const * const yyvsp_reference[] =
+{
+    "#line 1336 \"btyaccpa.ske\"",
+    "yyvsp[%d]",
+    0
+};
+
 static char const * const rflag_prefix[] =
 {
-    "#line 1137 \"btyaccpa.ske\"",
+    "#line 1338 \"btyaccpa.ske\"",
     "static",
     0
 };
 
 static char const * const not_rflag_prefix[] =
 {
-    "#line 1139 \"btyaccpa.ske\"",
+    "#line 1340 \"btyaccpa.ske\"",
     "",
     0
 };
 
 static char const * const int_table_start[] =
 {
-    "#line 1141 \"btyaccpa.ske\"",
-    "%sYshort %s[%d] = {%41d,",
+    "#line 1342 \"btyaccpa.ske\"",
+    "%sYshort %29s[%5d] = {%5d%s",
     0
 };
 
 static char const * const int_table_entry[] =
 {
-    "#line 1143 \"btyaccpa.ske\"",
-    "%5d,",
+    "#line 1344 \"btyaccpa.ske\"",
+    "%5d%s",
+    0
+};
+
+static char const * const int_table_entry_separator[] =
+{
+    "#line 1346 \"btyaccpa.ske\"",
+    ",",
     0
 };
 
 static char const * const int_table_end[] =
 {
-    "#line 1145 \"btyaccpa.ske\"",
+    "#line 1348 \"btyaccpa.ske\"",
     "",
     "};",
     "",
@@ -1214,15 +1482,19 @@ static char const * const int_table_end[] =
 
 static char const * const table_size[] =
 {
-    "#line 1149 \"btyaccpa.ske\"",
+    "#line 1352 \"btyaccpa.ske\"",
+    "",
+    "",
     "#define YYTABLESIZE %d",
+    "",
+    "",
     "",
     0
 };
 
 static char const * const defines_file_protection_start[] =
 {
-    "#line 1152 \"btyaccpa.ske\"",
+    "#line 1359 \"btyaccpa.ske\"",
     "",
     "#ifndef _BTYACC_DEFINES_H_",
     "#define _BTYACC_DEFINES_H_",
@@ -1234,7 +1506,7 @@ static char const * const defines_file_protection_start[] =
 
 static char const * const defines_file_protection_end[] =
 {
-    "#line 1159 \"btyaccpa.ske\"",
+    "#line 1366 \"btyaccpa.ske\"",
     "",
     "",
     "#endif /* _BTYACC_DEFINES_H_ */",
@@ -1245,14 +1517,14 @@ static char const * const defines_file_protection_end[] =
 
 static char const * const token_charset[] =
 {
-    "#line 1165 \"btyaccpa.ske\"",
+    "#line 1372 \"btyaccpa.ske\"",
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$",
     0
 };
 
 static char const * const define_token[] =
 {
-    "#line 1167 \"btyaccpa.ske\"",
+    "#line 1374 \"btyaccpa.ske\"",
     "#define %-60s %5d",
     "",
     0
@@ -1260,7 +1532,7 @@ static char const * const define_token[] =
 
 static char const * const yystype_extern_decl[] =
 {
-    "#line 1170 \"btyaccpa.ske\"",
+    "#line 1377 \"btyaccpa.ske\"",
     "",
     "extern YYSTYPE yylval;",
     "",
@@ -1269,17 +1541,30 @@ static char const * const yystype_extern_decl[] =
 
 static char const * const define_default_yystype[] =
 {
-    "#line 1174 \"btyaccpa.ske\"",
+    "#line 1381 \"btyaccpa.ske\"",
+    "",
     "#ifndef YYSTYPE",
     "typedef int YYSTYPE;",
+    "",
+    "#ifdef __cplusplus",
+    "#define YYSTYPE_ZERO(yylval)\t\tyylval = 0",
     "#endif",
+    "",
+    "/* ",
+    " * Since we know the yylval type, we can also provide a default yydebug log function now:",
+    " */",
+    "#ifndef YYDBPR",
+    "#define YYDBPR(yystype)    BTYACC_DEBUG_LOG_PARTIAL(\"%d\", (yystype))",
+    "#endif",
+    "#endif /* YYSTYPE */",
+    "",
     "",
     0
 };
 
 static char const * const union_decl_start[] =
 {
-    "#line 1179 \"btyaccpa.ske\"",
+    "#line 1399 \"btyaccpa.ske\"",
     "",
     "typedef union",
     0
@@ -1287,101 +1572,131 @@ static char const * const union_decl_start[] =
 
 static char const * const union_decl_end[] =
 {
-    "#line 1182 \"btyaccpa.ske\"",
-    " YYSTYPE;",
-    "",
+    "#line 1402 \"btyaccpa.ske\"",
+    " yystype_t;",
+    "#define YYSTYPE yystype_t",
     " ",
+    "",
     0
 };
 
 static char const * const define_yymaxtoken[] =
 {
-    "#line 1186 \"btyaccpa.ske\"",
+    "#line 1407 \"btyaccpa.ske\"",
+    "",
     "#define YYMAXTOKEN %5d",
+    "",
     "",
     0
 };
 
 static char const * const define_yyfinal[] =
 {
-    "#line 1189 \"btyaccpa.ske\"",
+    "#line 1412 \"btyaccpa.ske\"",
+    "",
     "#define YYFINAL %5d",
+    "",
     "",
     0
 };
 
 static char const * const define_yydebug[] =
 {
-    "#line 1192 \"btyaccpa.ske\"",
+    "#line 1417 \"btyaccpa.ske\"",
+    "",
     "#ifndef YYDEBUG",
     "#define YYDEBUG %d",
     "#endif",
     "",
+    "",
+    0
+};
+
+static char const * const debug_yy_null[] =
+{
+    "#line 1424 \"btyaccpa.ske\"",
+    "0",
     0
 };
 
 static char const * const debug_yyname_strings_start[] =
 {
-    "#line 1197 \"btyaccpa.ske\"",
-    "#if YYDEBUG",
-    "%schar *yyname[] = {",
+    "#line 1426 \"btyaccpa.ske\"",
     "",
+    "#if YYDEBUG",
+    "%schar const *yyname[] = {",
+    "",
+    0
+};
+
+static char const * const debug_yyname_strings_separator[] =
+{
+    "#line 1431 \"btyaccpa.ske\"",
+    ",",
     0
 };
 
 static char const * const debug_yyname_strings_end[] =
 {
-    "#line 1201 \"btyaccpa.ske\"",
-    "",
+    "#line 1433 \"btyaccpa.ske\"",
     "};",
     "#endif",
+    "",
     "",
     0
 };
 
 static char const * const debug_yyrule_strings_start[] =
 {
-    "#line 1206 \"btyaccpa.ske\"",
-    "#if YYDEBUG",
-    "%schar *yyrule[] = {",
+    "#line 1438 \"btyaccpa.ske\"",
     "",
+    "#if YYDEBUG",
+    "%schar const *yyrule[] = {",
+    "",
+    0
+};
+
+static char const * const debug_yyrule_strings_separator[] =
+{
+    "#line 1443 \"btyaccpa.ske\"",
+    ",",
     0
 };
 
 static char const * const debug_yyrule_strings_end[] =
 {
-    "#line 1210 \"btyaccpa.ske\"",
-    "",
+    "#line 1445 \"btyaccpa.ske\"",
     "};",
     "#endif",
+    "",
     "",
     0
 };
 
 static char const * const DEFINES_FILENAME[] =
 {
-    "#line 1215 \"btyaccpa.ske\"",
+    "#line 1450 \"btyaccpa.ske\"",
     "%s%s.tab.h",
     0
 };
 
 static char const * const OUTPUT_FILENAME[] =
 {
-    "#line 1217 \"btyaccpa.ske\"",
+    "#line 1452 \"btyaccpa.ske\"",
     "%s%s.tab.c",
     0
 };
 
 static char const * const CODE_FILENAME[] =
 {
-    "#line 1219 \"btyaccpa.ske\"",
+    "#line 1454 \"btyaccpa.ske\"",
     "%s%s.code.c",
     0
 };
 
 static char const * const VERBOSE_FILENAME[] =
 {
-    "#line 1221 \"btyaccpa.ske\"",
+    "#line 1456 \"btyaccpa.ske\"",
     "%s%s.output",
     0
 };
@@ -1394,10 +1709,23 @@ struct section section_list_btyaccpa[] = {
 	{ "body", &body[0] },
 	{ "trailer", &trailer[0] },
 	{ "line_position", &line_position[0] },
+	{ "comment_start", &comment_start[0] },
+	{ "comment_end", &comment_end[0] },
+	{ "action_case_start", &action_case_start[0] },
+	{ "action_code", &action_code[0] },
+	{ "action_case_end", &action_case_end[0] },
+	{ "action_if_!yytrial_start", &action_if_not_yytrial_start[0] },
+	{ "action_block_start", &action_block_start[0] },
+	{ "action_block_end", &action_block_end[0] },
+	{ "yyval.tag_reference", &yyval_tag_reference[0] },
+	{ "yyval_reference", &yyval_reference[0] },
+	{ "yyvsp.tag_reference", &yyvsp_tag_reference[0] },
+	{ "yyvsp_reference", &yyvsp_reference[0] },
 	{ "rflag_prefix", &rflag_prefix[0] },
 	{ "!rflag_prefix", &not_rflag_prefix[0] },
 	{ "int_table_start", &int_table_start[0] },
 	{ "int_table_entry", &int_table_entry[0] },
+	{ "int_table_entry_separator", &int_table_entry_separator[0] },
 	{ "int_table_end", &int_table_end[0] },
 	{ "table_size", &table_size[0] },
 	{ "defines_file_protection_start", &defines_file_protection_start[0] },
@@ -1411,12 +1739,18 @@ struct section section_list_btyaccpa[] = {
 	{ "define_yymaxtoken", &define_yymaxtoken[0] },
 	{ "define_yyfinal", &define_yyfinal[0] },
 	{ "define_yydebug", &define_yydebug[0] },
+	{ "debug_yy_null", &debug_yy_null[0] },
 	{ "debug_yyname_strings_start", &debug_yyname_strings_start[0] },
+	{ "debug_yyname_strings_separator", &debug_yyname_strings_separator[0] },
 	{ "debug_yyname_strings_end", &debug_yyname_strings_end[0] },
 	{ "debug_yyrule_strings_start", &debug_yyrule_strings_start[0] },
+	{ "debug_yyrule_strings_separator", &debug_yyrule_strings_separator[0] },
 	{ "debug_yyrule_strings_end", &debug_yyrule_strings_end[0] },
 	{ "DEFINES_FILENAME", &DEFINES_FILENAME[0] },
 	{ "OUTPUT_FILENAME", &OUTPUT_FILENAME[0] },
 	{ "CODE_FILENAME", &CODE_FILENAME[0] },
 	{ "VERBOSE_FILENAME", &VERBOSE_FILENAME[0] },
 	{ 0, 0 } };
+
+unsigned int section_list_btyaccpa_count = 48;
+

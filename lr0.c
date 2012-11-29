@@ -3,10 +3,7 @@
 #endif
 
 #include "defs.h"
-
-#ifdef TRACE
 #include "log.h"
-#endif
 
 int nstates = 0;
 core *first_state = NULL;
@@ -91,9 +88,8 @@ static core* new_state(int symbol)
     register Yshort *isp2;
     register Yshort *iend;
 
-#ifdef  TRACE
-    BtYacc_logf("Entering new_state(%d)\n", symbol);
-#endif
+	if (tflag > 1)
+	    BtYacc_logf("LR(0): Entering new_state(%d)\n", symbol);
 
     if (nstates >= MAXSHORT)
         fatal("too many states");
@@ -130,9 +126,8 @@ static int get_state(int symbol)
     register int found;
     register int n;
 
-#ifdef  TRACE
-    BtYacc_logf("Entering get_state(%d)\n", symbol);
-#endif
+	if (tflag > 1)
+	    BtYacc_logf("LR(0): Entering get_state(%d)\n", symbol);
 
     isp1 = kernel_base[symbol];
     iend = kernel_end[symbol];
@@ -188,9 +183,9 @@ static void append_states(void)
     register int j;
     register int symbol;
 
-#ifdef  TRACE
-    BtYacc_logs("Entering append_states()\n");
-#endif
+	if (tflag > 1)
+	    BtYacc_logf("LR(0): Entering append_states()\n");
+
     for (i = 1; i < nshifts; ++i)
     {
         symbol = shift_symbol[i];
@@ -402,28 +397,30 @@ void show_cores(void)
     int i, j, k, n;
     int itemno;
 
+    BtYacc_logf("\n\nLR0: cores:\n\n");
+
     k = 0;
     for (p = first_state; p; ++k, p = p->next)
     {
-        if (k) printf("\n");
-        printf("state %d, number = %d, accessing symbol = %s\n",
+        if (k) 
+			BtYacc_logf("\n");
+        BtYacc_logf("state %d, number = %d, accessing symbol = %s\n",
                 k, p->number, symbol_name[p->accessing_symbol]);
         n = p->nitems;
         for (i = 0; i < n; ++i)
         {
             itemno = p->items[i];
-            printf("%4d  ", itemno);
+            BtYacc_logf("%4d  ", itemno);
             j = itemno;
             while (ritem[j] >= 0) ++j;
-            printf("%s :", symbol_name[rlhs[-ritem[j]]]);
+            BtYacc_logf("%s :", symbol_name[rlhs[-ritem[j]]]);
             j = rrhs[-ritem[j]];
             while (j < itemno)
-                printf(" %s", symbol_name[ritem[j++]]);
-            printf(" .");
+                BtYacc_logf(" %s", symbol_name[ritem[j++]]);
+            BtYacc_logf(" .");
             while (ritem[j] >= 0)
-                printf(" %s", symbol_name[ritem[j++]]);
-            printf("\n");
-            fflush(stdout);
+                BtYacc_logf(" %s", symbol_name[ritem[j++]]);
+            BtYacc_logf("\n");
         }
     }
 }
@@ -436,17 +433,18 @@ void show_ritems(void)
     int i;
 
     for (i = 0; i < nitems; ++i)
-        printf("ritem[%d] = %d\n", i, ritem[i]);
+        BtYacc_logf("ritem[%d] = %d\n", i, ritem[i]);
 }
 
 
 /* show_rrhs is used for debugging */
+
 void show_rrhs(void)
 {
     int i;
 
     for (i = 0; i < nrules; ++i)
-        printf("rrhs[%d] = %d\n", i, rrhs[i]);
+        BtYacc_logf("rrhs[%d] = %d\n", i, rrhs[i]);
 }
 
 
@@ -457,41 +455,42 @@ void show_shifts(void)
     shifts *p;
     int i, j, k;
 
-    k = 0;
+	BtYacc_logf("\n\nLR0: shifts:\n\n");
+
+	k = 0;
     for (p = first_shift; p; ++k, p = p->next)
     {
-        if (k) printf("\n");
-        printf("shift %d, number = %d, nshifts = %d\n", k, p->number,
+        if (k) 
+			BtYacc_logf("\n");
+        BtYacc_logf("shift %d, number = %d, nshifts = %d\n", k, p->number,
                 p->nshifts);
         j = p->nshifts;
         for (i = 0; i < j; ++i)
-            printf("\t%d\n", p->shift[i]);
+            BtYacc_logf("    %d\n", p->shift[i]);
     }
 }
 
 
-#ifdef  DEBUG
 static void print_derives(void)
 {
     register int i;
     register Yshort *sp;
 
-    printf("\nDERIVES\n\n");
+    BtYacc_logf("\n\nLR0: DERIVES:\n\n");
 
     for (i = start_symbol; i < nsyms; ++i)
     {
-        printf("%s derives ", symbol_name[i]);
+        BtYacc_logf("%-30s derives ", symbol_name[i]);
 
         for (sp = derives[i]; *sp >= 0; ++sp)
         {
-            printf("  %d", *sp);
+            BtYacc_logf("  %d", *sp);
         }
-        putchar('\n');
+        BtYacc_logf("\n");
     }
 
-    putchar('\n');
+    BtYacc_logf("\n");
 }
-#endif
 
 
 static void set_derives(void)
@@ -521,9 +520,10 @@ static void set_derives(void)
         k++;
     }
 
-#ifdef  DEBUG
-    print_derives();
-#endif
+	if (tflag > 1)
+	{
+	    print_derives();
+	}
 }
 
 void free_derives(void)
@@ -571,15 +571,16 @@ static void set_nullable(void)
         }
     }
 
-#ifdef DEBUG
-    for (i = 0; i < nsyms; ++i)
-    {
-        if (nullable[i])
-            printf("%s is nullable\n", symbol_name[i]);
-        else
-            printf("%s is not nullable\n", symbol_name[i]);
-    }
-#endif
+	if (tflag > 1)
+	{
+		for (i = 0; i < nsyms; ++i)
+		{
+			if (nullable[i])
+				BtYacc_logf("%-30s is nullable\n", symbol_name[i]);
+			else
+				BtYacc_logf("%-30s is not nullable\n", symbol_name[i]);
+		}
+	}
 }
 
 

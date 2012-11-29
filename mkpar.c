@@ -39,7 +39,7 @@ static void unused_rules(void)
     register int i;
     register action *p;
 
-    rules_used = (Yshort *) MALLOC(nrules*sizeof(Yshort));
+    rules_used = (Yshort *) MALLOC(nrules * sizeof(Yshort));
     if (rules_used == 0) no_space();
 
     for (i = 0; i < nrules; ++i)

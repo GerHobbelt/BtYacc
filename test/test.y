@@ -11,22 +11,33 @@ S : /* empty */	{ printf("S -> epsilon\n"); }
     /* see how preprocessor can be used */
   | '*'         { printf("S -> *\n"); }
 %endif
+  | 'a'         { printf("S -> 'a'\n"); }
   ;
 %%
 #include <stdio.h>
 
-main() {
-  printf("yyparse() = %d\n",yyparse());
+int main(void) 
+{
+  printf("Enter a series of 'a' tokens and braces:\n");
+  printf("yyparse() = %d\n", yyparse());
+  return 0;
 }
 
-yylex() {
-  int ch;
+int yylex(void) 
+{
+    int ch;
 
-	do { ch = getchar(); } while (ch == ' ' || ch == '\n' || ch == '\t');
-	if (ch == EOF) return 0;
+	do 
+	{ 
+		ch = getchar(); 
+	} while (ch == ' ' || ch == '\n' || ch == '\t');
+	if (ch == EOF || ch == '\x04' /* Control-D */ ) 
+		return 0;
+	printf("lex -> $%02X (%c)\n", ch, (isprint(ch) ? ch : '?'));
 	return ch;
 }
 
-yyerror(s) char*s; {
-  printf("%s\n",s);
+void yyerror(char const *s) 
+{
+  printf("%s\n", s);
 }
