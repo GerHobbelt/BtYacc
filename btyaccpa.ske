@@ -353,8 +353,8 @@ static void btyacc_debug_log_partial(const char *msg, ...);
 #endif
 
 #ifndef BTYACC_DEBUG_LOG_EOL
-#define BTYACC_DEBUG_LOG_EOL        btyacc_debug_log_eol
-static void btyacc_debug_log_partial(const char *msg, ...);
+#define BTYACC_DEBUG_LOG_EOL            btyacc_debug_log_eol
+static void btyacc_debug_log_eol(const char *msg, ...);
 #endif
 
 
@@ -400,8 +400,6 @@ int yyparse(void)
 #endif
 
 #if YYDEBUG
-  char const *yys;
-
   BTYACC_SET_YYDEBUG_FROM_ENV();
   if (yydebug)
   {
@@ -437,19 +435,20 @@ yyloop:
 #if YYDEBUG
     if (yydebug)
     {
-      yys = 0;
+      char const *yys = 0;
+
       if (yychar <= YYMAXTOKEN)
         yys = yyname[yychar];
       if (!yys)
         yys = "illegal-symbol";
-      fprintf(stderr, "btyacc[%3u,%2d%s]: read token %d (%s)",
+      BTYACC_DEBUG_LOG_PARTIAL("btyacc[%3u,%2d%s]: read token %d (%s)",
               yystate, yydepth, (yytrial ? ",trial" : ""), yychar, yys);
 #ifdef YYDBPR
-      fputs(" <", stderr);
+      BTYACC_DEBUG_LOG_PARTIAL(" <");
       YYDBPR(yylval);
-      fputc('>', stderr);
+      BTYACC_DEBUG_LOG_PARTIAL(">");
 #endif
-      fputc('\n', stderr);
+      BTYACC_DEBUG_LOG_EOL("\n");
     }
 #endif
   }
@@ -467,7 +466,7 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        fprintf(stderr, "btyacc[%3u,%2d%s]: CONFLICT: following successful trial parse\n",
+        BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: CONFLICT: following successful trial parse\n",
                 yystate, yydepth, (yytrial ? ",trial" :""));
       }
 #endif
@@ -486,12 +485,12 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        fprintf(stderr, "btyacc[%3u,%2d%s]: CONFLICT. ",
+        BTYACC_DEBUG_LOG_PARTIAL("btyacc[%3u,%2d%s]: CONFLICT. ",
                 yystate, yydepth, (yytrial ? ",trial" : ""));
         if (yytrial)
-          fputs("ALREADY in conflict, continuing trial parse.\n", stderr);
+          BTYACC_DEBUG_LOG_EOL("ALREADY in conflict, continuing trial parse.\n", stderr);
         else
-          fputs("starting trial parse.\n", stderr);
+          BTYACC_DEBUG_LOG_EOL("starting trial parse.\n", stderr);
       }
 #endif
       save = yyNewState(yyps->ssp - yyps->ss + 1, YYTRIALSTACKGROWTH);
@@ -510,7 +509,7 @@ yyloop:
 #if YYDEBUG
         if (yydebug && yychar >= 0)
         {
-          fprintf(stderr, "btyacc[%s]: backtracking 1 token\n", (yytrial ? "trial" : "---"));
+          BTYACC_DEBUG_LOG_EOL("btyacc[%s]: backtracking 1 token\n", (yytrial ? "trial" : "---"));
         }
 #endif
 
@@ -566,7 +565,7 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        fprintf(stderr, "btyacc[%3u,%2d%s]: shifting to state %d\n",
+        BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: shifting to state %d\n",
                 yystate, yydepth, (yytrial ? ",trial" : ""), yyctable[ctry]);
       }
 #endif
@@ -598,7 +597,7 @@ yyloop:
 #if YYDEBUG
     if (yydebug)
     {
-      fprintf(stderr, "btyacc[%3u,%2d%s]: shifting to state %d\n",
+      BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: shifting to state %d\n",
               yystate, yydepth, (yytrial ? ",trial" : ""), yytable[yyn]);
     }
 #endif
@@ -644,7 +643,7 @@ yyerrhandler:
 #if YYDEBUG
     if (yydebug)
     {
-      fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR, CONFLICT BACKTRACKING to state %d, %d tokens\n",
+      BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: ERROR, CONFLICT BACKTRACKING to state %d, %d tokens\n",
               yystate, yydepth, (yytrial ? ",trial" : ""),
               yytrial->state, yylvp - yylvals - yytrial->lexeme);
     }
@@ -697,7 +696,7 @@ yyerrhandler:
 #if YYDEBUG
       if (yydebug)
       {
-        fprintf(stderr, "btyacc[%3u,%2d%s]:%s parse FAILED, entering ERROR mode\n",
+        BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]:%s parse FAILED, entering ERROR mode\n",
               yystate, yydepth, (yytrial ? ",trial" : ""), (yytrial ? " trial" : ""));
       }
 #endif
@@ -745,7 +744,7 @@ yyinrecovery:
 #if YYDEBUG
         if (yydebug)
         {
-          fprintf(stderr, "btyacc[%3d,%2d%s]: ERROR recovery shifts to state %d\n",
+          BTYACC_DEBUG_LOG_EOL("btyacc[%3d,%2d%s]: ERROR recovery shifts to state %d\n",
                   *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""),
                   yytable[yyn]);
         }
@@ -788,12 +787,13 @@ yyinrecovery:
 #if YYDEBUG
     if (yydebug)
     {
-      yys = 0;
+      char const *yys = 0;
+
       if (yychar <= YYMAXTOKEN)
         yys = yyname[yychar];
       if (!yys)
         yys = "illegal-symbol";
-      fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR recovery discards token %d (%s)\n",
+      BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: ERROR recovery discards token %d (%s)\n",
               yystate, yydepth, (yytrial ? ",trial" : ""), yychar, yys);
     }
 #endif
@@ -812,23 +812,23 @@ yyreduce:
 #if YYDEBUG
   if (yydebug)
   {
-    fprintf(stderr, "btyacc[%3u,%2d%s]: reducing by rule %d (%s)",
+    BTYACC_DEBUG_LOG_PARTIAL("btyacc[%3u,%2d%s]: reducing by rule %d (%s)",
             yystate, yydepth, (yytrial ? ",trial" : ""), yyn, yyrule[yyn]);
 #ifdef YYDBPR
     if (yym > 0)
     {
       int i;
-      fputs(" <", stderr);
+      BTYACC_DEBUG_LOG_PARTIAL(" <");
       for (i = yym; i > 0; --i)
       {
         if (i != yym)
-          fprintf(stderr, ", ");
+          BTYACC_DEBUG_LOG_PARTIAL(", ");
         YYDBPR(yyps->vsp[1 - i]);
       }
-      fputc('>', stderr);
+      BTYACC_DEBUG_LOG_PARTIAL(">");
     }
 #endif
-    fputc('\n', stderr);
+    BTYACC_DEBUG_LOG_EOL("\n");
   }
 #endif
   if (yyps->ssp + 1 - yym >= yyps->ss + yyps->stacksize)
@@ -881,10 +881,10 @@ yyreduce:
 #if defined(YYDBPR)
   if (yydebug)
   {
-    fprintf(stderr, "btyacc[%3u,%2d%s]: after reduction, result is ",
+    BTYACC_DEBUG_LOG_PARTIAL("btyacc[%3u,%2d%s]: after reduction, result is ",
             yystate, yydepth, (yytrial ? ",trial" : ""));
     YYDBPR(yyps->val);
-    fputc('\n', stderr);
+    BTYACC_DEBUG_LOG_EOL("\n");
   }
 #endif
 #endif
@@ -908,7 +908,7 @@ yyreduce:
 #if YYDEBUG
     if (yydebug)
     {
-      fprintf(stderr, "btyacc[  0,%2d%s]: reduced, shifting to final state %d\n",
+      BTYACC_DEBUG_LOG_EOL("btyacc[  0,%2d%s]: reduced, shifting to final state %d\n",
               yydepth, (yytrial ? ",trial" : ""), YYFINAL);
     }
 #endif
@@ -928,12 +928,13 @@ yyreduce:
 #if YYDEBUG
       if (yydebug)
       {
-        yys = 0;
+        char const *yys = 0;
+
         if (yychar <= YYMAXTOKEN)
           yys = yyname[yychar];
         if (!yys)
           yys = "illegal-symbol";
-        fprintf(stderr, "btyacc[%3d,%2d%s]: read %d (%s)\n",
+        BTYACC_DEBUG_LOG_EOL("btyacc[%3d,%2d%s]: read %d (%s)\n",
                 YYFINAL, yydepth, (yytrial ? ",trial" : ""), yychar, yys);
       }
 #endif
@@ -956,7 +957,7 @@ yyreduce:
 #if YYDEBUG
   if (yydebug)
   {
-    fprintf(stderr, "btyacc[%3d,%2d%s]: reduced, shifting to state %d\n",
+    BTYACC_DEBUG_LOG_EOL("btyacc[%3d,%2d%s]: reduced, shifting to state %d\n",
             *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""), yystate);
   }
 #endif
@@ -989,7 +990,7 @@ yyvalid:
 #if YYDEBUG
   if (yydebug)
   {
-    fprintf(stderr, "btyacc[%3d,%2d%s]: CONFLICT trial successful, "
+    BTYACC_DEBUG_LOG_EOL("btyacc[%3d,%2d%s]: CONFLICT trial successful, "
             "backtracking to state %d, %d tokens\n",
             yystate, yydepth, (yytrial ? ",trial" : ""),
             yypath->state, yylvp - yylvals - yypath->lexeme);
@@ -1199,7 +1200,7 @@ static void yyMoreStack(YYParseState *yyps)
 #if YYDEBUG
   if (yydebug)
   {
-    fprintf(stderr, "btyacc: stack size increased to %d\n", yyps->stacksize);
+    BTYACC_DEBUG_LOG_EOL("btyacc: stack size increased to %d\n", yyps->stacksize);
   }
 #endif
 }
@@ -1296,10 +1297,21 @@ static void btyacc_debug_log_start(const char *msg)
 
 static void btyacc_debug_log_partial(const char *msg, ...)
 {
+    va_list args;
 
+    va_start(args, msg);
+    vfprintf(stderr, msg, args);
+    va_end(args);
 }
 
-static void btyacc_debug_log_partial(const char *msg, ...);
+static void btyacc_debug_log_eol(const char *msg, ...)
+{
+    va_list args;
+
+    va_start(args, msg);
+    vfprintf(stderr, msg, args);
+    va_end(args);
+}
 
 %% line_position
 #line %d "%s"
