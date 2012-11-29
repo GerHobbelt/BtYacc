@@ -11,7 +11,7 @@ btyacc (3.0-4-i_a-v2)
 
   * Fixed makefile to build btyacc.1 manpage using latest docbook2man tools.
     (Also made this part of the default 'make all' build chain.)
-  
+
 btyacc (3.0-4) unstable; urgency=low
 
   * Remove dependency on btyacc.1 in Makefile, to prevent make from
@@ -29,14 +29,14 @@ btyacc (3.0-2) unstable; urgency=low
 
   * Security bugfix: Switched to mkstemp() instead of mktemp(),
     temporary files are unlink()ed immediately after creation
-    
+
     [i_a] this fix has NOT been merged with this version!
-    
+
   * Added parser skeleton /usr/doc/btyacc/examples/btyacc-c.ske.gz
     which compiles both as C and C++
-    
+
     [i_a] this is the updated btyaccpa.ske file.
-    
+
   * Applied some compatibility fixes by Mitchell Charity, made
     "usage:" message more verbose, made "skel2c" build script work
     with all awks, not just gawk

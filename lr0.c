@@ -88,8 +88,8 @@ static core* new_state(int symbol)
     register Yshort *isp2;
     register Yshort *iend;
 
-	if (tflag > 1)
-	    BtYacc_logf("LR(0): Entering new_state(%d)\n", symbol);
+    if (tflag > 1)
+        BtYacc_logf("LR(0): Entering new_state(%d)\n", symbol);
 
     if (nstates >= MAXSHORT)
         fatal("too many states");
@@ -126,8 +126,8 @@ static int get_state(int symbol)
     register int found;
     register int n;
 
-	if (tflag > 1)
-	    BtYacc_logf("LR(0): Entering get_state(%d)\n", symbol);
+    if (tflag > 1)
+        BtYacc_logf("LR(0): Entering get_state(%d)\n", symbol);
 
     isp1 = kernel_base[symbol];
     iend = kernel_end[symbol];
@@ -183,8 +183,8 @@ static void append_states(void)
     register int j;
     register int symbol;
 
-	if (tflag > 1)
-	    BtYacc_logf("LR(0): Entering append_states()\n");
+    if (tflag > 1)
+        BtYacc_logf("LR(0): Entering append_states()\n");
 
     for (i = 1; i < nshifts; ++i)
     {
@@ -402,8 +402,8 @@ void show_cores(void)
     k = 0;
     for (p = first_state; p; ++k, p = p->next)
     {
-        if (k) 
-			BtYacc_logf("\n");
+        if (k)
+            BtYacc_logf("\n");
         BtYacc_logf("state %d, number = %d, accessing symbol = %s\n",
                 k, p->number, symbol_name[p->accessing_symbol]);
         n = p->nitems;
@@ -455,13 +455,13 @@ void show_shifts(void)
     shifts *p;
     int i, j, k;
 
-	BtYacc_logf("\n\nLR0: shifts:\n\n");
+    BtYacc_logf("\n\nLR0: shifts:\n\n");
 
-	k = 0;
+    k = 0;
     for (p = first_shift; p; ++k, p = p->next)
     {
-        if (k) 
-			BtYacc_logf("\n");
+        if (k)
+            BtYacc_logf("\n");
         BtYacc_logf("shift %d, number = %d, nshifts = %d\n", k, p->number,
                 p->nshifts);
         j = p->nshifts;
@@ -520,10 +520,10 @@ static void set_derives(void)
         k++;
     }
 
-	if (tflag > 1)
-	{
-	    print_derives();
-	}
+    if (tflag > 1)
+    {
+        print_derives();
+    }
 }
 
 void free_derives(void)
@@ -571,16 +571,16 @@ static void set_nullable(void)
         }
     }
 
-	if (tflag > 1)
-	{
-		for (i = 0; i < nsyms; ++i)
-		{
-			if (nullable[i])
-				BtYacc_logf("%-30s is nullable\n", symbol_name[i]);
-			else
-				BtYacc_logf("%-30s is not nullable\n", symbol_name[i]);
-		}
-	}
+    if (tflag > 1)
+    {
+        for (i = 0; i < nsyms; ++i)
+        {
+            if (nullable[i])
+                BtYacc_logf("%-30s is nullable\n", symbol_name[i]);
+            else
+                BtYacc_logf("%-30s is not nullable\n", symbol_name[i]);
+        }
+    }
 }
 
 

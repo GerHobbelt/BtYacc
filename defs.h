@@ -60,22 +60,22 @@
 
 #if defined(__MSDOS__) /* || defined(WIN32) || defined(__WIN32) */
 #define BITS_PER_WORD   16
-#define LOG2_BPW		4
+#define LOG2_BPW        4
 #define MAXSHORT        ((int)0x7FFF)
 #define MINSHORT        ((int)0x8000)
 #define MAXTABLE        4000
 #else    /* Real computers... */
 #define BITS_PER_WORD   32
-#define LOG2_BPW		5
+#define LOG2_BPW        5
 #define MAXSHORT        ((int)0x7FFFFFFF)
 #define MINSHORT        ((int)0x80000000)
 #define MAXTABLE        120000
 #endif
 #define BITS_PER_WORD_1 (BITS_PER_WORD - 1)
 
-#define WORDSIZE(n)		(((n) + (BITS_PER_WORD_1)) / BITS_PER_WORD)
-#define BIT(r, n)		((((r)[(n) >> LOG2_BPW]) >> ((n) & BITS_PER_WORD_1)) & 1)
-#define SETBIT(r, n)	((r)[(n) >> LOG2_BPW] |= ((unsigned)1 << ((n) & BITS_PER_WORD_1)))
+#define WORDSIZE(n)     (((n) + (BITS_PER_WORD_1)) / BITS_PER_WORD)
+#define BIT(r, n)       ((((r)[(n) >> LOG2_BPW]) >> ((n) & BITS_PER_WORD_1)) & 1)
+#define SETBIT(r, n)    ((r)[(n) >> LOG2_BPW] |= ((unsigned)1 << ((n) & BITS_PER_WORD_1)))
 
 /* VM: this is a 32-bit replacement for original 16-bit short */
 typedef int Yshort;
@@ -99,51 +99,51 @@ typedef int Yshort;
 
 typedef enum keyword_code_enumeration
 {
-	TOKEN                           = 0,
-	LEFT                            = 1,
-	RIGHT                           = 2,
-	NONASSOC                        = 3,
-	MARK                            = 4,
-	TEXT                            = 5,
-	TYPE                            = 6,
-	START                           = 7,
-	UNION                           = 8,
-	IDENT                           = 9,
+    TOKEN                           = 0,
+    LEFT                            = 1,
+    RIGHT                           = 2,
+    NONASSOC                        = 3,
+    MARK                            = 4,
+    TEXT                            = 5,
+    TYPE                            = 6,
+    START                           = 7,
+    UNION                           = 8,
+    IDENT                           = 9,
 
-	/* [i_a] bison emulation additions */
-	BISON_DEBUG                     = 110,
-	BISON_DEFINE                    = 111,
-	BISON_DEFINES                   = 112,
-	BISON_LOCATIONS                 = 113,
-	BISON_PURE                      = 114,
-	BISON_NAME_PREFIX               = 115,
-	BISON_FILE_PREFIX               = 116,
-	BISON_ERR_VERBOSE               = 117,
-	BISON_EXPECT                    = 118,
-	BISON_GLR_PARSER                = 119,
-	BISON_LEX_PARAM                 = 120,
-	BISON_NO_LINES                  = 121,
-	BISON_OUTPUT                    = 122,
-	BISON_PARSE_PARAM               = 123,
-	BISON_SKELETON                  = 124,
-	BISON_TOKEN_TABLE               = 125,
-	BISON_VERBOSE                   = 126,
-	BISON_YACC                      = 127,
-	BISON_DESTRUCTOR                = 128,
-	BISON_PRINTER                   = 129,
-	BISON_NTERM                     = 130,
-	BISON_DPREC                     = 131,
-	BISON_MERGE                     = 132,
-	BISON_PREC                      = 133
+    /* [i_a] bison emulation additions */
+    BISON_DEBUG                     = 110,
+    BISON_DEFINE                    = 111,
+    BISON_DEFINES                   = 112,
+    BISON_LOCATIONS                 = 113,
+    BISON_PURE                      = 114,
+    BISON_NAME_PREFIX               = 115,
+    BISON_FILE_PREFIX               = 116,
+    BISON_ERR_VERBOSE               = 117,
+    BISON_EXPECT                    = 118,
+    BISON_GLR_PARSER                = 119,
+    BISON_LEX_PARAM                 = 120,
+    BISON_NO_LINES                  = 121,
+    BISON_OUTPUT                    = 122,
+    BISON_PARSE_PARAM               = 123,
+    BISON_SKELETON                  = 124,
+    BISON_TOKEN_TABLE               = 125,
+    BISON_VERBOSE                   = 126,
+    BISON_YACC                      = 127,
+    BISON_DESTRUCTOR                = 128,
+    BISON_PRINTER                   = 129,
+    BISON_NTERM                     = 130,
+    BISON_DPREC                     = 131,
+    BISON_MERGE                     = 132,
+    BISON_PREC                      = 133
 } BtYacc_keyword_code;
 
 typedef enum symbol_class_enumeration
 {
-	UNKNOWN = 0,
-	TERM = 1,
-	NONTERM = 2,
-	ACTION = 3,
-	ARGUMENT = 4
+    UNKNOWN = 0,
+    TERM = 1,
+    NONTERM = 2,
+    ACTION = 3,
+    ARGUMENT = 4
 } BtYacc_symbol_class;
 
 
@@ -258,7 +258,7 @@ struct action
 struct section {
     char const * name;
     char const * const * ptr;
-	char const * cached_multiline_ptr;
+    char const * cached_multiline_ptr;
 };
 
 extern struct section section_list_btyaccpa[];

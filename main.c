@@ -68,7 +68,7 @@ FILE *verbose_file = NULL;      /*  y.output                                    
 
 int nitems = 0;
 int nrules = 0;
-int nsyms = 0;					/* the total number of TERMinals and non-terminals */
+int nsyms = 0;                  /* the total number of TERMinals and non-terminals */
 int ntokens = 0;                /* the total number of TERMinals */
 int nvars = 0;                  /* the total number of non-terminals */
 
@@ -180,9 +180,9 @@ static void usage(void)
             "  -DNAME       Define btyacc preprocessor variable NAME\n"
             "  -E           Print preprocessed grammar to stdout\n"
             "  -l           Do not insert #line directives into generated code\n"
-			"  -o path      Write all files to directory <path> instead of current working directory\n"
+            "  -o path      Write all files to directory <path> instead of current working directory\n"
             "  -p prefix    Change `yy' into `prefix' in all output code.\n"
-			"               Note: '@' means we use the filename as a prefix.\n"
+            "               Note: '@' means we use the filename as a prefix.\n"
             "  -r           Write tables to `y.tab.c', code to `y.code.c'\n"
             "  -S x.skel    Select parser skeleton\n"
             "  -t           Include debugging code in generated parser\n"
@@ -249,8 +249,8 @@ static void getargs(int argc, char **argv)
 
         case 'D':
             /* Find the preprocessor variable */
-            { 
-			  char **ps;
+            {
+              char **ps;
               char *var_name = NULL;
               extern char *defd_vars[];
 
@@ -261,10 +261,10 @@ static void getargs(int argc, char **argv)
               else
                 usage();
 
-              for (ps = &defd_vars[0]; *ps; ++ps) 
-			  {
-                if (strcmp(*ps, var_name) == 0) 
-				{
+              for (ps = &defd_vars[0]; *ps; ++ps)
+              {
+                if (strcmp(*ps, var_name) == 0)
+                {
                   error(lineno, 0, 0, "Preprocessor variable %s already defined", var_name);
                 }
               }
@@ -371,7 +371,7 @@ no_more_options:;
         s = strrchr(s2, ':');
         if (!s) s = s2; else s++;
 
-		s2 = strrchr(s, '.');
+        s2 = strrchr(s, '.');
         if (s2)
           *s2 = 0;
 
@@ -385,78 +385,78 @@ no_more_options:;
     if (name_prefix && *name_prefix) {
         char *s2;
 
-		if (0 == strcmp(name_prefix, "@") && 0 != strcmp(file_prefix, "y"))
-		{
-			name_prefix = strdup(file_prefix);
-		}
+        if (0 == strcmp(name_prefix, "@") && 0 != strcmp(file_prefix, "y"))
+        {
+            name_prefix = strdup(file_prefix);
+        }
 
-		/* sanitize the prefix to be suitable as part of variable names: */
-		s2 = name_prefix;
-		if (*s2 && !isalpha(*s2) && *s2 != '_')
-		{
-			*s2 = 'y';
-		}
-		for (++s2; *s2; s2++)
-		{
-			if (!isalnum(*s2) && *s2 != '_')
-			{
-				*s2 = '_';
-			}
-		}
+        /* sanitize the prefix to be suitable as part of variable names: */
+        s2 = name_prefix;
+        if (*s2 && !isalpha(*s2) && *s2 != '_')
+        {
+            *s2 = 'y';
+        }
+        for (++s2; *s2; s2++)
+        {
+            if (!isalnum(*s2) && *s2 != '_')
+            {
+                *s2 = '_';
+            }
+        }
     }
     if (!name_prefix || !*name_prefix) {
         name_prefix = "yy";
     }
     name_uc_prefix = strdup(name_prefix);
-	strupr(name_uc_prefix);
+    strupr(name_uc_prefix);
 
-	if (target_dir && *target_dir) 
-	{
-		if (0 == strcmp(target_dir, "@")) 
-		{
-			if (!input_file_name) 
-			{
-				target_dir = "";
-			}
-			else
-			{
-				char *s2;
-				char *s;
+    if (target_dir && *target_dir)
+    {
+        if (0 == strcmp(target_dir, "@"))
+        {
+            if (!input_file_name)
+            {
+                target_dir = "";
+            }
+            else
+            {
+                char *s2;
+                char *s;
 
-				target_dir = strdup(input_file_name);
-				if (!target_dir) no_space();
+                target_dir = strdup(input_file_name);
+                if (!target_dir) no_space();
 
-				// strip off filename from the input file path:
-				s = strrchr(target_dir, '/');
-				if (!s) s = target_dir; else s++;
-				s2 = strrchr(s, '\\');
-				if (!s2) s2 = s; else s2++;
-				s = strrchr(s2, ':');
-				if (!s) s = s2; else s++;
+                // strip off filename from the input file path:
+                s = strrchr(target_dir, '/');
+                if (!s) s = target_dir; else s++;
+                s2 = strrchr(s, '\\');
+                if (!s2) s2 = s; else s2++;
+                s = strrchr(s2, ':');
+                if (!s) s = s2; else s++;
 
-				*s2 = 0;
-			}
-		}
-		else
-		{
-			char *p;
-			size_t l;
+                *s2 = 0;
+            }
+        }
+        else
+        {
+            char *p;
+            size_t l;
 
-			l = strlen(target_dir);
+            l = strlen(target_dir);
 
-			p = (char *)MALLOC(l + 2);
-			if (!p) no_space();
-			strcpy(p, target_dir);
-			if (p[l - 1] != '/' && p[l - 1] != '\\' && p[l - 1] != ':')
-			{
-				p[l++] = '/';
-				p[l] = 0;
-			}
-			target_dir = p;
-		}
-	}
-	if (!target_dir || !*target_dir)
-		target_dir = "";
+            p = (char *)MALLOC(l + 2);
+            if (!p) no_space();
+            strcpy(p, target_dir);
+            if (p[l - 1] != '/' && p[l - 1] != '\\' && p[l - 1] != ':')
+            {
+                p[l++] = '/';
+                p[l] = 0;
+            }
+            target_dir = p;
+        }
+    }
+    if (!target_dir || !*target_dir)
+        target_dir = "";
 }
 
 char *allocate(unsigned n)
@@ -601,7 +601,7 @@ void create_output_files(void)
         code_file_name = (char *)MALLOC(len + 256);
         if (code_file_name == 0)
             no_space();
-	    sprintf(code_file_name, get_section("CODE_FILENAME"), target_dir, file_prefix);
+        sprintf(code_file_name, get_section("CODE_FILENAME"), target_dir, file_prefix);
     }
     else
     {
@@ -614,7 +614,7 @@ void create_output_files(void)
         defines_file_name = (char *)MALLOC(len + 256);
         if (defines_file_name == 0)
             no_space();
-	    sprintf(defines_file_name, get_section("DEFINES_FILENAME"), target_dir, file_prefix);
+        sprintf(defines_file_name, get_section("DEFINES_FILENAME"), target_dir, file_prefix);
     }
 
     if (vflag)
@@ -622,7 +622,7 @@ void create_output_files(void)
         verbose_file_name = (char *)MALLOC(len + 256);
         if (verbose_file_name == 0)
             no_space();
-	    sprintf(verbose_file_name, get_section("VERBOSE_FILENAME"), target_dir, file_prefix);
+        sprintf(verbose_file_name, get_section("VERBOSE_FILENAME"), target_dir, file_prefix);
     }
 }
 
@@ -641,7 +641,7 @@ static void open_input_files(void)
 void open_temporary_files(void)
 {
     /* do this only once, first time is on demand, i.e. as late as possible */
-	if (!action_file && !text_file && !union_file)
+    if (!action_file && !text_file && !union_file)
     {
         create_temporary_files();
     }
@@ -650,7 +650,7 @@ void open_temporary_files(void)
 
 void open_output_files(void)
 {
-	open_temporary_files();
+    open_temporary_files();
 
     /* do this only once, first time is on demand, i.e. as late as possible */
     if (!verbose_file && !defines_file && !output_file && !code_file)
@@ -701,7 +701,7 @@ int main(int argc, char **argv)
 
     active_section_list = section_list_btyaccpa;
     getargs(argc, argv);
-	line_format = get_section("line_position");
+    line_format = get_section("line_position");
 
     BTYACC_INTERRUPTION_CHECK();
     open_input_files();

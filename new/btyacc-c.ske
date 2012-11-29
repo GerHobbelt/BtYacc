@@ -240,7 +240,7 @@ int yyparse() {
   }
   if (yydebug) {
     fputs("btyacc[<current state>,<nr of symbols on state stack>]\n",
-	  stderr);
+      stderr);
   }
 # endif
 
@@ -456,7 +456,7 @@ yyerrhandler:
       yyerrctx->vsp = yyerrctx->vs + (yyps->vsp - yyps->vs);
       yyerrctx->psp = yyerrctx->ps + (yyps->psp - yyps->ps);
       memcpy (yyerrctx->ss, yyps->ss,
-	      (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));
+          (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));
       yySCopy(yyerrctx->vs, yyps->vs, (yyps->ssp - yyps->ss + 1));
       yyPCopy(yyerrctx->ps, yyps->ps, (yyps->ssp - yyps->ss + 1));
       yyerrctx->lexeme = yylvp - yylvals;
@@ -499,7 +499,7 @@ yyerrhandler:
       yyps->vsp = yyps->vs + (yyerrctx->vsp - yyerrctx->vs);
       yyps->psp = yyps->ps + (yyerrctx->psp - yyerrctx->ps);
       memcpy (yyps->ss, yyerrctx->ss,
-	      (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));
+          (yyps->ssp - yyps->ss + 1) * sizeof(Yshort));
       yySCopy(yyps->vs, yyerrctx->vs,  yyps->vsp - yyps->vs + 1);
       yyPCopy(yyps->ps, yyerrctx->ps,  yyps->psp - yyps->ps + 1);
       yystate = yyerrctx->state;

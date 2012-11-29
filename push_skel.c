@@ -1,5 +1,5 @@
 /*
-** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\push.skel
+** This file generated automatically from push.skel
 */
 
 #include "defs.h"
@@ -20,7 +20,7 @@ static char const * const language[] =
    the target C compiler supports #ident directives.
 
    If the skeleton is changed, the banner should be changed so that
-   the altered version can easily be distinguished from the original.  
+   the altered version can easily be distinguished from the original.
 */
 
 static char const * const banner[] =
@@ -481,7 +481,7 @@ static char const * const body[] =
     "            if (yychar >= 0)",
     "            {",
     "                yylvp--;",
-    "\t\tyylexp--;",
+    "        yylexp--;",
     "                yychar = -1;",
     "            }",
     "            save->lexeme = yylvp - yylvals;",
@@ -497,8 +497,8 @@ static char const * const body[] =
     "            if (yychar < 0)",
     "            {",
     "                yylvp++;",
-    "\t\tyylexp++;",
-    "\t    }",
+    "        yylexp++;",
+    "        }",
     "            yychar = -1;",
     "            if (yyerrflag > 0)",
     "                --yyerrflag;",
@@ -670,7 +670,7 @@ static char const * const trailer[] =
     "",
     "    }",
     "",
-    "#if YYDEBUG ",
+    "#if YYDEBUG",
     "#if defined(YYDBPR)",
     "    if (yydebug)",
     "    {",

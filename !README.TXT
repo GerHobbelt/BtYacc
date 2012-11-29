@@ -1,6 +1,6 @@
 BTYACC -- Backtracking Derivative of Berkeley YACC
 
-This version is derived from BTYACC 3.0 and includes several patches 
+This version is derived from BTYACC 3.0 and includes several patches
 (including BISON compatibility) from the Debian 3.0 distribution.
 
 
@@ -8,7 +8,7 @@ WIN32:
 
 MSVC2005 (.NET) project files have been included.
 
-Note: regenerate the skeleton by running:                     
+Note: regenerate the skeleton by running:
 
          awk -f skel2c btyaccpa.ske > skeleton.c
 

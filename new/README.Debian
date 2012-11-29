@@ -16,7 +16,7 @@ btyacc:
   ones used if you don't #define your own) have been changed to take
   two arguments.
 
-- The default rule action of btyacc was to zero out $$ using memset. 
+- The default rule action of btyacc was to zero out $$ using memset.
   In order to get closer to bison compatibility, the default has been
   changed to "$$=$1". You can still get the original behaviour with a
   "#define _YACC_DEFAULT_ACTION_" in your grammar file.

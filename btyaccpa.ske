@@ -8,7 +8,7 @@ C
    the target C compiler supports #ident directives.
 
    If the skeleton is changed, the banner should be changed so that
-   the altered version can easily be distinguished from the original.  
+   the altered version can easily be distinguished from the original.
 */
 
 %% banner
@@ -116,28 +116,28 @@ extern _YACC_EXTERN_ char const *yyrule[];
 #define YYPOSN int
 
 #ifdef __cplusplus
-#define YYPOSN_ZERO(yyposn)		yyposn = 0
+#define YYPOSN_ZERO(yyposn)     yyposn = 0
 #endif
 #endif /* YYPOSN */
 
-/* 
- * YYREDUCEPOSNFUNC is a overridable function with the following prototype: 
- * 
+/*
+ * YYREDUCEPOSNFUNC is a overridable function with the following prototype:
+ *
  *   void YYREDUCEPOSNFUNC(YYPOSN action_yyposn, YYPOSN *yyposn_stack, YYSTYPE *yylval_stack, int rule_stack_size, int stack_size, int lexed_token, YYPOSN current_yyposn, ... ** yyval ~ $$ by default ** );
- * 
- * where yylval_stack[0] and yyposn_stack[0] point at the yylval/yyposn values 
- * for $1 of the reduction rule, while yylval_stack[rule_stack_size - 1] and 
+ *
+ * where yylval_stack[0] and yyposn_stack[0] point at the yylval/yyposn values
+ * for $1 of the reduction rule, while yylval_stack[rule_stack_size - 1] and
  * yyposn_stack[rule_stack_size - 1] would point at the yylval/yyposn for $$
  * of the same rule.
- * 
- * The 'stack_size' indicates the depth of the yylval/yyposn stacks, where the 
- * entire stack would then span the range [rule_stack_size - 1 - stack_size] 
+ *
+ * The 'stack_size' indicates the depth of the yylval/yyposn stacks, where the
+ * entire stack would then span the range [rule_stack_size - 1 - stack_size]
  * to [rule_stack_size - 1].
- * 
- * 
- * YYREDUCEPOSNFUNC() would be able to accept an arbitrary number of parameters, 
- * depending on your YYREDUCEPOSNFUNCARG define override. The default 
- * YYREDUCEPOSNFUNCARG define equals the YYSTYPE value for the last reduction, 
+ *
+ *
+ * YYREDUCEPOSNFUNC() would be able to accept an arbitrary number of parameters,
+ * depending on your YYREDUCEPOSNFUNCARG define override. The default
+ * YYREDUCEPOSNFUNCARG define equals the YYSTYPE value for the last reduction,
  * i.e. the $$ value for that rule.
  */
 #ifdef YYREDUCEPOSNFUNC
@@ -293,8 +293,8 @@ static void yyFreeState(YYParseState **p);
 static void yySCopy(YYSTYPE *to, YYSTYPE *from, int size);
 static void yyPCopy(YYPOSN  *to, YYPOSN  *from, int size);
 #else
-#define yySCopy(to, from, size)			memcpy(to, from, (size) * sizeof((to)[0]))
-#define yyPCopy(to, from, size)			memcpy(to, from, (size) * sizeof((to)[0]))
+#define yySCopy(to, from, size)         memcpy(to, from, (size) * sizeof((to)[0]))
+#define yyPCopy(to, from, size)         memcpy(to, from, (size) * sizeof((to)[0]))
 #endif
 
 
@@ -305,62 +305,62 @@ static void yyPCopy(YYPOSN  *to, YYPOSN  *from, int size);
 #endif
 
 /*
- * Define's which could have been overridden by the user: 
- *   
- * 
+ * Define's which could have been overridden by the user:
+ *
+ *
  * yydebug LOGGING OUTPUT (default to stderr)
- * 
+ *
  * A yyparse() yydebug session starts with a single call to
  *   BTYACC_SET_YYDEBUG_FROM_ENV
  * followed by a single call to
  *   BTYACC_DEBUG_LOG_START
  * when yydebug has been turned ON in the BTYACC_SET_YYDEBUG_FROM_ENV call.
- * 
- * When yydebug has been turned ON, the yyparse() run will then go and write 
+ *
+ * When yydebug has been turned ON, the yyparse() run will then go and write
  * one or more 'log lines' a.k.a. log report events:
- * 
- * Any log line consists of zero or more calls to 
+ *
+ * Any log line consists of zero or more calls to
  *   BTYACC_DEBUG_LOG_PARTIAL
  * followed by one call to
  *   BTYACC_DEBUG_LOG_EOL
- * which is like BTYACC_DEBUG_LOG_PARTIAL but includes the line terminator (LF) 
+ * which is like BTYACC_DEBUG_LOG_PARTIAL but includes the line terminator (LF)
  * and concludes this yydebug log report event.
- * 
- * 
+ *
+ *
  * DEVELOPER NOTE
  * --------------
- * 
- * When you provide your own custom implementation of these functions, this 
- * combination of functions may help you to cache the logged parts up to the 
- * invocation of BTYACC_DEBUG_LOG_EOL at which time you may send the entire 
- * concatenated log message to the destination, e.g. a syslog server (which 
+ *
+ * When you provide your own custom implementation of these functions, this
+ * combination of functions may help you to cache the logged parts up to the
+ * invocation of BTYACC_DEBUG_LOG_EOL at which time you may send the entire
+ * concatenated log message to the destination, e.g. a syslog server (which
  * would want to receive the entire line in a single string/message).
  */
 
 #ifndef BTYACC_SET_YYDEBUG_FROM_ENV
-#define BTYACC_SET_YYDEBUG_FROM_ENV()	btyacc_set_yydebug_from_env()
+#define BTYACC_SET_YYDEBUG_FROM_ENV()   btyacc_set_yydebug_from_env()
 static void btyacc_set_yydebug_from_env(void);
 #endif
 
 #ifndef BTYACC_DEBUG_LOG_START
-#define BTYACC_DEBUG_LOG_START(msg)		btyacc_debug_log_start(msg)
+#define BTYACC_DEBUG_LOG_START(msg)     btyacc_debug_log_start(msg)
 static void btyacc_debug_log_start(const char *msg);
 #endif
 
 #ifndef BTYACC_DEBUG_LOG_PARTIAL
-#define BTYACC_DEBUG_LOG_PARTIAL		btyacc_debug_log_partial
+#define BTYACC_DEBUG_LOG_PARTIAL        btyacc_debug_log_partial
 static void btyacc_debug_log_partial(const char *msg, ...);
 #endif
 
 #ifndef BTYACC_DEBUG_LOG_EOL
-#define BTYACC_DEBUG_LOG_EOL		btyacc_debug_log_eol
+#define BTYACC_DEBUG_LOG_EOL        btyacc_debug_log_eol
 static void btyacc_debug_log_partial(const char *msg, ...);
 #endif
 
 
 /*
  *    Parser function. Roughly looks like this:
- * 
+ *
  *    int yyparse(void)
  *    {
  *    yyloop:
@@ -378,14 +378,14 @@ static void btyacc_debug_log_partial(const char *msg, ...);
  *        goto yyloop;
  *      }
  *      if (reduce_possible) goto yyreduce;
- * 
+ *
  *      (error handling);
  *      goto yyloop;
- * 
+ *
  *    yyreduce:
  *      BIG_CHUNK_OF_RULE_ACTIONS;
  *      goto yyloop;
- * 
+ *
  *      (more error handling);
  *    }
  */
@@ -405,7 +405,7 @@ int yyparse(void)
   BTYACC_SET_YYDEBUG_FROM_ENV();
   if (yydebug)
   {
-	BTYACC_DEBUG_LOG_START("btyacc[<current state>,<nr of symbols on state stack>]\n");
+    BTYACC_DEBUG_LOG_START("btyacc[<current state>,<nr of symbols on state stack>]\n");
   }
 #endif
 
@@ -432,8 +432,8 @@ yyloop:
   if (yychar < 0)
   {
     yychar = yyLex1();
-    if (yychar < 0) 
-		yychar = 0;
+    if (yychar < 0)
+        yychar = 0;
 #if YYDEBUG
     if (yydebug)
     {
@@ -467,8 +467,8 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        fprintf(stderr, "btyacc[%3u,%2d%s]: CONFLICT: following successful trial parse\n", 
-				yystate, yydepth, (yytrial ? ",trial" :""));
+        fprintf(stderr, "btyacc[%3u,%2d%s]: CONFLICT: following successful trial parse\n",
+                yystate, yydepth, (yytrial ? ",trial" :""));
       }
 #endif
       /* Switch to the next conflict context */
@@ -509,9 +509,9 @@ yyloop:
       {
 #if YYDEBUG
         if (yydebug && yychar >= 0)
-		{
+        {
           fprintf(stderr, "btyacc[%s]: backtracking 1 token\n", (yytrial ? "trial" : "---"));
-		}
+        }
 #endif
 
         ++ctry;
@@ -552,9 +552,9 @@ yyloop:
       }
       if (yychar >= 0)
       {
-        --yylvp; 
-		--yylpp; 
-		--yylexp;
+        --yylvp;
+        --yylpp;
+        --yylexp;
         yychar = YYEMPTY;
       }
       save->lexeme = yylvp - yylvals;
@@ -565,16 +565,16 @@ yyloop:
     {
 #if YYDEBUG
       if (yydebug)
-	  {
+      {
         fprintf(stderr, "btyacc[%3u,%2d%s]: shifting to state %d\n",
                 yystate, yydepth, (yytrial ? ",trial" : ""), yyctable[ctry]);
-	  }
+      }
 #endif
       if (yychar < 0)
       {
-        ++yylvp; 
-		++yylpp; 
-		++yylexp;
+        ++yylvp;
+        ++yylpp;
+        ++yylexp;
       }
       yychar = YYEMPTY;
       if (yyps->errflag > 0)
@@ -597,10 +597,10 @@ yyloop:
   {
 #if YYDEBUG
     if (yydebug)
-	{
+    {
       fprintf(stderr, "btyacc[%3u,%2d%s]: shifting to state %d\n",
               yystate, yydepth, (yytrial ? ",trial" : ""), yytable[yyn]);
-	}
+    }
 #endif
     yychar = YYEMPTY;
     if (yyps->errflag > 0)
@@ -616,7 +616,7 @@ yyshift:
     *++(yyps->vsp) = yylval;
     *++(yyps->psp) = yyposn;
     goto yyloop;
-  }           
+  }
   yyn = yyrindex[yystate];
   if (yyn != 0 &&
       (yyn += yychar) >= 0 &&
@@ -643,11 +643,11 @@ yyerrhandler:
     YYParseState *save = yytrial;
 #if YYDEBUG
     if (yydebug)
-	{
+    {
       fprintf(stderr, "btyacc[%3u,%2d%s]: ERROR, CONFLICT BACKTRACKING to state %d, %d tokens\n",
               yystate, yydepth, (yytrial ? ",trial" : ""),
               yytrial->state, yylvp - yylvals - yytrial->lexeme);
-	}
+    }
 #endif
     /* Memorize most forward-looking error state in case
        it's really an error. */
@@ -744,11 +744,11 @@ yyinrecovery:
       {
 #if YYDEBUG
         if (yydebug)
-		{
+        {
           fprintf(stderr, "btyacc[%3d,%2d%s]: ERROR recovery shifts to state %d\n",
                   *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""),
                   yytable[yyn]);
-		}
+        }
 #endif
         /* Use label yyerrlab, so that compiler does not warn */
         if(yyps->errflag != yyps->errflag)
@@ -760,11 +760,11 @@ yyinrecovery:
       {
 #if YYDEBUG
         if (yydebug)
-		{
+        {
           fprintf(stderr,
                   "btyacc[%3d,%2d%s]: ERROR recovery discards this state\n",
                   *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""));
-		}
+        }
 #endif
         if (yyps->ssp <= yyps->ss)
         {
@@ -855,7 +855,7 @@ yyreduce:
   /*
    * Default reduced position is NULL -- no position at all. No
    * position will be assigned at trial time and if no position
-   * handling is present 
+   * handling is present
    */
 #ifdef __cplusplus
   /* C++: YYPOSN can be an arbitrary class, so we need to explicitly zero it: */
@@ -919,7 +919,7 @@ yyreduce:
     *++(yyps->psp) = yyps->pos;
     yyretposn = yyps->pos;  /* return value of root position to yyposn */
     if (yychar < 0)
-    {           
+    {
       yychar = yyLex1();
       if (yychar < 0)
       {
@@ -942,8 +942,8 @@ yyreduce:
       goto yyaccept;
     goto yyloop;
   }
-	      
-  yyn = yygindex[yym];	      
+
+  yyn = yygindex[yym];
   if (yyn != 0 && (yyn += yystate) >= 0 &&
       yyn <= YYTABLESIZE && yycheck[yyn] == yystate)
   {
@@ -1217,16 +1217,16 @@ static YYParseState *yyNewState(int old_size, int growth)
   p->ps = new YYPOSN [size];
 
   /*
-   * C++: YYSTYPE and YYPOSN can be arbitrary classes, so we need to 
+   * C++: YYSTYPE and YYPOSN can be arbitrary classes, so we need to
    *      explicitly zero them
    *
-   * However, keep in mind that the caller of this function will fill the items 
+   * However, keep in mind that the caller of this function will fill the items
    * up to index [old_size] (not including that one)!
    */
   for (int i = old_size; i < size; i++)
   {
-	  YYSTYPE_ZERO(p->vs[i]);
-	  YYPOSN_ZERO(p->ps[i]);
+      YYSTYPE_ZERO(p->vs[i]);
+      YYPOSN_ZERO(p->ps[i]);
   }
 #else
   p = (YYParseState*)malloc(sizeof(p[0]));
@@ -1234,7 +1234,7 @@ static YYParseState *yyNewState(int old_size, int growth)
   p->vs = (YYSTYPE*)malloc(size * sizeof(p->vs[0]));
   p->ps = (YYPOSN*) malloc(size * sizeof(p->ps[0]));
   /*
-   * Keep in mind that the caller of this function will fill the items 
+   * Keep in mind that the caller of this function will fill the items
    * up to index [old_size] (not including that one)!
    */
   memset(&p->vs[old_size], 0, (size - old_size) * sizeof(p->vs[0]));
@@ -1265,13 +1265,13 @@ static void yyFreeState(YYParseState **v)
 
 /*
  * ----------------------------------------------------------------------
- * Several functions which can be overridden by the user when she has set 
+ * Several functions which can be overridden by the user when she has set
  * up the proper #define's.
- * 
+ *
  * Note:
- * 
- * We assume that the compiler is smart enough to discard these local 
- * functions when their references through the #define's have been 
+ *
+ * We assume that the compiler is smart enough to discard these local
+ * functions when their references through the #define's have been
  * overridden.
  * ----------------------------------------------------------------------
  */
@@ -1291,12 +1291,12 @@ static void btyacc_set_yydebug_from_env(void)
 
 static void btyacc_debug_log_start(const char *msg)
 {
-	fprintf(stderr, "%s", msg);
+    fprintf(stderr, "%s", msg);
 }
 
 static void btyacc_debug_log_partial(const char *msg, ...)
 {
-	
+
 }
 
 static void btyacc_debug_log_partial(const char *msg, ...);
@@ -1313,15 +1313,15 @@ static void btyacc_debug_log_partial(const char *msg, ...);
 
 %% action_code
     %s;
-	
+
 
 %% action_case_end
-	break;
-	
+    break;
+
 
 %% action_if_!yytrial_start
 if (!yytrial)
-	
+
 %% action_block_start
 {
 %% action_block_end
@@ -1383,10 +1383,10 @@ extern YYSTYPE yylval;
 typedef int YYSTYPE;
 
 #ifdef __cplusplus
-#define YYSTYPE_ZERO(yylval)		yylval = 0
+#define YYSTYPE_ZERO(yylval)        yylval = 0
 #endif
 
-/* 
+/*
  * Since we know the yylval type, we can also provide a default yydebug log function now:
  */
 #ifndef YYDBPR
@@ -1401,7 +1401,7 @@ typedef union
 %% union_decl_end
  yystype_t;
 #define YYSTYPE yystype_t
- 
+
 
 %% define_yymaxtoken
 

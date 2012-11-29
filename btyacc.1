@@ -36,22 +36,22 @@ where \fIprefix\fR defaults to `y'.
 For a detailed description of the format of a grammar
 specification, and an excellent tutorial on how to use YACC-like
 tools, see the info manual for GNU
-\fBbison\fR. 
+\fBbison\fR.
 btyacc-specific extensions are explained below.
 .PP
 \fINote:\fR The parser skeleton supplied by
 btyacc's upstream author only compiles as C++. Use the skeleton
 \*(T<\fI/usr/doc/btyacc/examples/btyacc\-c.ske\fR\*(T> to
-generate a parser that compiles both as C and C++. 
+generate a parser that compiles both as C and C++.
 (Unfortunately, this alternative skeleton does not currently
 check malloc() return values.)
 .SH OPTIONS
-.TP 
+.TP
 -b \fIprefix\fR
 Change the prefix prepended to the output file names
-to the string denoted by \fIprefix\fR. 
+to the string denoted by \fIprefix\fR.
 The default prefix is the character `y'.
-.TP 
+.TP
 -d
 Create a header file called
 \fIprefix\fR\*(T<\fI.tab.h\fR\*(T>
@@ -60,37 +60,37 @@ along with
 containing the symbol definitions and a declaration for
 \*(T<YYSTYPE\*(T> and
 \*(T<yylval\*(T>.
-.TP 
+.TP
 -D\fINAME\fR
 Define the btyacc preprocessor variable
 \fINAME\fR, for use with
 \*(T<%ifdef \*(T>\fINAME\fR
 directives in the grammar file.
-.TP 
+.TP
 -E
 Print the preprocessed grammar to standard
 output.
-.TP 
+.TP
 -l
 Do not insert \*(T<#line\*(T> directives into
 the generated parser code.
-.TP 
+.TP
 -r
 Write the parser code and the associated tables to
 different files. Whereas the tables can be found in
 \fIprefix\fR\*(T<\fI.tab.c\fR\*(T>
 as before, the code now gets written to
 \fIprefix\fR\*(T<\fI.code.c\fR\*(T>.
-.TP 
+.TP
 -S \fIx.ske\fR
 Select a different parser skeleton. The default
 skeleton is hardwired into the program, but a copy can be
 found in the file \*(T<\fIbtyaccpa.ske\fR\*(T>.
-.TP 
+.TP
 -t
 Cause debugging code to be compiled into the generated
 parser.
-.TP 
+.TP
 -v
 Write a human-readable description of the generated
 parser to \*(T<\fIy.output\fR\*(T>. It includes
@@ -130,7 +130,7 @@ YYERROR; ]\*(T>
 .PP
 However, note that adding backtracking rules slows down
 the parser. In practice, you should try to restrict the number
-of conflicts in the grammar to what is absolutely necessary. 
+of conflicts in the grammar to what is absolutely necessary.
 Consider using the "lexer feedback hack" if it is a clean
 solution, and reserve backtracking for a few special
 cases.
@@ -173,25 +173,25 @@ positions to the AST nodes.
 In standard YACCs every token and every non-terminal
 has an \*(T<YYSTYPE\*(T> semantic value attached to
 it. With btyacc, every token and every non-terminal also has
-an \*(T<YYPOSN\*(T> text position attached to it. 
+an \*(T<YYPOSN\*(T> text position attached to it.
 \*(T<YYPOSN\*(T> is a user-defined type.
 .PP
 btyacc maintains a stack of text position values in the
 same way that it maintains a stack of semantic values. To make
 use of the text position feature, you need to
 \*(T<#define\*(T> the following:
-.TP 
+.TP
 YYPOSN
 Preprocessor symbol for the C/C++ type of
 the text position attached to every token and
 non-terminal.
-.TP 
+.TP
 yyposn
-Global variable of type \*(T<YYPOSN\*(T>. 
+Global variable of type \*(T<YYPOSN\*(T>.
 The lexer must assign the text position of the
 returned token to yyposn, just like it assigns the
 semantic value of the returned token to yylval.
-.TP 
+.TP
 YYREDUCEPOSNFUNC
 Preprocessor symbol for a function that is called
 immediately after the regular grammar rule reduction
@@ -214,53 +214,53 @@ later. Its prototype is:
 'in \n(.iu-\nxu
 .ad b
 'hy
-.RS 
-.TP 
+.RS
+.TP
 ret
 Reference to the text position
 returned by the rule. You must overwrite this
 with the computed text position that the rule
 yields, analogous to the $$ semantic
 value.
-.TP 
+.TP
 term_posns
 Array of the right-hand side rule
 components' \*(T<YYPOSN\*(T> text
 positions, analogous to $1, $2, ..., $N for
 the semantic values.
-.TP 
+.TP
 term_vals
 Array of the right-hand side rule
-components' \*(T<YYSTYPE\*(T> values. 
+components' \*(T<YYSTYPE\*(T> values.
 These are the $1, ..., $N
 themselves.
-.TP 
+.TP
 term_no
 Number of components in the right
 hand side of the reduced rule, i.e. the size
 of the term_posns and term_vals arrays. Also
 equal to N in $1, ..., $N.
-.TP 
+.TP
 stk_pos
 \*(T<YYSTYPE\*(T>/\*(T<YYPOSN\*(T>
 stack position before the
 reduction.
-.TP 
+.TP
 yychar
 Lookahead token that immediately
 follows the reduced right hand side
 components.
-.TP 
+.TP
 yyposn
 \*(T<YYPOSN\*(T> of the
 token that immediately follows the reduced
 right hand side components.
-.TP 
+.TP
 extra
 User-defined extra argument passed
 to ReducePosn.
 .RE
-.TP 
+.TP
 YYREDUCEPOSNFUNCARG
 Extra argument passed to the ReducePosn
 function. This argument can be any variable defined in
@@ -280,12 +280,12 @@ you to supply functions for cleaning up the semantic and text
 position values, by \*(T<#define\*(T>ing the
 following symbols in the preamble of your grammar file:
 .PP
-.TP 
+.TP
 YYDELETEVAL
 Preprocessor symbol for a function to call
 before the semantic value of a token or non-terminal
 is discarded.
-.TP 
+.TP
 YYDELETEPOSN
 Preprocessor symbol for a function to call
 before the text position of a token or non-terminal is
@@ -293,18 +293,18 @@ discarded.
 .PP
 Both functions are called with two arguments. The first
 argument of type \*(T<YYSTYPE\*(T> or
-\*(T<YYPOSN\*(T> is the value that will be discarded. 
+\*(T<YYPOSN\*(T> is the value that will be discarded.
 The second argument is of type \*(T<int\*(T> and is
 one of three values:
-.TP 
+.TP
 0
 discarding input
 token
-.TP 
+.TP
 1
 discarding state on
 stack
-.TP 
+.TP
 2
 cleaning up stack when
 aborting
@@ -324,18 +324,18 @@ function:
 'in \n(.iu-\nxu
 .ad b
 'hy
-.TP 
+.TP
 text
 error message
-.TP 
+.TP
 errt
 code of the token that caused the
 error
-.TP 
+.TP
 errt_value
 value of the token that caused the
 error
-.TP 
+.TP
 errt_posn
 text position of token that caused
 error
@@ -343,31 +343,31 @@ error
 btyacc supports defining symbols and acting on them with
 conditional directives inside grammar files, not unlike the C
 preprocessor.
-.TP 
+.TP
 %define \fINAME\fR
 Define the preprocessor symbol
 \fINAME\fR. Equivalent to the
 command line switch
 \*(T<\-D\*(T>\fINAME\fR.
-.TP 
+.TP
 %ifdef \fINAME\fR
 If preprocessor variable
 \fINAME\fR is defined, process the
 text from this \*(T<%ifdef\*(T> to the closing
 \*(T<%endif\*(T>, otherwise skip
 it.
-.TP 
+.TP
 %endif
 Closing directive for
 \*(T<%ifdef\*(T>. \*(T<%ifdef\*(T>s
 cannot be nested.
-.TP 
+.TP
 %include \fIFILENAME\fR
 Process contents of the file named
 \fIFILENAME\fR. Only one nesting
 level of \*(T<%include\*(T> is
 allowed.
-.TP 
+.TP
 %ident \fISTRING\fR
 Insert an `\*(T<#ident
 \*(T>\fISTRING\fR' directive into

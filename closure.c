@@ -80,24 +80,24 @@ static void print_first_derives(void)
   for (i = start_symbol; i < nsyms; ++i)
     {
       BtYacc_logf("\n%-30s derives\n", symbol_name[i]);
-	  assert(i >= ntokens);
+      assert(i >= ntokens);
       rp = first_derives + i * WORDSIZE(nrules);
       cword = *rp++;
       mask = 1;
-	  kp = 0;
+      kp = 0;
 
       for (j = 0; j <= nrules; ++j)
         {
           if (cword & mask)
-		  {
+          {
             BtYacc_logf(" %5d", j);
-			kp++;
-			if (kp == 10) 
-			{
-				BtYacc_logf("\n");
-				kp = 0;
-			}
-		  }
+            kp++;
+            if (kp == 10)
+            {
+                BtYacc_logf("\n");
+                kp = 0;
+            }
+          }
 
           mask <<= 1;
           if (mask == 0)
@@ -107,10 +107,10 @@ static void print_first_derives(void)
             }
         }
 
-		if (kp) 
-		{
-			BtYacc_logf("\n");
-		}
+        if (kp)
+        {
+            BtYacc_logf("\n");
+        }
     }
 
   fflush(stdout);
@@ -149,8 +149,8 @@ static void set_EFF(void)
 
     reflexive_transitive_closure(EFF, nvars);
 
-	if (tflag > 1)
-		print_EFF();
+    if (tflag > 1)
+        print_EFF();
 }
 
 
@@ -206,8 +206,8 @@ void set_first_derives(void)
       rrow += rulesetsize;
     }
 
-	if (tflag > 1)
-		print_first_derives();
+    if (tflag > 1)
+        print_first_derives();
 
   FREE(EFF);
 }
@@ -241,7 +241,7 @@ void closure(Yshort* nucleus, int n)
         symbol = ritem[*csp];
         if (ISVAR(symbol))
         {
-		    assert(symbol >= ntokens);
+            assert(symbol >= ntokens);
             dsp = first_derives + symbol * rulesetsize;
             rsp = ruleset;
             while (rsp < rsend)
@@ -281,7 +281,7 @@ void closure(Yshort* nucleus, int n)
     while (csp < csend)
         *itemsetend++ = *csp++;
 
-	if (tflag > 1)
-		print_closure(n);
+    if (tflag > 1)
+        print_closure(n);
 }
 

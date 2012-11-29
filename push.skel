@@ -8,7 +8,7 @@ C
    the target C compiler supports #ident directives.
 
    If the skeleton is changed, the banner should be changed so that
-   the altered version can easily be distinguished from the original.  
+   the altered version can easily be distinguished from the original.
 */
 
 %% banner
@@ -452,7 +452,7 @@ yyloop:
             if (yychar >= 0)
             {
                 yylvp--;
-		yylexp--;
+        yylexp--;
                 yychar = -1;
             }
             save->lexeme = yylvp - yylvals;
@@ -468,8 +468,8 @@ yyloop:
             if (yychar < 0)
             {
                 yylvp++;
-		yylexp++;
-	    }
+        yylexp++;
+        }
             yychar = -1;
             if (yyerrflag > 0)
                 --yyerrflag;
@@ -636,7 +636,7 @@ yyreduce:
 
     }
 
-#if YYDEBUG 
+#if YYDEBUG
 #if defined(YYDBPR)
     if (yydebug)
     {
