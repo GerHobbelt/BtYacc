@@ -104,6 +104,37 @@ static char const *count_newlines(unsigned int outfile_idx, char const *str)
     return str;
 }
 
+static void print_one_comment(FILE *outfile, unsigned int outfile_idx, char const * comment)
+{
+    if (!strchr(comment, '\n'))
+    {
+        BtYacc_printf(outfile, "%s %s %s",
+                    count_newlines(outfile_idx, get_section("comment_start")),
+                    comment,
+                    count_newlines(outfile_idx, get_section("comment_end")));
+    }
+    else
+    {
+        char *cmt = strdup(comment);
+        char *cmtline;
+
+        if (!cmt) no_space();
+
+        ++outline[outfile_idx];
+        BtYacc_printf(outfile, "%s\n",
+                    count_newlines(outfile_idx, get_section("comment_start")));
+        for (cmtline = strtok(cmt, "\n"); cmtline; cmtline = strtok(NULL, "\n"))
+        {
+            ++outline[outfile_idx];
+            BtYacc_printf(outfile, "%s %s\n",
+                        count_newlines(outfile_idx, get_section("comment_next_line")),
+                        cmtline);
+        }
+        BtYacc_printf(outfile, "%s",
+                    count_newlines(outfile_idx, get_section("comment_end")));
+    }
+}
+
 static void print_one_table(FILE *outfile, unsigned int outfile_idx, char const * name, int item_count, Yshort *data)
 {
     int j;
@@ -168,6 +199,7 @@ void output_rule_data(void)
 
     open_output_files();
 
+    print_one_comment(output_file, OUTPUT_FILE, "[rule] ==> LHS: symbol value");
     rules[0] = symbol_value[start_symbol];
     j = 1;
     for (i = 3; i < nrules; ++i)
@@ -176,6 +208,7 @@ void output_rule_data(void)
     }
     print_one_table(output_file, OUTPUT_FILE, "yylhs", j, rules);
 
+    print_one_comment(output_file, OUTPUT_FILE, "[rule] ==> number of right-hand side tokens in the rule");
     rules[0] = 2;
     j = 1;
     for (i = 3; i < nrules; ++i)
@@ -197,6 +230,7 @@ void output_yydefred(void)
 
     open_output_files();
 
+    print_one_comment(output_file, OUTPUT_FILE, "[state] ==> default reduction state");
     states[0] = (defred[0] ? defred[0] - 2 : 0);
     j = 1;
     for (i = 1; i < nstates; ++i)
@@ -216,10 +250,10 @@ static int find_conflict_base(int cbase)
     {
         for (j = 0; j + cbase < nconflicts; ++j)
         {
-            if (conflicts[i+j] != conflicts[cbase+j])
+            if (conflicts[i + j] != conflicts[cbase + j])
                 break;
         }
-        if (j+cbase >= nconflicts)
+        if (j + cbase >= nconflicts)
             return i;
     }
     return cbase;
@@ -523,6 +557,7 @@ static void goto_actions(void)
 
     state_count = NEW2(nstates, Yshort);
 
+    print_one_comment(output_file, OUTPUT_FILE, "[state (symbol)] ==> default goto state");
     k = default_goto(start_symbol + 1);
     save_column(start_symbol + 1, k);
     states[0] = k;
@@ -637,8 +672,8 @@ int matching_vector(int vector)
     register int prev;
 
     i = order[vector];
-    if (i >= 2*nstates)
-        return (-1);
+    if (i >= 2 * nstates)
+        return -1;
 
     t = tally[i];
     w = width[i];
@@ -647,7 +682,7 @@ int matching_vector(int vector)
     {
         j = order[prev];
         if (width[j] != w || tally[j] != t)
-            return (-1);
+            return -1;
 
         match = 1;
 
@@ -658,10 +693,10 @@ int matching_vector(int vector)
         }
 
         if (match)
-            return (j);
+            return j;
     }
 
-    return (-1);
+    return -1;
 }
 
 
@@ -748,12 +783,16 @@ void output_base(void)
 {
     open_output_files();
 
+    print_one_comment(output_file, OUTPUT_FILE, "[state] ==> shift");
     print_one_table(output_file, OUTPUT_FILE, "yysindex", nstates, base);
 
+    print_one_comment(output_file, OUTPUT_FILE, "[state] ==> reduce");
     print_one_table(output_file, OUTPUT_FILE, "yyrindex", nstates, &base[nstates]);
 
+    print_one_comment(output_file, OUTPUT_FILE, "[state] ==> conflict (when non-zero)");
     print_one_table(output_file, OUTPUT_FILE, "yycindex", nstates, &base[2 * nstates]);
 
+    print_one_comment(output_file, OUTPUT_FILE, "[state] ==> goto");
     print_one_table(output_file, OUTPUT_FILE, "yygindex", nvectors - 1 - 3 * nstates, &base[3 * nstates]);
 
     FREE(base);
@@ -765,7 +804,7 @@ void output_table(void)
 {
     open_output_files();
 
-    ++outline[CODE_FILE];
+    //++outline[CODE_FILE];
 
     if (tflag)
         BtYacc_logf("YYTABLESIZE: %d\n", high);
@@ -777,6 +816,7 @@ void output_table(void)
 
     BtYacc_printf(code_file, get_section("table_size"), high);
 
+    print_one_comment(output_file, OUTPUT_FILE, "[i] ==> shift on conflict");
     print_one_table(output_file, OUTPUT_FILE, "yytable", high + 1, table);
 
     FREE(table);
@@ -788,6 +828,7 @@ void output_check(void)
 {
     open_output_files();
 
+    print_one_comment(output_file, OUTPUT_FILE, "[i] ==> token check");
     print_one_table(output_file, OUTPUT_FILE, "yycheck", high + 1, check);
 
     FREE(check);
@@ -797,6 +838,7 @@ void output_ctable(void)
 {
     open_output_files();
 
+    print_one_comment(output_file, OUTPUT_FILE, "[i + 1] ==> reduce on conflict");
     print_one_table(output_file, OUTPUT_FILE, "yyctable", nconflicts, conflicts);
 
     FREE(conflicts);

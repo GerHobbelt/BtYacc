@@ -151,23 +151,23 @@ static void initialize_LA(void)
 
 static void set_goto_map(void)
 {
-  register shifts *sp;
-  register int i;
-  register int symbol;
-  register int k;
-  register Yshort *temp_map;
-  register int state2;
-  register int state1;
+    register shifts *sp;
+    register int i;
+    register int symbol;
+    register int k;
+    register Yshort *temp_map;
+    register int state2;
+    register int state1;
 
-  goto_map = NEW2(nvars + 1, Yshort);
-  goto_map -= ntokens;
-  temp_map = NEW2(nvars + 1, Yshort);
-  temp_map -= ntokens;
+    goto_map = NEW2(nvars + 1, Yshort);
+    goto_map -= ntokens;
+    temp_map = NEW2(nvars + 1, Yshort);
+    temp_map -= ntokens;
 
-  ngotos = 0;
-  for (sp = first_shift; sp; sp = sp->next)
+    ngotos = 0;
+    for (sp = first_shift; sp; sp = sp->next)
     {
-      for (i = sp->nshifts - 1; i >= 0; --i)
+        for (i = sp->nshifts - 1; i >= 0; --i)
         {
           symbol = accessing_symbol[sp->shift[i]];
 
@@ -181,8 +181,8 @@ static void set_goto_map(void)
         }
     }
 
-  k = 0;
-  for (i = ntokens; i < nsyms; ++i)
+    k = 0;
+    for (i = ntokens; i < nsyms; ++i)
     {
       temp_map[i] = k;
       k += goto_map[i];

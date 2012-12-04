@@ -56,10 +56,10 @@ static void unused_rules(void)
 
     nunused = 0;
     for (i = 3; i < nrules; ++i)
-	{
-        if (!rules_used[i]) 
-			++nunused;
-	}
+    {
+        if (!rules_used[i])
+            ++nunused;
+    }
 
     if (nunused)
     {

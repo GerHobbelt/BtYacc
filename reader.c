@@ -1820,7 +1820,7 @@ static char *insert_arg_rule(char *arg, char *tag)
         rule = nrules;
         insert_arg_cache(code, rule);
         BtYacc_printf(f, get_section("action_case_start"), rule - 2);
-        BtYacc_printf(f, "    %s \x01%u\x1f %s\n", get_section("comment_start"), rule, get_section("comment_end"));
+        BtYacc_printf(f, "    %s \x01%u\x1f %s", get_section("comment_start"), rule, get_section("comment_end"));
 
         if (!lflag)
             BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
@@ -1943,7 +1943,7 @@ void copy_action(void)
     last_was_action = 1;
 
     BtYacc_printf(f, get_section("action_case_start"), nrules - 2);
-    BtYacc_printf(f, "    %s \x01%u\x1f %s\n", get_section("comment_start"), nrules, get_section("comment_end"));
+    BtYacc_printf(f, "    %s \x01%u\x1f %s", get_section("comment_start"), nrules, get_section("comment_end"));
 
     if (*cptr != '[')
         BtYacc_printf(f, get_section("action_if_!yytrial_start"));

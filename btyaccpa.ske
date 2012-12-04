@@ -1390,8 +1390,11 @@ static void btyacc_debug_log_eol(const char *msg, ...)
 
 %% comment_start
 /*
+%% comment_next_line
+**
 %% comment_end
 */
+
 %% action_case_start
   case %d:
 
@@ -1404,12 +1407,12 @@ static void btyacc_debug_log_eol(const char *msg, ...)
 
 
 %% action_if_!yytrial_start
-	if (!yytrial)
-	{
+    if (!yytrial)
+    {
 
 %% action_if_!yytrial_end
 
-	} /* end: if (!yytrial) */
+    } /* end: if (!yytrial) */
 
 %% action_block_start
 {
@@ -1472,7 +1475,9 @@ extern YYSTYPE yylval;
 typedef int YYSTYPE;
 
 #ifdef __cplusplus
+#ifndef YYSTYPE_ZERO
 #define YYSTYPE_ZERO(yylval)        yylval = 0
+#endif
 #endif
 
 /*
