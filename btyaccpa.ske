@@ -169,8 +169,9 @@ extern _YACC_EXTERN_ char const *yyrule[];
 #endif
 
 #define YYEMPTY      (-1)
+/* Clear any previous look-ahead token: */
 #define yyclearin    (yychar = YYEMPTY)
-
+/* Reset the parser error state to 'normal' */
 #define yyerrok      (yyps->errflag = 0)
 
 
@@ -669,7 +670,7 @@ yyerrhandler:
     if (yyerrctx == 0 || yyerrctx->lexeme < yylvp - yylvals)
     {
       /* Free old saved error context state */
-      if(yyerrctx)
+      if (yyerrctx)
         yyFreeState(&yyerrctx);
       /* Create and fill out new saved error context state */
       yyerrctx = yyNewState(yyps->ssp - yyps->ss + 1, YYTRIALSTACKGROWTH);
@@ -767,7 +768,7 @@ yyinrecovery:
         }
 #endif
         /* Use label yyerrlab, so that compiler does not warn */
-        if(yyps->errflag != yyps->errflag)
+        if (yyps->errflag != yyps->errflag)
           goto yyerrlab;
         yystate = yytable[yyn];
         goto yyshift;
@@ -1014,7 +1015,7 @@ yyvalid:
             yypath->state, (int)(yylvp - yylvals - yypath->lexeme));
   }
 #endif
-  if(yyerrctx)
+  if (yyerrctx)
   {
     yyFreeState(&yyerrctx);
   }
@@ -1403,11 +1404,12 @@ static void btyacc_debug_log_eol(const char *msg, ...)
 
 
 %% action_if_!yytrial_start
-if (!yytrial)
-{
+	if (!yytrial)
+	{
 
 %% action_if_!yytrial_end
-} /* end: if (!yytrial) */
+
+	} /* end: if (!yytrial) */
 
 %% action_block_start
 {

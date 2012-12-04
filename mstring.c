@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <string.h>
+
 #include "mstring.h"
 
 /* parameters about string length.  START is the starting size and

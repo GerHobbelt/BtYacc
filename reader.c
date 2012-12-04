@@ -399,12 +399,12 @@ int keyword(void)
   else
   {
     ++cptr;
-    if (c == '{') return (TEXT);
-    if (c == '%' || c == '\\') return (MARK);
-    if (c == '<') return (LEFT);
-    if (c == '>') return (RIGHT);
-    if (c == '0') return (TOKEN);
-    if (c == '2') return (NONASSOC);
+    if (c == '{') return TEXT;
+    if (c == '%' || c == '\\') return MARK;
+    if (c == '<') return LEFT;
+    if (c == '>') return RIGHT;
+    if (c == '0') return TOKEN;
+    if (c == '2') return NONASSOC;
   }
   syntax_error_ex(lineno, line, t_cptr, "expected a keyword or one of these: [ %%{  %%%%  %%\\  %%<  %%>  %%0  %%2 ]");
   /*NOTREACHED*/
@@ -1946,7 +1946,7 @@ void copy_action(void)
     BtYacc_printf(f, "    %s \x01%u\x1f %s\n", get_section("comment_start"), nrules, get_section("comment_end"));
 
     if (*cptr != '[')
-        BtYacc_printf(f, "    %s", get_section("action_if_!yytrial_start"));
+        BtYacc_printf(f, get_section("action_if_!yytrial_start"));
     else
         trialaction = 1;
 
@@ -2144,7 +2144,7 @@ loop:
 
             if (!lflag) BtYacc_puts("#\n", f);
 
-            BtYacc_printf(f, "    %s", get_section("action_if_!yytrial_start"));
+            BtYacc_printf(f, get_section("action_if_!yytrial_start"));
 
             if (!lflag)
                 BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
@@ -2178,7 +2178,7 @@ loop:
 
         if (!trialaction)
         {
-            BtYacc_printf(f, "    %s", get_section("action_if_!yytrial_end"));
+            BtYacc_printf(f, get_section("action_if_!yytrial_end"));
         }
         BtYacc_puts("\n", f);
 
@@ -2203,7 +2203,7 @@ loop:
 
     case '}':
         if (--depth > 0) goto loop;
-        BtYacc_printf(f, "    %s", get_section("action_if_!yytrial_end"));
+        BtYacc_printf(f, get_section("action_if_!yytrial_end"));
 
         c = nextc();
         if (c == '[' && !haveyyval)
@@ -2217,7 +2217,7 @@ loop:
 
             if (!lflag) BtYacc_puts("#\n", f);
 
-            BtYacc_printf(f, "    %s", get_section("action_if_!yytrial_start"));
+            BtYacc_printf(f, get_section("action_if_!yytrial_start"));
 
             if (!lflag)
                 BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
