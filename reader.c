@@ -17,39 +17,45 @@
 /* this is a hard limit, but seems more than adequate */
 #define MAXARGS 20
 
-char *cache = NULL;
-int cinc = 0, cache_size = 0;
+static char *cache = NULL;
+static int cinc = 0;
+static int cache_size = 0;
 
-int ntags = 0, tagmax = 0, havetags = 0;
-char **tag_table = NULL;
+int ntags = 0;
+static int tagmax = 0;
+static int havetags = 0;
+static char **tag_table = NULL;
 
-char saw_eof = 0, unionized = 0;
-char *cptr = NULL, *line = NULL;
-int linesize = 0;
+static char saw_eof = 0;
+
+char unionized = 0;
+char *cptr = NULL;
+char *line = NULL;
+static int linesize = 0;
 
 FILE *inc_file = NULL;
 char  inc_file_name[LINESIZE] = "???";
-int unsigned inc_save_lineno = 0;
+static int unsigned inc_save_lineno = 0;
 
-int in_ifdef = 0;
-int ifdef_skip = 0;
+static int in_ifdef = 0;
+static int ifdef_skip = 0;
 
 #define MAX_DEFD_VARS 1000
 char *defd_vars[MAX_DEFD_VARS] = {NULL};
 
-bucket *goal = NULL;
-int prec = 0;
-int gensym = 0;
-char last_was_action = 0;
+static bucket *goal = NULL;
+static int prec = 0;
+static int gensym = 0;
+static char last_was_action = 0;
 
-int maxitems = 0;
-bucket **pitem = NULL;
+static int maxitems = 0;
+static bucket **pitem = NULL;
 
-int maxrules = 0;
-bucket **plhs = NULL;
+static int maxrules = 0;
+static bucket **plhs = NULL;
 
-int name_pool_size = 0;
-char *name_pool = NULL;
+static int name_pool_size = 0;
+static char *name_pool = NULL;
 
 char const *line_format = NULL;
 
