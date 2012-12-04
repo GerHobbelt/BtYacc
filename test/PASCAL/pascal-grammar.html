@@ -1,0 +1,786 @@
+#! /bin/sh
+# This is a shell archive, meaning:
+# 1. Remove everything above the #! /bin/sh line.
+# 2. Save the resulting text in a file.
+# 3. Execute the file with /bin/sh (not csh) to create:
+#	ident-list
+#	makefile
+#	misc.c
+#	mktoken_name
+#	pascal.l
+#	pascal.y
+#	types.h
+# This archive created: Thu Nov 26 22:10:37 1987
+export PATH; PATH=/bin:/usr/bin:$PATH
+echo shar: "extracting 'ident-list'" '(1162 characters)'
+if test -f 'ident-list'
+then
+	echo shar: "will not over-write existing file 'ident-list'"
+else
+sed 's/^	X//' << \SHAR_EOF > 'ident-list'
+	X#!/bin/sh
+	X#
+	X#	ident-list [-s] <program>
+	X#
+	Xtmp1=/tmp/a$$X
+	Xtmp2=/tmp/a$$Y
+	Xsflag="$1"
+	Xif [ "x$sflag" = "x-s" ]
+	Xthen shift
+	Xfi
+	X
+	Xcat $* | extract-ids >$tmp1
+	Xif [ "x$sflag" = "x-s" ]
+	Xthen
+	X	sed -e '/^program/d
+	X/^field/d
+	X/^external-file/d
+	Xs/^conformant-bound/parameter/
+	Xs/^procedure-parameter/parameter/
+	Xs/^function-parameter/parameter/
+	Xs/^var-parameter/parameter/
+	Xs/^value-parameter/parameter/
+	Xs/^enumerated-literal/constant/' <$tmp1 >$tmp2
+	X	mv $tmp2 $tmp1
+	Xfi
+	Xsort -uf +0 -1 +1 -2 <$tmp1 |
+	Xawk '
+	Xfunc tabulate(title,n) {
+	X	columns = int(pagewidth/(maxlen+3));
+	X	colwidth = int(pagewidth/columns);
+	X	rows = int((n+columns-1)/columns);
+	X	format = sprintf("%%-%ds", colwidth);
+	X	for(i=1;i<=rows; i++)
+	X	{
+	X	    printf "%-19s| ", title; title=""
+	X	    for(j=0; j<columns; j++)
+	X	    {
+	X		x = i + j*rows
+	X		if(x<=n)printf(format, s[x]);
+	X	    }
+	X	    print ""
+	X	}
+	X	print ""
+	X}
+	X
+	XBEGIN { itemtype="";  pagewidth=59
+	Xbar="---------------------------------------------------------------"}
+	X{
+	X	if($1 != itemtype)
+	X	{
+	X		if(n>0)  tabulate(itemtype,n)
+	X		itemtype = $1; n=0; maxlen=0;
+	X	}
+	X	s[++n] = $2;  len = length($2);  if(len>maxlen)maxlen=len;
+	X}
+	XEND { if(n>0)  tabulate(itemtype,n) }'
+	X
+	Xrm -f $tmp1
+SHAR_EOF
+if test 1162 -ne "`wc -c < 'ident-list'`"
+then
+	echo shar: "error transmitting 'ident-list'" '(should have been 1162 characters)'
+fi
+fi
+echo shar: "extracting 'makefile'" '(557 characters)'
+if test -f 'makefile'
+then
+	echo shar: "will not over-write existing file 'makefile'"
+else
+sed 's/^	X//' << \SHAR_EOF > 'makefile'
+	XOBJECTS = y.tab.o misc.o lex.yy.o token_name.o
+	X
+	X#
+	Xall:		extract-ids
+	Xextract-ids:	$(OBJECTS)
+	X		cc -o extract-ids $(OBJECTS) -ly -ll
+	Xy.tab.c y.tab.h:	pascal.y
+	X		yacc -vd pascal.y
+	Xlex.yy.c:	pascal.l
+	X		lex pascal.l
+	Xlex.yy.o:	tokens.h
+	Xtokens.h:	y.tab.h
+	X		-cmp -s y.tab.h tokens.h || cp y.tab.h tokens.h
+	Xtoken_name.c:	mktoken_name tokens.h
+	X		sh mktoken_name
+	X
+	Xinstall:	extract-ids
+	X		if [ -d "$(BIN)" ] ; then cp extract-ids ident-list $(BIN)/ ; \
+	X			     chmod 755 $(BIN)/extract-ids $(BIN)/ident-list ; fi
+	X		
+	Xclean:
+	X		rm -f *.o lex.yy.c y.* token_name.c tokens.h
+SHAR_EOF
+if test 557 -ne "`wc -c < 'makefile'`"
+then
+	echo shar: "error transmitting 'makefile'" '(should have been 557 characters)'
+fi
+fi
+echo shar: "extracting 'misc.c'" '(253 characters)'
+if test -f 'misc.c'
+then
+	echo shar: "will not over-write existing file 'misc.c'"
+else
+sed 's/^	X//' << \SHAR_EOF > 'misc.c'
+	X#include <stdio.h>
+	X
+	X
+	Xchar  *create_string(s)
+	Xchar	*s;
+	X{
+	X    char *p = (char *) malloc(strlen(s) + 1);
+	X    if(p==NULL) internal_error("Cannot malloc in create-string");
+	X    strcpy(p,s);
+	X    return p;
+	X}
+	X
+	Xint max(a,b)
+	Xint	a,b;
+	X{
+	X    return  a>b ? a : b;
+	X}
+SHAR_EOF
+if test 253 -ne "`wc -c < 'misc.c'`"
+then
+	echo shar: "error transmitting 'misc.c'" '(should have been 253 characters)'
+fi
+fi
+echo shar: "extracting 'mktoken_name'" '(465 characters)'
+if test -f 'mktoken_name'
+then
+	echo shar: "will not over-write existing file 'mktoken_name'"
+else
+sed 's/^	X//' << \SHAR_EOF > 'mktoken_name'
+	X#!/bin/sh
+	X#
+	X#	Make a symbol name
+	X#
+	X(
+	Xecho 'char *token_name(i)
+	Xint i;
+	X{
+	X    static char buf[10];
+	X    switch(i)
+	X    {
+	X	default  : if(i<256)
+	X		   {
+	X		       if(i<32 || i>126)
+	X			   sprintf(buf, "0%o", i);
+	X		       else
+	X		           sprintf(buf, "'%c'", i);
+	X		       return buf;
+	X		   }
+	X		   else
+	X		       return("<Unknown token>");
+	X	case   0 : return("<End of input>");'
+	Xawk '{printf"	case %d : return(\"%s\");\n",  $4, $3}'	< y.tab.h
+	Xecho '    }
+	X}'
+	X)  > token_name.c
+SHAR_EOF
+if test 465 -ne "`wc -c < 'mktoken_name'`"
+then
+	echo shar: "error transmitting 'mktoken_name'" '(should have been 465 characters)'
+fi
+fi
+echo shar: "extracting 'pascal.l'" '(3817 characters)'
+if test -f 'pascal.l'
+then
+	echo shar: "will not over-write existing file 'pascal.l'"
+else
+sed 's/^	X//' << \SHAR_EOF > 'pascal.l'
+	X%{
+	X/******************************************************************************
+	X		LEXICAL ANALYSER for ISO standard Pascal
+	X		----------------------------------------
+	X
+	XThis lexical analyser satisfies the following requirements in British
+	XStandards Institution Specification for Computer programming language Pascal
+	XBS6192:1982 (ISO 7185:1983)
+	X
+	X6.1.1	6.1.2	6.1.3	6.1.4	6.1.5	6.1.6	6.1.7
+	X6.1.8	(except ^Z is considered to be a space)
+	X6.1.9
+	X******************************************************************************/
+	X
+	X#include "y.tab.h"
+	Xint	character_no = -1;
+	X
+	X#undef input
+	X#undef unput
+	Xint  input()
+	X{
+	X    if(yysptr > yysbuf)
+	X    {
+	X	yytchar = U(*--yysptr);
+	X    } else
+	X	yytchar = getc(yyin);
+	X    character_no++;
+	X    if(yytchar == 10)  yylineno ++;
+	X    if(yytchar == 0)   yytchar= ' ';
+	X    if(yytchar == EOF) yytchar= 0;
+	X    return yytchar;
+	X}
+	X
+	Xunput(c)
+	Xint c;
+	X{
+	X    yytchar = c;
+	X    if (yytchar == '\n') yylineno--;
+	X    *yysptr++ = yytchar;
+	X    character_no--;
+	X}
+	X
+	Xcomment()
+	X{
+	X    char c, lastc=' ';
+	X    while(c = yyinput())
+	X	if(c == '}' || (lastc=='*' && c==')'))
+	X	    break;
+	X        else
+	X	    lastc = c;
+	X}
+	X
+	Xchar *laststring;
+	Xstrings()
+	X{
+	X    char  *create_string();
+	X    char  buf[256];
+	X    char  c, *p = buf;
+	X    while(c = yyinput())
+	X        switch(c) {
+	X	    case '\'' : if((c = yyinput()) == '\'')
+	X			    *p++ = c;
+	X			else
+	X			{   unput(c); *p++ = '\0';
+	X			    laststring = create_string(buf);
+	X			    return;
+	X			}
+	X			break;
+	X	    case '\n' :
+	X	    case '\014' :
+	X	    case '\015': yyerror("String not terminated");
+	X			return;
+	X	    default   : *p++ = c;
+	X			break;
+	X	}
+	X}
+	X
+	Xchar	numbertext[80];
+	Xchar    lastident[128];
+	X
+	X%}
+	X
+	XA	[Aa]
+	XB	[Bb]
+	XC	[Cc]
+	XD	[Dd]
+	XE	[Ee]
+	XF	[Ff]
+	XG	[Gg]
+	XH	[Hh]
+	XI	[Ii]
+	XJ	[Jj]
+	XK	[Kk]
+	XL	[Ll]
+	XM	[Mm]
+	XN	[Nn]
+	XO	[Oo]
+	XP	[Pp]
+	XQ	[Qq]
+	XR	[Rr]
+	XS	[Ss]
+	XT	[Tt]
+	XU	[Uu]
+	XV	[Vv]
+	XW	[Ww]
+	XX	[Xx]
+	XY	[Yy]
+	XZ	[Zz]
+	X%%
+	X\n				;
+	X[ \t\32]			;
+	X{A}{N}{D}			{ return(AND);		}
+	X{A}{R}{R}{A}{Y}			{ return(ARRAY);	}
+	X{B}{E}{G}{I}{N}			{ return(SBEGIN);	}
+	X{C}{A}{S}{E}			{ return(CASE);		}
+	X{C}{O}{N}{S}{T}			{ return(CONST);	}
+	X{D}{I}{V}			{ return(DIV);		}
+	X{D}{O}{W}{N}{T}{O}		{ return(DOWNTO);	}
+	X{D}{O}				{ return(DO);		}
+	X{E}{L}{S}{E}			{ return(ELSE);		}
+	X{E}{N}{D}			{ return(END);		}
+	X{F}{I}{L}{E}			{ return(SFILE);	}
+	X{F}{O}{R}			{ return(FOR);		}
+	X{F}{U}{N}{C}{T}{I}{O}{N}	{ return(FUNCTION);	}
+	X{G}{O}{T}{O}			{ return(GOTO);		}
+	X{I}{F}				{ return(IF);		}
+	X{I}{N}				{ return(IN);		}
+	X{L}{A}{B}{E}{L}			{ return(LABEL);	}
+	X{M}{O}{D}			{ return(MOD);		}
+	X{N}{I}{L}			{ return(NIL);		}
+	X{N}{O}{T}			{ return(NOT);		}
+	X{O}{F}				{ return(OF);		}
+	X{O}{R}				{ return(OR);		}
+	X{P}{A}{C}{K}{E}{D}		{ return(PACKED);	}
+	X{P}{R}{O}{C}{E}{D}{U}{R}{E}	{ return(PROCEDURE);	}
+	X{P}{R}{O}{G}{R}{A}{M}		{ return(PROGRAM);	}
+	X{R}{E}{C}{O}{R}{D}		{ return(RECORD);	}
+	X{R}{E}{P}{E}{A}{T}		{ return(REPEAT);	}
+	X{S}{E}{T}			{ return(SET);		}
+	X{T}{H}{E}{N}			{ return(THEN);		}
+	X{T}{O}				{ return(TO);		}
+	X{T}{Y}{P}{E}			{ return(TYPE);		}
+	X{U}{N}{T}{I}{L}			{ return(UNTIL);	}
+	X{V}{A}{R}			{ return(VAR);		}
+	X{W}{H}{I}{L}{E}			{ return(WHILE);	}
+	X{W}{I}{T}{H}			{ return(WITH);		}
+	X
+	X[a-zA-Z][a-zA-Z0-9_]*		{ strcpy(lastident, yytext);
+	X				  return(IDENTIFIER);
+	X						/*if strict check no '_' */}
+	X"<="				{ return(LE);	}
+	X">="				{ return(GE);	}
+	X"<>"				{ return(NE);	}
+	X":="				{ return(BECOMES);	}
+	X".."				{ return(DOTDOT);	}
+	X"(."				{ return('[');	}
+	X".)"				{ return(']');	}
+	X"-"	|
+	X"+"	|
+	X"*"	|
+	X"/"	|
+	X"="	|
+	X"<"	|
+	X">"	|
+	X"("	|
+	X")"	|
+	X"["	|
+	X"]"	|
+	X"."	|
+	X","	|
+	X";"	|
+	X":"	|
+	X"^"	{ return(yytext[0]); }
+	X"@"	{ return('^');	}
+	X[0-9]+("."[0-9]+)?[eE][+-]?[0-9]+	|
+	X[0-9]+"."[0-9]+				{ strcpy(numbertext,yytext);
+	X					  return(UNSIGNED_REAL);	}
+	X[0-9]+	{ strcpy(numbertext,yytext); return(UNSIGNED_INT);	}
+	X
+	X"{"	comment();
+	X"(*"	comment();
+	X'	{ strings(); return(STRING); }
+	X"}"	yyerror("'}' not in comment");
+	X.	{ char m[40];
+	X	  sprintf(m,"Illegal character '\\%o'", (int)yytext[0]);
+	X	  yyerror(m);
+	X	}
+SHAR_EOF
+if test 3817 -ne "`wc -c < 'pascal.l'`"
+then
+	echo shar: "error transmitting 'pascal.l'" '(should have been 3817 characters)'
+fi
+fi
+echo shar: "extracting 'pascal.y'" '(7510 characters)'
+if test -f 'pascal.y'
+then
+	echo shar: "will not over-write existing file 'pascal.y'"
+else
+sed 's/^	X//' << \SHAR_EOF > 'pascal.y'
+	X%{
+	X#include <stdio.h>
+	X#include "types.h"
+	X
+	Xextern	int	yylineno;
+	Xextern	char	yytext[];
+	Xextern	char	numbertext[80];
+	Xextern	char	*laststring;
+	Xextern	char	lastident[];
+	X
+	Xextern  char	*create_string();
+	X
+	X#define YYSTYPE item
+	X
+	X
+	Xint	lexical_level = 0;
+	X
+	Xstatic	int	param_level = 0;
+	Xstatic	char *its_a = "error - uninitialised";
+	X
+	X%}
+	X
+	X%start program
+	X
+	X%token UNSIGNED_INT UNSIGNED_REAL STRING IDENTIFIER
+	X%token NE LE GE BECOMES DIV MOD NIL IN OR AND NOT DOTDOT
+	X%token IF THEN ELSE CASE OF REPEAT UNTIL WHILE DO FOR TO DOWNTO
+	X%token SBEGIN END WITH GOTO CONST VAR TYPE ARRAY RECORD SET SFILE FUNCTION
+	X%token PROCEDURE LABEL PACKED PROGRAM
+	X
+	X%%   /*start of rules*/
+	Xprogram		: PROGRAM {its_a="program";} newident external_files ';' 
+	X			block '.'
+	X		;
+	Xexternal_files  : /*empty*/
+	X		| '(' {its_a="external-file";} newident_list ')'
+	X		;
+	X
+	Xblock		: opt_declarations  statement_part
+	X		;
+	Xopt_declarations: /*empty*/
+	X		| declarations
+	X		;
+	Xdeclarations	: declarations declaration	/*should be left-recursive*/
+	X		| declaration
+	X		;
+	Xdeclaration	: label_dcl_part
+	X		| const_dcl_part
+	X		| type_dcl_part
+	X		| var_dcl_part
+	X		| proc_dcl_part
+	X		;
+	X
+	Xlabel_dcl_part	: LABEL labels ';'
+	X		;
+	Xlabels		: labels ',' label
+	X		| label
+	X		;
+	Xlabel		: UNSIGNED_INT		/* 0 <= value <= 9999 [6.1.6] */
+	X		;
+	X
+	Xconst_dcl_part	: CONST const_defs ';'
+	X		;
+	Xconst_defs	: const_defs ';' const_def
+	X		| const_def
+	X		;
+	Xconst_def	: {its_a="constant";} newident '=' constant
+	X		;
+	X
+	Xconstant	: unsigned_num
+	X		| '+' unsigned_num
+	X		| '-' unsigned_num
+	X		| ident				/*check it is constant*/
+	X		| '+' ident
+	X		| '-' ident
+	X		| STRING			/*type is char if len=1*/
+	X		;
+	X
+	Xunsigned_num	: UNSIGNED_INT
+	X		| UNSIGNED_REAL
+	X		;
+	X
+	Xtype_dcl_part	: TYPE type_defs ';'
+	X		;
+	Xtype_defs	: type_defs ';' type_def
+	X		| type_def
+	X		;
+	Xtype_def	: {its_a="type";} newident '=' type
+	X		;
+	X
+	Xtype		: simple_type
+	X		| PACKED struct_type
+	X		| struct_type
+	X		| '^' IDENTIFIER    /*check forward reference semantics*/
+	X		;
+	X
+	Xsimple_type	: '(' {its_a="enumerated-literal";} newident_list ')'
+	X		| constant DOTDOT constant
+	X		| ident
+	X		;
+	X
+	Xstruct_type	: ARRAY '[' index_t_list ']' OF type
+	X		| RECORD /*consider this a scope*/ field_list END
+	X		| SET OF simple_type
+	X		| SFILE OF type
+	X		;
+	Xindex_t_list	: index_t_list ',' simple_type
+	X		| simple_type
+	X		;
+	Xfield_list	: fixed_part
+	X		| fixed_part ';' variant_part
+	X		| variant_part
+	X		;
+	Xfixed_part	: fixed_part ';' record_section
+	X		| record_section
+	X		;
+	Xrecord_section	: {its_a="field";} newident_list ':' type
+	X		| /*empty*/
+	X		;
+	Xvariant_part	: CASE {its_a="field";} tag_field OF variants
+	X		;
+	Xtag_field	: newident ':' ident 
+	X		| ident /*type*/
+	X		;
+	Xvariants	: variants ';' variant
+	X		| variant
+	X		;
+	Xvariant		: case_label_list ':' '(' field_list ')'
+	X		| /*empty*/
+	X		;
+	X
+	Xvar_dcl_part	: VAR variable_dcls ';'
+	X		;
+	Xvariable_dcls	: variable_dcls ';' variable_dcl
+	X		| variable_dcl
+	X		;
+	Xvariable_dcl	: {its_a="variable";} newident_list ':' type
+	X		;
+	Xnewident_list	: new_id_list {its_a="don't know";}
+	X		;
+	Xnew_id_list	: new_id_list ',' newident
+	X		| newident
+	X		;
+	X
+	Xproc_dcl_part	: proc_or_func
+	X		;
+	Xproc_or_func	: proc_heading ';' body ';'     /*check if forward or fwd refd*/
+	X			{lexical_level--;
+	X			}
+	X		| func_heading ';' body ';'  /*also func heading may be -type */
+	X			{lexical_level--;
+	X			}
+	X		;
+	Xproc_heading	: PROCEDURE
+	X			{if(param_level==0)its_a="procedure";}
+	X		  newident {lexical_level++;}
+	X			formal_params
+	X		;
+	Xfunc_heading	: FUNCTION
+	X			{if(param_level==0)its_a="function";}
+	X		  newident {lexical_level++;}
+	X			function_form
+	X		;
+	Xfunction_form	: /*empty*/			/*if forward referenced*/
+	X		| formal_params ':' ident
+	X		;
+	X
+	Xbody		: block
+	X			/* result determined in block */
+	X		| IDENTIFIER				/*directive-FORWARD*/
+	X		;
+	Xformal_params	: /*empty*/
+	X		| '(' {param_level++;} formal_p_sects ')' {param_level--;}
+	X		;
+	Xformal_p_sects	: formal_p_sects ';' formal_p_sect
+	X		| formal_p_sect
+	X		;
+	Xformal_p_sect	: {its_a="value-parameter";} param_group
+	X		| VAR {its_a="var-parameter";} param_group
+	X		| {its_a="procedure-parameter";} proc_heading
+	X			{lexical_level--;}
+	X		| {its_a="function-parameter";} func_heading  {lexical_level--;}
+	X		;
+	Xparam_group	: newident_list ':' paramtype
+	X		;
+	Xparamtype	: ident
+	X		| ARRAY '[' index_specs ']' OF paramtype
+	X		| PACKED ARRAY '[' index_spec ']' OF ident
+	X		;
+	Xindex_specs	: index_specs ';' index_spec
+	X		| index_spec
+	X		;
+	Xindex_spec	: {its_a="conformant-bound";} newident DOTDOT newident ':' ident
+	X		;
+	X
+	Xstatement_part	: compound_stmt
+	X		;
+	Xcompound_stmt	: SBEGIN statements END
+	X		;
+	Xstatements	: statements ';' statement
+	X		| statement
+	X		;
+	Xstatement	: /*empty*/
+	X		| label ':' statement
+	X		| compound_stmt
+	X		| assignment
+	X		| procedure_call
+	X		| GOTO label
+	X		| IF expression THEN statement
+	X		| IF expression THEN statement ELSE statement
+	X		| CASE expression OF case_list END
+	X		| WHILE expression DO statement
+	X		| REPEAT statements UNTIL expression
+	X		| FOR ident BECOMES expression direction expression DO statement
+	X		| WITH rec_var_list DO statement 
+	X		;
+	Xdirection	: TO
+	X		| DOWNTO
+	X		;
+	X
+	Xassignment	: variable BECOMES expression	/* must test for fn_ident */
+	X	/*	| ident BECOMES expression	*/
+	X		;
+	X
+	Xprocedure_call	: ident actual_params
+	X		;
+	X
+	Xactual_params	:  /*empty*/
+	X		| '(' actuals_list ')'
+	X		;
+	Xactuals_list	: actuals_list ',' actual_param
+	X		| actual_param
+	X		;
+	Xactual_param	: expression    /* which could be a variable or a proc/fn id */
+	X		| expression colon_things  /* only in i/o */
+	X		;
+	Xcolon_things    : ":" expression	/*integer*/
+	X		| ":" expression ":" expression 
+	X		;
+	X
+	Xcase_list	: case_list ';' case_list_elem
+	X		| case_list_elem
+	X		;
+	Xcase_list_elem	: case_label_list ':' statement
+	X		| /*empty*/
+	X		;
+	Xcase_label_list	: case_label_list ',' case_label
+	X		| case_label
+	X		;
+	Xcase_label	: constant
+	X		;
+	X
+	Xrec_var_list	: rec_var_list ',' record_var
+	X		| record_var
+	X		;
+	X
+	Xexpression	: simple_expr
+	X		| simple_expr relational_op simple_expr
+	X		;
+	Xrelational_op	: '='
+	X		| '<'
+	X		| '>'
+	X		| LE
+	X		| GE
+	X		| NE
+	X		| IN
+	X		;
+	X
+	Xsimple_expr	: term
+	X		| '+' term
+	X		| '-' term
+	X		| simple_expr add_op term
+	X		;
+	Xadd_op		: '+'
+	X		| '-'
+	X		| OR
+	X		;
+	X
+	Xterm		: factor
+	X		| term mult_op factor
+	X		;
+	Xmult_op		: '*'
+	X		| '/'
+	X		| DIV
+	X		| MOD
+	X		| AND
+	X		;
+	X
+	Xfactor		: variable		/* could be a const_ident of fn_call*/
+	X		| unsigned_lit
+	X		| '(' expression ')'
+	X	/*	| function_call		*/
+	X		| set
+	X		| NOT factor
+	X		;
+	X
+	Xunsigned_lit	: unsigned_num
+	X		| STRING			/*type is char if len=1*/
+	X		| NIL
+	X		;
+	X/*
+	Xfunction_call	: ident actual_params
+	X		;
+	X*/
+	X
+	Xset		: '[' member_list ']'
+	X		;
+	Xmember_list	: /*empty*/
+	X		| members
+	X		;
+	Xmembers		: members ',' member
+	X		| member
+	X		;
+	Xmember		: expression
+	X		| expression DOTDOT expression
+	X		;
+	X
+	X/* kludge */
+	Xvariable	: ident actual_params	/* check variable, const_id, fn_call */
+	X		| variable '[' expressions ']'
+	X		| variable '.' ident
+	X		| variable '^'
+	X		;
+	Xexpressions	: expressions ',' expression
+	X		| expression
+	X		;
+	Xrecord_var	: variable
+	X		;
+	Xident		: IDENTIFIER
+	X		;
+	Xnewident	: IDENTIFIER
+	X		    { 
+	X			if(param_level<2)
+	X			    printf("%s\t%s\n", its_a, lastident);
+	X		    }
+	X		;
+	X%%   /*start of routines*/
+	X
+	Xyyerror(msg) char *msg;
+	X{
+	X    if(msg==NULL || *msg=='\0')
+	X	fprintf(stderr, "Error at %s near line %d\n",
+	X				token_name(yychar), yylineno);
+	X    else
+	X	fprintf(stderr, "Error at %s near line %d : %s\n",
+	X				token_name(yychar), yylineno, msg);
+	X    exit(1);
+	X}
+	X
+	Xparser_info()
+	X{
+	X    printf("\n%d line%s parsed\n", yylineno, plural(yylineno));
+	X}
+	X
+	X
+	Xinternal_error(s,a1,a2,a3,a4)
+	X{
+	X    fprintf(stderr, "Internal error: ");
+	X    fprintf(stderr, s, a1, a2, a3, a4);
+	X    exit(2);
+	X}
+	X
+	Xwarning(fmt, a1, a2, a3, a4)
+	X{
+	X    fprintf(stderr, "Warning line %d: ", yylineno);
+	X    fprintf(stderr, fmt, a1, a2, a3, a4);
+	X    fprintf(stderr, "\n");
+	X}
+	X
+	Xmain()
+	X{
+	X    yyparse();
+	X}
+SHAR_EOF
+if test 7510 -ne "`wc -c < 'pascal.y'`"
+then
+	echo shar: "error transmitting 'pascal.y'" '(should have been 7510 characters)'
+fi
+fi
+echo shar: "extracting 'types.h'" '(115 characters)'
+if test -f 'types.h'
+then
+	echo shar: "will not over-write existing file 'types.h'"
+else
+sed 's/^	X//' << \SHAR_EOF > 'types.h'
+	X#define pluralsuffix(num,suffix)	((num)==1?"":(suffix))
+	X#define plural(num)	pluralsuffix(num,"s")
+	X#define item int
+SHAR_EOF
+if test 115 -ne "`wc -c < 'types.h'`"
+then
+	echo shar: "error transmitting 'types.h'" '(should have been 115 characters)'
+fi
+fi
+exit 0
+#	End of shell archive

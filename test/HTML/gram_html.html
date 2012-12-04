@@ -1,0 +1,831 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <link rel=stylesheet type="text/css" href="css/style.css">
+   
+<META NAME="konwerter" CONTENT="Ogonki97 1.3">
+<META HTTP-EQUIV="content-type" CONTENT="text/html; CHARSET=iso-8859-2">
+   <meta name="Author" content="Marek Gryber">
+   <meta name="GENERATOR" content="Mozilla/4.5 [en] (Win95; I) [Netscape]">
+   <title>Gramatyka - BNF</title>
+</head>
+<body>
+
+<center>
+<h1>Gramatyka HTML 3.2 - BNF</h1></center>
+&nbsp;&nbsp;&nbsp; Poniżej jest przedstawiona gramatyka HTML 3.2&nbsp;
+w notacji BNF, oraz przy użyciu wyrażeń regularnych. W dokumetach zgodnych
+z tą gramatyka wymagane jest aby znacznik &lt;P> kończył się &lt;/P>, co
+nie jest wymagane w standardzie języka.
+<p>&nbsp;&nbsp;&nbsp; Znaczenie użytych symboli:
+<br><tt><b>%expression</b>&lt;nazwa></tt> -&nbsp; oznacza stan. Wyrażenia napisane
+poniżej to wyrażenia dostępne w danym stanie,
+<br><tt><b>%push</b> &lt;nazwa>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt> - przejście
+z obecnego stanu do stanu &lt;nazwa>,
+<br><tt><b>%pop</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt>
+- przejście do stanu, z którego obecny stan został osiągnięty,
+<br><tt>%ignore&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt>
+- symbol&nbsp; jest ignorowany, nie podlega przetwarzaniu w gramatyce.
+<p>Makra zastosowane w wyrażeniach regularnych:
+<code>
+<p><tt>{FNMCHAR}&nbsp;&nbsp; '[a-zA-Z]'</tt>
+<br><tt>{NMCHAR}&nbsp;&nbsp;&nbsp; '[a-zA-Z0-9\.\-]'</tt>
+<br><tt>{DIGIT}&nbsp;&nbsp;&nbsp;&nbsp; '[0-9]'</tt>
+<br><tt>{HEXDIGIT}&nbsp; '[a-fA-F0-9]'</tt>
+<br><tt>{ps}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '[ \t\r\n\f\l]'</tt>
+</code>
+<p><b>Symbole terminalne (leksemy):</b>
+<code>
+<p><tt><b>%expression</b> Main</tt>
+<br><tt>'[^&lt;&amp;]+'&nbsp; 'DATA';</tt>
+<br><tt>'&lt;!\-\-'&nbsp; %ignore, <b>%push</b> Coment;</tt>
+<br><tt>'&lt;![dD][oO][cC][tT][yY][pP][eE] [hH][tT][mM][lL] [pP][uU][bB][lL][iI][cC].*>'
+DOCTYPE';</tt>
+<br><tt>'&amp;{FNMCHAR}{NMCHAR}*'&nbsp; 'DATA';</tt>
+<br><tt>'&amp;#{NMCHAR}+'&nbsp;&nbsp;&nbsp;&nbsp; 'DATA' ;</tt>
+<br><tt>'{ps}+'&nbsp; %ignore;</tt>
+<p><tt>'&lt;[aA]'&nbsp;&nbsp;&nbsp;&nbsp; '&lt;A',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[bB]'&nbsp;&nbsp;&nbsp;&nbsp; '&lt;B',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[iI]'&nbsp;&nbsp;&nbsp;&nbsp; '&lt;I',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[pP]'&nbsp;&nbsp;&nbsp;&nbsp; '&lt;P',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[uU]'&nbsp;&nbsp;&nbsp;&nbsp; '&lt;U',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[bB][rR]'&nbsp;&nbsp;&nbsp; '&lt;BR',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[dD][dD]'&nbsp;&nbsp;&nbsp; '&lt;DD',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[dD][lL]'&nbsp;&nbsp;&nbsp; '&lt;DL',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[dD][tT]'&nbsp;&nbsp;&nbsp; '&lt;DT',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[eE][mM]'&nbsp;&nbsp;&nbsp; '&lt;EM',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[hH]1'&nbsp;&nbsp; '&lt;H1',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[hH]2'&nbsp;&nbsp;&nbsp; '&lt;H2',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[hH]3'&nbsp;&nbsp;&nbsp; '&lt;H3',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[hH]4'&nbsp;&nbsp;&nbsp; '&lt;H4',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[hH]5'&nbsp;&nbsp;&nbsp; '&lt;H5',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[hH]6'&nbsp;&nbsp;&nbsp; '&lt;H6',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[hH][rR]'&nbsp;&nbsp;&nbsp; '&lt;HR',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[lL][iI]'&nbsp;&nbsp;&nbsp; '&lt;LI',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[oO][lL]'&nbsp;&nbsp;&nbsp; '&lt;OL',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[tT][dD]'&nbsp;&nbsp;&nbsp; '&lt;TD',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[tT][hH]'&nbsp;&nbsp;&nbsp; '&lt;TH',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[tT][rR]'&nbsp;&nbsp;&nbsp; '&lt;TR',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[tT][tT]'&nbsp;&nbsp;&nbsp; '&lt;TT',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[uU][lL]'&nbsp;&nbsp;&nbsp; '&lt;UL',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[bB][iI][gG]'&nbsp;&nbsp;&nbsp; '&lt;BIG',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[dD][fF][nN]'&nbsp;&nbsp;&nbsp; '&lt;DFN',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[dD][iI][rR]'&nbsp;&nbsp;&nbsp; '&lt;DIR',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[dD][iI][vV]'&nbsp;&nbsp;&nbsp; '&lt;DIV',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[iI][mM][gG]'&nbsp;&nbsp;&nbsp; '&lt;IMG',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[kK][bB][dD]'&nbsp;&nbsp;&nbsp; '&lt;KBD',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[mM][aA][pP]'&nbsp;&nbsp;&nbsp; '&lt;MAP',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[pP][rR][eE]'&nbsp;&nbsp;&nbsp; '&lt;PRE',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[sS][uU][bB]'&nbsp;&nbsp;&nbsp; '&lt;SUB',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[sS][uU][pP]'&nbsp;&nbsp;&nbsp; '&lt;SUP',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[vV][aA][rR]'&nbsp;&nbsp;&nbsp; '&lt;VAR',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[aA][rR][eE][aA]'&nbsp;&nbsp;&nbsp; '&lt;AREA',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[bB][aA][sS][eE]'&nbsp;&nbsp;&nbsp; '&lt;BASE',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[bB][oO][dD][yY]'&nbsp;&nbsp;&nbsp; '&lt;BODY',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[cC][iI][tT][eE]'&nbsp;&nbsp;&nbsp; '&lt;CITE',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[cC][oO][dD][eE]'&nbsp;&nbsp;&nbsp; '&lt;CODE',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[fF][oO][nN][tT]'&nbsp;&nbsp;&nbsp; '&lt;FONT',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[fF][oO][rR][mM]'&nbsp;&nbsp;&nbsp; '&lt;FORM',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[hH][eE][aA][dD]'&nbsp;&nbsp;&nbsp; '&lt;HEAD',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[hH][tT][mM][lL]'&nbsp;&nbsp;&nbsp; '&lt;HTML',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[lL][iI][nN][kK]'&nbsp;&nbsp;&nbsp; '&lt;LINK',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[mM][eE][nN][uU]'&nbsp;&nbsp;&nbsp; '&lt;MENU',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[mM][eE][tT][aA]'&nbsp;&nbsp;&nbsp; '&lt;META',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[sS][aA][mM][pP]'&nbsp;&nbsp;&nbsp; '&lt;SAMP',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[iI][nN][pP][uU][tT]'&nbsp;&nbsp; '&lt;INPUT',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[pP][aA][rR][aA][mM]'&nbsp;&nbsp; '&lt;PARAM',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[sS][mM][aA][lL][lL]'&nbsp;&nbsp; '&lt;SMALL',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[sS][tT][yY][lL][eE]'&nbsp;&nbsp; '&lt;STYLE',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[tT][aA][bB][lL][eE]'&nbsp;&nbsp; '&lt;TABLE',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[tT][iI][tT][lL][eE]'&nbsp;&nbsp; '&lt;TITLE',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[aA][pP][pP][lL][eE][tT]'&nbsp;&nbsp; '&lt;APPLET',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[cC][eE][nN][tT][eE][rR]'&nbsp;&nbsp; '&lt;CENTER',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[oO][pP][tT][iI][oO][nN]'&nbsp;&nbsp; '&lt;OPTION',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[sS][cC][rR][iI][pP][tT]'&nbsp; '&lt;SCRIPT',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[sS][eE][lL][eE][cC][tT]'&nbsp;&nbsp; '&lt;SELECT',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[sS][tT][rR][iI][kK][eE]'&nbsp; '&lt;STRIKE',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[sS][tT][rR][oO][nN][gG]'&nbsp;&nbsp; '&lt;STRONG',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[aA][dD][dD][rR][eE][sS][sS]'&nbsp; '&lt;ADDRESS',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[cC][aA][pP][tT][iI][oO][nN]'&nbsp; '&lt;CAPTION',<b>%push</b> Attr;</tt>
+<br><tt>'&lt;[bB][aA][sS][eE][fF][oO][nN][tT]'&nbsp; '&lt;BASEFONT',<b>%push</b>
+Attr;</tt>
+<br><tt>'&lt;[iI][sS][iI][nN][dD][eE][xX]'&nbsp;&nbsp; '&lt;ISINDEX',<b>%push</b>
+Attr;</tt>
+<br><tt>'&lt;[bB][lL][oO][cC][kK][qQ][uU][oO][tT][eE]'&nbsp; '&lt;BLOCKQUOTE',<b>%push</b>
+Attr;</tt>
+<br><tt>'&lt;[tT][eE][xX][tT][aA][rR][eE][aA]'&nbsp; '&lt;TEXTAREA',<b>%push</b>
+Attr;</tt>
+<br><tt>'{ps}+'&nbsp; %ignore;</tt>
+<p><tt>'&lt;/[aA]'&nbsp;&nbsp;&nbsp;&nbsp; '&lt;/A', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[bB]'&nbsp;&nbsp;&nbsp;&nbsp; '&lt;/B', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[iI]'&nbsp;&nbsp;&nbsp;&nbsp; '&lt;/I', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[pP]'&nbsp;&nbsp;&nbsp;&nbsp; '&lt;/P', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[uU]'&nbsp;&nbsp;&nbsp;&nbsp; '&lt;/U', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[bB][rR]'&nbsp;&nbsp;&nbsp; '&lt;/BR', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[dD][dD]'&nbsp;&nbsp;&nbsp; '&lt;/DD', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[dD][lL]'&nbsp;&nbsp;&nbsp; '&lt;/DL', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[dD][tT]'&nbsp;&nbsp;&nbsp; '&lt;/DT', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[eE][mM]'&nbsp;&nbsp;&nbsp; '&lt;/EM', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[hH]1'&nbsp;&nbsp;&nbsp; '&lt;/H1', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[hH]2'&nbsp;&nbsp;&nbsp; '&lt;/H2', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[hH]3'&nbsp;&nbsp;&nbsp; '&lt;/H3', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[hH]4'&nbsp;&nbsp;&nbsp; '&lt;/H4', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[hH]5'&nbsp;&nbsp;&nbsp; '&lt;/H5', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[hH]6'&nbsp;&nbsp;&nbsp; '&lt;/H6', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[hH][rR]'&nbsp;&nbsp;&nbsp; '&lt;/HR', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[lL][iI]'&nbsp;&nbsp;&nbsp; '&lt;/LI', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[oO][lL]'&nbsp;&nbsp;&nbsp; '&lt;/OL', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[tT][dD]'&nbsp;&nbsp;&nbsp; '&lt;/TD', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[tT][hH]'&nbsp;&nbsp;&nbsp; '&lt;/TH', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[tT][rR]'&nbsp;&nbsp;&nbsp; '&lt;/TR', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[tT][tT]'&nbsp;&nbsp;&nbsp; '&lt;/TT', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[uU][lL]'&nbsp;&nbsp;&nbsp; '&lt;/UL', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[bB][iI][gG]'&nbsp;&nbsp;&nbsp; '&lt;/BIG', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[dD][fF][nN]'&nbsp;&nbsp;&nbsp; '&lt;/DFN', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[dD][iI][rR]'&nbsp;&nbsp;&nbsp; '&lt;/DIR', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[dD][iI][vV]'&nbsp;&nbsp;&nbsp; '&lt;/DIV', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[iI][mM][gG]'&nbsp;&nbsp;&nbsp; '&lt;/IMG', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[kK][bB][dD]'&nbsp;&nbsp;&nbsp; '&lt;/KBD', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[mM][aA][pP]'&nbsp;&nbsp;&nbsp; '&lt;/MAP', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[pP][rR][eE]'&nbsp;&nbsp;&nbsp; '&lt;/PRE', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[sS][uU][bB]'&nbsp;&nbsp;&nbsp; '&lt;/SUB', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[sS][uU][pP]'&nbsp;&nbsp;&nbsp; '&lt;/SUP', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[vV][aA][rR]'&nbsp;&nbsp;&nbsp; '&lt;/VAR', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[aA][rR][eE][aA]'&nbsp;&nbsp;&nbsp; '&lt;/AREA', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[bB][aA][sS][eE]'&nbsp;&nbsp;&nbsp; '&lt;/BASE', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[bB][oO][dD][yY]'&nbsp;&nbsp;&nbsp; '&lt;/BODY', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[cC][iI][tT][eE]'&nbsp;&nbsp;&nbsp; '&lt;/CITE', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[cC][oO][dD][eE]'&nbsp;&nbsp;&nbsp; '&lt;/CODE', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[fF][oO][nN][tT]'&nbsp;&nbsp;&nbsp; '&lt;/FONT', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[fF][oO][rR][mM]'&nbsp;&nbsp;&nbsp; '&lt;/FORM', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[hH][eE][aA][dD]'&nbsp;&nbsp;&nbsp; '&lt;/HEAD', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[hH][tT][mM][lL]'&nbsp;&nbsp;&nbsp; '&lt;/HTML', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[lL][iI][nN][kK]'&nbsp;&nbsp;&nbsp; '&lt;/LINK', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[mM][eE][nN][uU]'&nbsp;&nbsp;&nbsp; '&lt;/MENU', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[mM][eE][tT][aA]'&nbsp;&nbsp;&nbsp; '&lt;/META', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[sS][aA][mM][pP]'&nbsp;&nbsp;&nbsp; '&lt;/SAMP', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[iI][nN][pP][uU][tT]'&nbsp;&nbsp; '&lt;/INPUT', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[pP][aA][rR][aA][mM]'&nbsp;&nbsp; '&lt;/PARAM', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[sS][mM][aA][lL][lL]'&nbsp;&nbsp; '&lt;/SMALL', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[sS][tT][yY][lL][eE]'&nbsp;&nbsp; '&lt;/STYLE', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[tT][aA][bB][lL][eE]'&nbsp;&nbsp; '&lt;/TABLE', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[tT][iI][tT][lL][eE]'&nbsp;&nbsp; '&lt;/TITLE', <b>%push</b> End;</tt>
+<br><tt>'&lt;/[aA][pP][pP][lL][eE][tT]'&nbsp;&nbsp; '&lt;/APPLET', <b>%push</b>
+End;</tt>
+<br><tt>'&lt;/[cC][eE][nN][tT][eE][rR]'&nbsp;&nbsp; '&lt;/CENTER', <b>%push</b>
+End;</tt>
+<br><tt>'&lt;/[oO][pP][tT][iI][oO][nN]'&nbsp;&nbsp; '&lt;/OPTION', <b>%push</b>
+End;</tt>
+<br><tt>'&lt;/[sS][cC][rR][iI][pP][tT]'&nbsp;&nbsp; '&lt;/SCRIPT', <b>%push</b>
+End;</tt>
+<br><tt>'&lt;/[sS][eE][lL][eE][cC][tT]'&nbsp;&nbsp; '&lt;/SELECT', <b>%push</b>
+End;</tt>
+<br><tt>'&lt;/[sS][tT][rR][iI][kK][eE]'&nbsp;&nbsp; '&lt;/STRIKE', <b>%push</b>
+End;</tt>
+<br><tt>'&lt;/[sS][tT][rR][oO][nN][gG]'&nbsp;&nbsp; '&lt;/STRONG', <b>%push</b>
+End;</tt>
+<br><tt>'&lt;/[aA][dD][dD][rR][eE][sS][sS]'&nbsp; '&lt;/ADDRESS', <b>%push</b>
+End;</tt>
+<br><tt>'&lt;/[cC][aA][pP][tT][iI][oO][nN]'&nbsp; '&lt;/CAPTION', <b>%push</b>
+End;</tt>
+<br><tt>'&lt;/[bB][aA][sS][eE][fF][oO][nN][tT]'&nbsp; '&lt;/BASEFONT',
+<b>%push</b> End;</tt>
+<br><tt>'&lt;/[iI][sS][iI][nN][dD][eE][xX]'&nbsp;&nbsp; '&lt;/ISINDEX',
+<b>%push</b> End;</tt>
+<br><tt>'&lt;/[bB][lL][oO][cC][kK][qQ][uU][oO][tT][eE]'&nbsp; '&lt;/BLOCKQUOTE',
+<b>%push</b> End;</tt>
+<br><tt>'&lt;/[tT][eE][xX][tT][aA][rR][eE][aA]'&nbsp; '&lt;/TEXTAREA',
+<b>%push</b> End;</tt>
+<p><tt><b>%expression</b> End</tt>
+<br><tt>'{ps}+'&nbsp; %ignore;</tt>
+<br><tt>'>'&nbsp;&nbsp; '>', <b>%pop</b>;</tt>
+<p><tt><b>%expression</b> Coment</tt>
+<br><tt>'.' %ignore ;</tt>
+<br><tt>'\n' %ignore ;</tt>
+<br><tt>'\-\->' %ignore, <b>%pop</b> ;</tt>
+<p><tt><b>%expression</b> Attr</tt>
+<br><tt>'{ps}+'&nbsp; %ignore;</tt>
+<br><tt>'='&nbsp;&nbsp; '=', <b>%push</b> Val;</tt>
+<br><tt>'>'&nbsp;&nbsp; '>', <b>%pop</b>;</tt>
+<br><tt>'[aA][lL][tT]'&nbsp;&nbsp;&nbsp; 'ALT';</tt>
+<br><tt>'[aA][cC][tT][iI][oO][nN]'&nbsp;&nbsp; 'ACTION';</tt>
+<br><tt>'[aA][lL][iI][gG][nN]'&nbsp;&nbsp; 'ALIGN';</tt>
+<br><tt>'[aA][lL][iI][nN][kK]'&nbsp;&nbsp; 'ALINK';</tt>
+<br><tt>'[bB][oO][rR][dD][eE][rR]'&nbsp;&nbsp; 'BORDER';</tt>
+<br><tt>'[bB][gG][cC][oO][lL][oO][rR]'&nbsp; 'BGCOLOR';</tt>
+<br><tt>'[bB][aA][cC][kK][gG][rR][oO][uU][nN][dD]' 'BACKGROUND';</tt>
+<br><tt>'[cC][oO][dD][eE]'&nbsp;&nbsp; 'CODE';</tt>
+<br><tt>'[cC][oO][lL][sS]'&nbsp;&nbsp; 'COLS';</tt>
+<br><tt>'[cC][oO][lL][oO][rR]'&nbsp;&nbsp; 'COLOR';</tt>
+<br><tt>'[cC][lL][eE][aA][rR]'&nbsp;&nbsp; 'CLEAR';</tt>
+<br><tt>'[cC][oO][oO][rR][dD][sS]'&nbsp;&nbsp; 'COORDS';</tt>
+<br><tt>'[cC][hH][eE][cC][kK][eE][dD]'&nbsp; 'CHECKED';</tt>
+<br><tt>'[cC][oO][lL][sS][pP][aA][nN]'&nbsp; 'COLSPAN';</tt>
+<br><tt>'[cC][oO][mM][pP][aA][cC][tT]'&nbsp; 'COMPACT';</tt>
+<br><tt>'[cC][oO][nN][tT][eE][nN][tT]'&nbsp; 'CONTENT';</tt>
+<br><tt>'[cC][oO][dD][eE][bB][aA][sS][eE]'&nbsp; 'CODEBASE';</tt>
+<br><tt>'[cC][eE][lL][lL][pP][aA][dD][dD][iI][nN][gG]' 'CELLPADDING';</tt>
+<br><tt>'[cC][eE][lL][lL][sS][pP][aA][cC][iI][nN][gG]' 'CELLSPACING';</tt>
+<br><tt>'[eE][nN][cC][tT][yY][pP][eE]'&nbsp; 'ENCTYPE';</tt>
+<br><tt>'[hH][rR][eE][fF]'&nbsp;&nbsp; 'HREF';</tt>
+<br><tt>'[hH][eE][iI][gG][hH][tT]'&nbsp;&nbsp; 'HEIGHT';</tt>
+<br><tt>'[hH][sS][pP][aA][cC][eE]'&nbsp;&nbsp; 'HSPACE';</tt>
+<br><tt>'[hH][tT][tT][pP]\-[eE][qQ][uU][iI][vV]' 'HTTP-EQUIV';</tt>
+<br><tt>'[iI][sS][mM][aA][pP]'&nbsp;&nbsp; 'ISMAP';</tt>
+<br><tt>'[lL][iI][nN][kK]'&nbsp;&nbsp; 'LINK';</tt>
+<br><tt>'[mM][eE][tT][hH][oO][dD]'&nbsp;&nbsp; 'METHOD';</tt>
+<br><tt>'[mM][uU][lL][tT][iI][pP][lL][eE]'&nbsp; 'MULTIPLE';</tt>
+<br><tt>'[mM][aA][xX][lL][eE][nN][gG][tT][hH]'&nbsp; 'MAXLENGTH';</tt>
+<br><tt>'[nN][aA][mM][eE]'&nbsp;&nbsp; 'NAME';</tt>
+<br><tt>'[nN][oO][wW][rR][aA][pP]'&nbsp;&nbsp; 'NOWRAP';</tt>
+<br><tt>'[nN][oO][hH][rR][eE][fF]'&nbsp;&nbsp; 'NOHREF';</tt>
+<br><tt>'[nN][oO][sS][hH][aA][dD][eE]'&nbsp; 'NOSHADE';</tt>
+<br><tt>'[pP][rR][oO][mM][pP][tT]'&nbsp;&nbsp; 'PROMPT';</tt>
+<br><tt>'[rR][eE][fF]'&nbsp;&nbsp;&nbsp; 'REF';</tt>
+<br><tt>'[rR][eE][lL]'&nbsp;&nbsp;&nbsp; 'REL';</tt>
+<br><tt>'[rR][eE][vV]'&nbsp;&nbsp;&nbsp; 'REV';</tt>
+<br><tt>'[rR][oO][wW][sS]'&nbsp;&nbsp; 'ROWS';</tt>
+<br><tt>'[rR][oO][wW][sS][pP][aA][nN]'&nbsp; 'ROWSPAN';</tt>
+<br><tt>'[sS][rR][cC]'&nbsp;&nbsp;&nbsp; 'SRC';</tt>
+<br><tt>'[sS][iI][zZ][eE]'&nbsp;&nbsp; 'SIZE';</tt>
+<br><tt>'[sS][hH][aA][pP][eE]'&nbsp;&nbsp; 'SHAPE';</tt>
+<br><tt>'[sS][tT][aA][rR][tT]'&nbsp;&nbsp; 'START';</tt>
+<br><tt>'[sS][eE][lL][eE][cC][tT][eE][dD]'&nbsp; 'SELECTED';</tt>
+<br><tt>'[tT][eE][xX][tT]'&nbsp;&nbsp; 'TEXT';</tt>
+<br><tt>'[tT][yY][pP][eE]'&nbsp;&nbsp; 'TYPE';</tt>
+<br><tt>'[tT][iI][tT][lL][eE]'&nbsp;&nbsp; 'TITLE';</tt>
+<br><tt>'[uU][sS][eE][mM][aA][pP]'&nbsp;&nbsp; 'USEMAP';</tt>
+<br><tt>'[vV][aA][lL][uU][eE]'&nbsp;&nbsp; 'VALUE';</tt>
+<br><tt>'[vV][lL][iI][nN][kK]'&nbsp;&nbsp; 'VLINK';</tt>
+<br><tt>'[vV][sS][pP][aA][cC][eE]'&nbsp;&nbsp; 'VSPACE';</tt>
+<br><tt>'[vV][aA][lL][iI][gG][nN]'&nbsp;&nbsp; 'VALIGN';</tt>
+<br><tt>'[vV][eE][rR][sS][iI][oO][nN]'&nbsp; 'VERSION';</tt>
+<br><tt>'[wW][iI][dD][tT][hH]'&nbsp;&nbsp; 'WIDTH';</tt>
+<p><tt><b>%expression</b> Val</tt>
+<br><tt>'\"[^\"]*\"'&nbsp;&nbsp;&nbsp;&nbsp; 'STRING' <b>%pop</b>;</tt>
+<br><tt>'{DIGIT}+'&nbsp; 'NUMBER', <b>%pop</b>;</tt>
+<br><tt>'{NMCHAR}+'&nbsp; 'STRING', <b>%pop</b>;</tt>
+<br><tt>'\"#{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}\"'
+'RGB', <b>%pop</b>;</tt>
+<br><tt>'\"[\+\-]{DIGIT}+\"' 'SIZE_VALUE', <b>%pop</b>;</tt>
+<br><tt>'\"{DIGIT}+\"' 'NUMBER', <b>%pop</b>;</tt>
+<br><tt>'\"{DIGIT}+%\"'&nbsp; 'PERCENT', <b>%pop</b>;</tt>
+<br><tt>'[aA][lL][lL]'&nbsp;&nbsp; 'ALL', <b>%pop</b>;</tt>
+<br><tt>'[aA][qQ][uU][aA]'&nbsp; 'AQUA', <b>%pop</b>;</tt>
+<br><tt>'[bB][aA][sS][eE][lL][iI][nN][eE]' 'BASELINE', <b>%pop</b>;</tt>
+<br><tt>'[bB][lL][uU][eE]'&nbsp; 'BLUE', <b>%pop</b>;</tt>
+<br><tt>'[bB][lL][aA][cC][kK]'&nbsp; 'BLACK', <b>%pop</b>;</tt>
+<br><tt>'[bB][oO][tT][tT][oO][mM]'&nbsp; 'BOTTOM', <b>%pop</b>;</tt>
+<br><tt>'[cC][eE][nN][tT][eE][rR]'&nbsp; 'CENTER', <b>%pop</b>;</tt>
+<br><tt>'[cC][iI][rR][cC][lL][eE]'&nbsp; 'CIRCLE', <b>%pop</b>;</tt>
+<br><tt>'[cC][oO][mM][pP][aA][cC][tT]' 'COMPACT', <b>%pop</b>;</tt>
+<br><tt>'[cC][hH][eE][cC][kK][bB][oO][xX]' 'CHECKBOX', <b>%pop</b>;</tt>
+<br><tt>'[cC][hH][eE][cC][kK][eE][dD]' 'CHECKED', <b>%pop</b>;</tt>
+<br><tt>'[dD][iI][sS][cC]'&nbsp; 'DISC', <b>%pop</b>;</tt>
+<br><tt>'[dD][eE][fF][aA][uU][lL][tT]' 'DEFAULT', <b>%pop</b>;</tt>
+<br><tt>'[fF][iI][lL][eE]'&nbsp; 'FILE', <b>%pop</b>;</tt>
+<br><tt>'[fF][uU][cC][hH][sS][iI][aA]' 'FUCHSIA', <b>%pop</b>;</tt>
+<br><tt>'[gG][eE][tT]'&nbsp;&nbsp; 'GET', <b>%pop</b>;</tt>
+<br><tt>'[gG][rR][aA][yY]'&nbsp; 'GRAY', <b>%pop</b>;</tt>
+<br><tt>'[gG][rR][eE][eE][nN]'&nbsp; 'GREEN', <b>%pop</b>;</tt>
+<br><tt>'[hH][iI][dD][dD][eE][nN]'&nbsp; 'HIDDEN', <b>%pop</b>;</tt>
+<br><tt>'[iI][mM][aA][gG][eE]'&nbsp; 'IMAGE', <b>%pop</b>;</tt>
+<br><tt>'[iI][sS][mM][aA][pP]'&nbsp; 'ISMAP', <b>%pop</b>;</tt>
+<br><tt>'[lL][eE][fF][tT]'&nbsp; 'LEFT', <b>%pop</b>;</tt>
+<br><tt>'[lL][iI][mM][eE]'&nbsp; 'LIME', <b>%pop</b>;</tt>
+<br><tt>'[mM][aA][rR][oO][oO][nN]'&nbsp; 'MAROON', <b>%pop</b>;</tt>
+<br><tt>'[mM][iI][dD][dD][lL][eE]'&nbsp; 'MIDDLE', <b>%pop</b>;</tt>
+<br><tt>'[mM][uU][lL][tT][iI][pP][lL][eE]' 'MULTIPLE', <b>%pop</b>;</tt>
+<br><tt>'[nN][aA][vV][yY]'&nbsp; 'NAVY', <b>%pop</b>;</tt>
+<br><tt>'[nN][oO][nN][eE]'&nbsp; 'NONE', <b>%pop</b>;</tt>
+<br><tt>'[nN][oO][wW][rR][aA][pP]'&nbsp; 'NOWRAP', <b>%pop</b>;</tt>
+<br><tt>'[nN][oO][hH][rR][eE][fF]'&nbsp; 'NOHREF', <b>%pop</b>;</tt>
+<br><tt>'[nN][oO][sS][hH][aA][dD][eE]' 'NOSHADE', <b>%pop</b>;</tt>
+<br><tt>'[oO][lL][iI][vV][eE]'&nbsp; 'OLIVE', <b>%pop</b>;</tt>
+<br><tt>'[pP][oO][lL][yY]'&nbsp; 'POLY', <b>%pop</b>;</tt>
+<br><tt>'[pP][oO][sS][tT]'&nbsp; 'POST', <b>%pop</b>;</tt>
+<br><tt>'[pP][uU][rR][pP][lL][eE]'&nbsp; 'PURPLE', <b>%pop</b>;</tt>
+<br><tt>'[pP][aA][sS][sS][wW][oO][rR][dD]' 'PASSWORD', <b>%pop</b>;</tt>
+<br><tt>'[rR][eE][dD]'&nbsp;&nbsp; 'RED', <b>%pop</b>;</tt>
+<br><tt>'[rR][eE][cC][tT]'&nbsp; 'RECT', <b>%pop</b>;</tt>
+<br><tt>'[rR][aA][dD][iI][oO]'&nbsp; 'RADIO', <b>%pop</b>;</tt>
+<br><tt>'[rR][eE][sS][eE][tT]'&nbsp; 'RESET', <b>%pop</b>;</tt>
+<br><tt>'[rR][iI][gG][hH][tT]'&nbsp; 'RIGHT', <b>%pop</b>;</tt>
+<br><tt>'[sS][lL][iI][vV][eE][rR]'&nbsp; 'SLIVER', <b>%pop</b>;</tt>
+<br><tt>'[sS][qQ][uU][aA][rR][eE]'&nbsp; 'SQUARE', <b>%pop</b>;</tt>
+<br><tt>'[sS][uU][bB][mM][iI][tT]'&nbsp; 'SUBMIT', <b>%pop</b>;</tt>
+<br><tt>'[sS][eE][lL][eE][cC][tT][eE][dD]' 'SELECTED', <b>%pop</b>;</tt>
+<br><tt>'[tT][oO][pP]'&nbsp;&nbsp; 'TOP', <b>%pop</b>;</tt>
+<br><tt>'[tT][eE][aA][lL]'&nbsp; 'TEAL', <b>%pop</b>;</tt>
+<br><tt>'[tT][eE][xX][tT]'&nbsp; 'TEXT', <b>%pop</b>;</tt>
+<br><tt>'[wW][hH][iI][tT][eE]'&nbsp; 'WHITE', <b>%pop</b>;</tt>
+<br><tt>'[yY][eE][lL][lL][oO][wW]'&nbsp; 'YELLOW', <b>%pop</b>;</tt>
+</code>
+<p>Wartości w cudzysłowach:
+<code>
+<p><tt>'\"[aA][lL][lL]\"'&nbsp;&nbsp; 'ALL', <b>%pop</b>;</tt>
+<br><tt>'\"[aA][qQ][uU][aA]\"'&nbsp; 'AQUA', <b>%pop</b>;</tt>
+<br><tt>'\"[bB][aA][sS][eE][lL][iI][nN][eE]\"' 'BASELINE', <b>%pop</b>;</tt>
+<br><tt>'\"[bB][lL][uU][eE]\"'&nbsp; 'BLUE', <b>%pop</b>;</tt>
+<br><tt>'\"[bB][lL][aA][cC][kK]\"'&nbsp; 'BLACK', <b>%pop</b>;</tt>
+<br><tt>'\"[bB][oO][tT][tT][oO][mM]\"'&nbsp; 'BOTTOM', <b>%pop</b>;</tt>
+<br><tt>'\"[cC][eE][nN][tT][eE][rR]\"'&nbsp; 'CENTER', <b>%pop</b>;</tt>
+<br><tt>'\"[cC][iI][rR][cC][lL][eE]\"'&nbsp; 'CIRCLE', <b>%pop</b>;</tt>
+<br><tt>'\"[cC][oO][mM][pP][aA][cC][tT]\"' 'COMPACT', <b>%pop</b>;</tt>
+<br><tt>'\"[cC][hH][eE][cC][kK][bB][oO][xX]\"' 'CHECKBOX', <b>%pop</b>;</tt>
+<br><tt>'\"[cC][hH][eE][cC][kK][eE][dD]\"' 'CHECKED', <b>%pop</b>;</tt>
+<br><tt>'\"[dD][iI][sS][cC]\"'&nbsp; 'DISC', <b>%pop</b>;</tt>
+<br><tt>'\"[dD][eE][fF][aA][uU][lL][tT]\"' 'DEFAULT', <b>%pop</b>;</tt>
+<br><tt>'\"[fF][iI][lL][eE]\"'&nbsp; 'FILE', <b>%pop</b>;</tt>
+<br><tt>'\"[fF][uU][cC][hH][sS][iI][aA]\"' 'FUCHSIA', <b>%pop</b>;</tt>
+<br><tt>'\"[gG][eE][tT]\"'&nbsp;&nbsp; 'GET', <b>%pop</b>;</tt>
+<br><tt>'\"[gG][rR][aA][yY]\"'&nbsp; 'GRAY', <b>%pop</b>;</tt>
+<br><tt>'\"[gG][rR][eE][eE][nN]\"'&nbsp; 'GREEN', <b>%pop</b>;</tt>
+<br><tt>'\"[hH][iI][dD][dD][eE][nN]\"'&nbsp; 'HIDDEN', <b>%pop</b>;</tt>
+<br><tt>'\"[iI][mM][aA][gG][eE]\"'&nbsp; 'IMAGE', <b>%pop</b>;</tt>
+<br><tt>'\"[iI][sS][mM][aA][pP]\"'&nbsp; 'ISMAP', <b>%pop</b>;</tt>
+<br><tt>'\"[lL][eE][fF][tT]\"'&nbsp; 'LEFT', <b>%pop</b>;</tt>
+<br><tt>'\"[lL][iI][mM][eE]\"'&nbsp; 'LIME', <b>%pop</b>;</tt>
+<br><tt>'\"[mM][aA][rR][oO][oO][nN]\"'&nbsp; 'MAROON', <b>%pop</b>;</tt>
+<br><tt>'\"[mM][iI][dD][dD][lL][eE]\"'&nbsp; 'MIDDLE', <b>%pop</b>;</tt>
+<br><tt>'\"[mM][uU][lL][tT][iI][pP][lL][eE]\"' 'MULTIPLE', <b>%pop</b>;</tt>
+<br><tt>'\"[nN][aA][vV][yY]\"'&nbsp; 'NAVY', <b>%pop</b>;</tt>
+<br><tt>'\"[nN][oO][nN][eE]\"'&nbsp; 'NONE', <b>%pop</b>;</tt>
+<br><tt>'\"[nN][oO][wW][rR][aA][pP]\"'&nbsp; 'NOWRAP', <b>%pop</b>;</tt>
+<br><tt>'\"[nN][oO][hH][rR][eE][fF]\"'&nbsp; 'NOHREF', <b>%pop</b>;</tt>
+<br><tt>'\"[nN][oO][sS][hH][aA][dD][eE]\"' 'NOSHADE', <b>%pop</b>;</tt>
+<br><tt>'\"[oO][lL][iI][vV][eE]\"'&nbsp; 'OLIVE', <b>%pop</b>;</tt>
+<br><tt>'\"[pP][oO][lL][yY]\"'&nbsp; 'POLY', <b>%pop</b>;</tt>
+<br><tt>'\"[pP][oO][sS][tT]\"'&nbsp; 'POST', <b>%pop</b>;</tt>
+<br><tt>'\"[pP][uU][rR][pP][lL][eE]\"'&nbsp; 'PURPLE', <b>%pop</b>;</tt>
+<br><tt>'\"[pP][aA][sS][sS][wW][oO][rR][dD]\"' 'PASSWORD', <b>%pop</b>;</tt>
+<br><tt>'\"[rR][eE][dD]\"'&nbsp;&nbsp; 'RED', <b>%pop</b>;</tt>
+<br><tt>'\"[rR][eE][cC][tT]\"'&nbsp; 'RECT', <b>%pop</b>;</tt>
+<br><tt>'\"[rR][aA][dD][iI][oO]\"'&nbsp; 'RADIO', <b>%pop</b>;</tt>
+<br><tt>'\"[rR][eE][sS][eE][tT]\"'&nbsp; 'RESET', <b>%pop</b>;</tt>
+<br><tt>'\"[rR][iI][gG][hH][tT]\"'&nbsp; 'RIGHT', <b>%pop</b>;</tt>
+<br><tt>'\"[sS][lL][iI][vV][eE][rR]\"'&nbsp; 'SLIVER', <b>%pop</b>;</tt>
+<br><tt>'\"[sS][qQ][uU][aA][rR][eE]\"'&nbsp; 'SQUARE', <b>%pop</b>;</tt>
+<br><tt>'\"[sS][uU][bB][mM][iI][tT]\"'&nbsp; 'SUBMIT', <b>%pop</b>;</tt>
+<br><tt>'\"[sS][eE][lL][eE][cC][tT][eE][dD]\"' 'SELECTED', <b>%pop</b>;</tt>
+<br><tt>'\"[tT][oO][pP]\"'&nbsp;&nbsp; 'TOP', <b>%pop</b>;</tt>
+<br><tt>'\"[tT][eE][aA][lL]\"'&nbsp; 'TEAL', <b>%pop</b>;</tt>
+<br><tt>'\"[tT][eE][xX][tT]\"'&nbsp; 'TEXT', <b>%pop</b>;</tt>
+<br><tt>'\"[wW][hH][iI][tT][eE]\"'&nbsp; 'WHITE', <b>%pop</b>;</tt>
+<br><tt>'\"[yY][eE][lL][lL][oO][wW]\"'&nbsp; 'YELLOW', <b>%pop</b>;'[aA][lL][lL]'&nbsp;&nbsp;
+ALL, 'ALL', <b>%pop</b>;</tt>
+</code>
+<P>
+<HR>
+<p><b>Produkcje :</b>
+<code>
+<p><tt>color -> 'RGB';</tt>
+<br><tt>color -> 'AQUA';</tt>
+<br><tt>color -> 'BLACK';</tt>
+<br><tt>color -> 'BLUE';</tt>
+<br><tt>color -> 'FUCHSIA';</tt>
+<br><tt>color -> 'GRAY';</tt>
+<br><tt>color -> 'GREEN';</tt>
+<br><tt>color -> 'LIME';</tt>
+<br><tt>color -> 'MAROON';</tt>
+<br><tt>color -> 'NAVY';</tt>
+<br><tt>color -> 'OLIVE';</tt>
+<br><tt>color -> 'PURPLE';</tt>
+<br><tt>color -> 'RED';</tt>
+<br><tt>color -> 'SLIVER';</tt>
+<br><tt>color -> 'TEAL';</tt>
+<br><tt>color -> 'WHITE';</tt>
+<br><tt>color -> 'YELLOW';</tt>
+<p><tt>data -> 'DATA';</tt>
+<p><tt>align_val -> 'LEFT';</tt>
+<br><tt>align_val -> 'RIGHT';</tt>
+<br><tt>align_val -> 'CENTER';</tt>
+<p><tt>align_special_val -> 'TOP';</tt>
+<br><tt>align_special_val -> 'MIDDLE';</tt>
+<br><tt>align_special_val -> 'BOTTOM';</tt>
+<br><tt>align_special_val -> 'LEFT';</tt>
+<br><tt>align_special_val -> 'RIGHT';</tt>
+<p><tt>httpmethod -> 'GET';</tt>
+<br><tt>httpmethod -> 'POST';</tt>
+<p><tt>document -> 'DOCTYPE' html ;</tt>
+<p><tt>html -> html_start head body '&lt;/HTML' '>';</tt>
+<br><tt>html -> head body;</tt>
+<p><tt>html_start -> '&lt;HTML' 'VERSION' '=' 'STRING' '>';</tt>
+<br><tt>html_start -> '&lt;HTML' '>';</tt>
+<p><tt>head -> '&lt;HEAD' '>' head_cont '&lt;/HEAD' '>';</tt>
+<br><tt>head -> head_cont;</tt>
+<p><tt>head_cont -> head_cont title;</tt>
+<br><tt>head_cont -> head_cont isindex;</tt>
+<br><tt>head_cont -> head_cont base;</tt>
+<br><tt>head_cont -> head_cont script;</tt>
+<br><tt>head_cont -> head_cont style;</tt>
+<br><tt>head_cont -> head_cont meta;</tt>
+<br><tt>head_cont -> head_cont link;</tt>
+<br><tt>head_cont -> ;</tt>
+<p><tt>title -> '&lt;TITLE' '>' data '&lt;/TITLE' '>';</tt>
+<br><tt>title -> '&lt;TITLE' '>' '&lt;/TITLE' '>';</tt>
+<p><tt>isindex -> '&lt;ISINDEX' 'PROMPT' '=' 'STRING' '>';</tt>
+<br><tt>isindex -> '&lt;ISINDEX' '>';</tt>
+<p><tt>base -> '&lt;BASE' 'HREF' '=' 'STRING' '>'; /* STRING -> URL */</tt>
+<p><tt>script -> '&lt;SCRIPT' '>' data '&lt;/SCRIPT' '>';</tt>
+<p><tt>style -> '&lt;STYLE' '>' data '&lt;/STYLE' '>';</tt>
+<p><tt>meta -> '&lt;META' meta_attr '>';</tt>
+<br><tt>meta_attr -> 'CONTENT' '=' 'STRING' ;</tt>
+<br><tt>meta_attr -> 'NAME' '=' 'STRING' 'CONTENT' '=' 'STRING' ;</tt>
+<br><tt>meta_attr -> 'HTTP-EQUIV' '=' 'STRING' 'CONTENT' '=' 'STRING' ;</tt>
+<p><tt>link -> '&lt;LINK' link_attrs '>';</tt>
+<br><tt>link_attrs -> link_attr;</tt>
+<br><tt>link_attr -> link_attr 'REL' '=' 'STRING' ;</tt>
+<br><tt>link_attr -> link_attr 'REV' '=' 'STRING' ;</tt>
+<br><tt>link_attr -> link_attr 'HREF' '=' 'STRING' ;</tt>
+<br><tt>link_attr -> link_attr 'TITLE' '=' 'STRING' ;</tt>
+<br><tt>link_attr -> ;</tt>
+<p><tt>body ->&nbsp; '&lt;BODY' body_attrs '>' body_cont '&lt;/BODY' '>';</tt>
+<br><tt>body -> body_cont ;</tt>
+<br><tt>body_attrs -> body_attr;</tt>
+<br><tt>body_attr -> body_attr 'BACKGROUND' '=' 'STRING';</tt>
+<br><tt>body_attr -> body_attr 'BGCOLOR' '=' color;</tt>
+<br><tt>body_attr -> body_attr 'TEXT' '=' color;</tt>
+<br><tt>body_attr -> body_attr 'LINK' '=' color;</tt>
+<br><tt>body_attr -> body_attr 'VLINK' '=' color;</tt>
+<br><tt>body_attr -> body_attr 'ALINK' '=' color;</tt>
+<br><tt>body_attr -> ;</tt>
+<p><tt>body_cont -> body_cont heading ;</tt>
+<br><tt>body_cont -> body_cont text ;</tt>
+<br><tt>body_cont -> body_cont block ;</tt>
+<br><tt>body_cont -> body_cont address ;</tt>
+<br><tt>body_cont -> /*empty*/;</tt>
+<p><tt>heading -> h1;</tt>
+<br><tt>heading -> h2;</tt>
+<br><tt>heading -> h3;</tt>
+<br><tt>heading -> h4;</tt>
+<br><tt>heading -> h5;</tt>
+<br><tt>heading -> h6;</tt>
+<p><tt>h1 -> '&lt;H1' h_attr '>' h_cont '&lt;/H1' '>';</tt>
+<br><tt>h2 -> '&lt;H2' h_attr '>' h_cont '&lt;/H2' '>';</tt>
+<br><tt>h3 -> '&lt;H3' h_attr '>' h_cont '&lt;/H3' '>';</tt>
+<br><tt>h4 -> '&lt;H4' h_attr '>' h_cont '&lt;/H4' '>';</tt>
+<br><tt>h5 -> '&lt;H5' h_attr '>' h_cont '&lt;/H5' '>';</tt>
+<br><tt>h6 -> '&lt;H6' h_attr '>' h_cont '&lt;/H6' '>';</tt>
+<p><tt>h_attr -> 'ALIGN' '=' align_val;</tt>
+<br><tt>h_attr -> ;</tt>
+<p><tt>h_cont -> ;</tt>
+<br><tt>h_cont -> h_cont text;</tt>
+<p><tt>text -> data;</tt>
+<br><tt>text -> font;</tt>
+<br><tt>text -> phrase;</tt>
+<br><tt>text -> special;</tt>
+<br><tt>text -> forms;</tt>
+<p><tt>font -> tt;</tt>
+<br><tt>font -> i;</tt>
+<br><tt>font -> b;</tt>
+<br><tt>font -> u;</tt>
+<br><tt>font -> strike;</tt>
+<br><tt>font -> big;</tt>
+<br><tt>font -> small;</tt>
+<br><tt>font -> sub;</tt>
+<br><tt>font -> sup;</tt>
+<p><tt>phrase -> em;</tt>
+<br><tt>phrase -> strong;</tt>
+<br><tt>phrase -> dfn;</tt>
+<br><tt>phrase -> code;</tt>
+<br><tt>phrase -> samp;</tt>
+<br><tt>phrase -> kbd;</tt>
+<br><tt>phrase -> var;</tt>
+<br><tt>phrase -> cite;</tt>
+<p><tt>special -> a;</tt>
+<br><tt>special -> img;</tt>
+<br><tt>special -> applet;</tt>
+<br><tt>special -> fonttag;</tt>
+<br><tt>special -> basefont;</tt>
+<br><tt>special -> br;</tt>
+<br><tt>special -> script;</tt>
+<br><tt>special -> map;</tt>
+<p><tt>forms -> input;</tt>
+<br><tt>forms -> select;</tt>
+<br><tt>forms -> textarea;</tt>
+<p><tt>tt&nbsp;&nbsp; -> '&lt;TT' '>' font_phrase_cont '&lt;/TT' '>';</tt>
+<br><tt>i&nbsp;&nbsp; -> '&lt;I' '>' font_phrase_cont '&lt;/I' '>' ;</tt>
+<br><tt>b&nbsp;&nbsp; -> '&lt;B' '>' font_phrase_cont '&lt;/B' '>' ;</tt>
+<br><tt>u&nbsp;&nbsp; -> '&lt;U' '>' font_phrase_cont '&lt;/U' '>' ;</tt>
+<br><tt>strike -> '&lt;STRIKE' '>' font_phrase_cont '&lt;/STRIKE' '>';</tt>
+<br><tt>big&nbsp; -> '&lt;BIG' '>' font_phrase_cont '&lt;/BIG' '>';</tt>
+<br><tt>small&nbsp; -> '&lt;SMALL' '>' font_phrase_cont '&lt;/SMALL' '>';</tt>
+<br><tt>sub&nbsp; -> '&lt;SUB' '>' font_phrase_cont '&lt;/SUB' '>';</tt>
+<br><tt>sup&nbsp; -> '&lt;SUP' '>' font_phrase_cont '&lt;/SUP' '>';</tt>
+<p><tt>em&nbsp;&nbsp; -> '&lt;EM' '>' font_phrase_cont '&lt;/EM' '>';</tt>
+<br><tt>strong -> '&lt;STRONG' '>' font_phrase_cont '&lt;/STRONG' '>';</tt>
+<br><tt>dfn&nbsp; -> '&lt;DFN' '>' font_phrase_cont '&lt;/DFN' '>';</tt>
+<br><tt>code&nbsp; -> '&lt;CODE' '>' font_phrase_cont '&lt;/CODE' '>' ;</tt>
+<br><tt>samp&nbsp; -> '&lt;SAMP' '>' font_phrase_cont '&lt;/SAMP' '>' ;</tt>
+<br><tt>kbd&nbsp; -> '&lt;KBD' '>' font_phrase_cont '&lt;/KBD' '>';</tt>
+<br><tt>var&nbsp; -> '&lt;VAR' '>' font_phrase_cont '&lt;/VAR' '>';</tt>
+<br><tt>cite&nbsp; -> '&lt;CITE' '>' font_phrase_cont '&lt;/CITE' '>' ;</tt>
+<p><tt>font_phrase_cont -> /*empty*/;</tt>
+<br><tt>font_phrase_cont -> font_phrase_cont text;</tt>
+<p><tt>a&nbsp;&nbsp; -> '&lt;A' a_attrs '>' a_cont '&lt;/A' '>' ;</tt>
+<br><tt>a_attrs -> a_attr ;</tt>
+<br><tt>a_attr -> a_attr 'HREF' '=' 'STRING' ;</tt>
+<br><tt>a_attr -> a_attr 'NAME' '=' 'STRING' ;</tt>
+<br><tt>a_attr -> a_attr 'REL' '=' 'STRING' ;</tt>
+<br><tt>a_attr -> a_attr 'REV' '=' 'STRING' ;</tt>
+<br><tt>a_attr -> a_attr 'TITLE' '=' 'STRING' ;</tt>
+<br><tt>a_attr -> ;</tt>
+<p><tt>a_cont -> ;/*empty*/</tt>
+<br><tt>a_cont -> a_cont text;/* blad - a nie moze zawierac w sobie innego
+a !!! */</tt>
+<p><tt>img&nbsp; -> '&lt;IMG' img_attrs '>';</tt>
+<br><tt>img_attrs -> img_attr;</tt>
+<br><tt>img_attr -> img_attr 'SRC' '=' 'STRING' ;</tt>
+<br><tt>img_attr -> img_attr 'ALT' '=' 'STRING' ;</tt>
+<br><tt>img_attr -> img_attr 'ALIGN' '=' align_special_val ;</tt>
+<br><tt>img_attr -> img_attr 'HEIGHT' '=' 'NUMBER' ;</tt>
+<br><tt>img_attr -> img_attr 'WIDTH' '=' 'NUMBER' ;</tt>
+<br><tt>img_attr -> img_attr 'BORDER' '=' 'NUMBER' ;</tt>
+<br><tt>img_attr -> img_attr 'HSPACE' '=' 'NUMBER' ;</tt>
+<br><tt>img_attr -> img_attr 'VSPACE' '=' 'NUMBER' ;</tt>
+<br><tt>img_attr -> img_attr 'USEMAP' '=' 'STRING' ;</tt>
+<br><tt>img_attr -> img_attr 'ISMAP' ;</tt>
+<br><tt>img_attr -> img_attr 'ISMAP' '=' 'ISMAP' ;</tt>
+<br><tt>img_attr -> ;/*empty*/</tt>
+<p><tt>applet&nbsp; -> '&lt;APPLET' applet_attrs '>' applet_cont '&lt;/APPLET'
+'>';</tt>
+<br><tt>applet_attrs -> applet_attr ;</tt>
+<br><tt>applet_attr -> applet_attr 'CODEBASE' '=' 'STRING' ;</tt>
+<br><tt>applet_attr -> applet_attr 'CODE' '=' 'STRING';</tt>
+<br><tt>applet_attr -> applet_attr 'NAME' '=' 'STRING';</tt>
+<br><tt>applet_attr -> applet_attr 'ALT' '=' 'STRING';</tt>
+<br><tt>applet_attr -> applet_attr 'ALIGN' '=' align_special_val ;</tt>
+<br><tt>applet_attr -> applet_attr 'HEIGHT' '=' 'NUMBER' ;</tt>
+<br><tt>applet_attr -> applet_attr 'WIDTH' '=' 'NUMBER' ;</tt>
+<br><tt>applet_attr -> applet_attr 'HSPACE' '=' 'NUMBER' ;</tt>
+<br><tt>applet_attr -> applet_attr 'VSPACE' '=' 'NUMBER' ;</tt>
+<br><tt>applet_attr -> ; /*empty*/</tt>
+<p><tt>applet_cont -> applet_cont param;</tt>
+<br><tt>applet_cont -> applet_cont text;</tt>
+<br><tt>applet_cont -> ; /*empty*/</tt>
+<p><tt>param&nbsp;&nbsp; -> '&lt;PARAM' param_attr '>' ;</tt>
+<br><tt>param_attr -> 'NAME' '=' 'STRING' 'VALUE' '=' 'STRING';</tt>
+<br><tt>param_attr -> 'NAME' '=' 'STRING' ;</tt>
+<p><tt>fonttag&nbsp; -> '&lt;FONT' font_attr '>' font_cont '&lt;/FONT'
+'>' ;</tt>
+<br><tt>font_attr -> 'SIZE' '=' 'SIZE_VALUE' ;</tt>
+<br><tt>font_attr -> 'COLOR' '=' color ;</tt>
+<br><tt>font_attr -> 'COLOR' '=' color 'SIZE' '=' 'SIZE_VALUE';</tt>
+<br><tt>font_attr -> 'SIZE' '=' 'SIZE_VALUE' 'COLOR' '=' color ;</tt>
+<br><tt>font_attr -> ;</tt>
+<p><tt>font_cont -> font_cont text ;</tt>
+<br><tt>font_cont -> ; /*empty*/</tt>
+<p><tt>basefont -> '&lt;BASEFONT' 'SIZE' '=' 'NUMBER' '>' ;</tt>
+<br><tt>basefont -> '&lt;BASEFONT' '>' ;</tt>
+<p><tt>br -> '&lt;BR' 'CLEAR' '=' clear_val '>' ;</tt>
+<br><tt>br -> '&lt;BR' '>' ;</tt>
+<br><tt>clear_val -> 'LEFT' ;</tt>
+<br><tt>clear_val -> 'RIGHT' ;</tt>
+<br><tt>clear_val -> 'ALL' ;</tt>
+<br><tt>clear_val -> 'NONE' ;</tt>
+<p><tt>map -> '&lt;MAP' 'NAME' '=' 'STRING' '>' map_cont '&lt;/MAP' '>';</tt>
+<br><tt>map -> '&lt;MAP' '>' map_cont '&lt;/MAP' '>';</tt>
+<p><tt>map_cont -> ;/*empty*/</tt>
+<br><tt>map_cont -> map_cont area;</tt>
+<p><tt>area&nbsp;&nbsp; -> '&lt;AREA' area_attrs '>' ;</tt>
+<br><tt>area_attrs -> area_attr ;</tt>
+<br><tt>area_attr -> area_attr 'SHAPE' '=' shape_val;</tt>
+<br><tt>area_attr -> area_attr 'COORDS' '=' 'STRING';</tt>
+<br><tt>area_attr -> area_attr 'NOHREF' ;</tt>
+<br><tt>area_attr -> area_attr 'NOHREF' '=' 'NOHREF' ;</tt>
+<br><tt>area_attr -> area_attr 'HREF' '=' 'STRING';</tt>
+<br><tt>area_attr -> area_attr 'ALT' '=' 'STRING';</tt>
+<br><tt>area_attr -> ;</tt>
+<p><tt>shape_val -> 'RECT';</tt>
+<br><tt>shape_val -> 'CIRCLE';</tt>
+<br><tt>shape_val -> 'POLY';</tt>
+<br><tt>shape_val -> 'DEFAULT';</tt>
+<p><tt>input&nbsp;&nbsp; -> '&lt;INPUT' input_attrs '>';</tt>
+<br><tt>input_attrs -> input_attr ;</tt>
+<br><tt>input_attr -> input_attr 'TYPE' '=' type_input_val;</tt>
+<br><tt>input_attr -> input_attr 'NAME' '=' 'STRING';</tt>
+<br><tt>input_attr -> input_attr 'VALUE' '=' 'STRING' ;</tt>
+<br><tt>input_attr -> input_attr 'CHECKED' '=' 'CHECKED' ;</tt>
+<br><tt>input_attr -> input_attr 'CHECKED' ;</tt>
+<br><tt>input_attr -> input_attr 'SIZE' '=' 'NUMBER' ;</tt>
+<br><tt>input_attr -> input_attr 'MAXLENGTH' '=' 'NUMBER' ;</tt>
+<br><tt>input_attr -> input_attr 'SRC' '=' 'STRING' ;</tt>
+<br><tt>input_attr -> input_attr 'ALIGN' '=' align_special_val ;</tt>
+<br><tt>input_attr -> ;</tt>
+<p><tt>type_input_val -> 'TEXT';</tt>
+<br><tt>type_input_val -> 'PASSWORD';</tt>
+<br><tt>type_input_val -> 'CHECKBOX';</tt>
+<br><tt>type_input_val -> 'RADIO';</tt>
+<br><tt>type_input_val -> 'SUBMIT';</tt>
+<br><tt>type_input_val -> 'RESET';</tt>
+<br><tt>type_input_val -> 'FILE';</tt>
+<br><tt>type_input_val -> 'HIDDEN';</tt>
+<br><tt>type_input_val -> 'IMAGE';</tt>
+<p><tt>select&nbsp; -> '&lt;SELECT' select_attrs '>' select_cont '&lt;/SELECT'
+'>';</tt>
+<br><tt>select_attrs -> select_attr ;</tt>
+<br><tt>select_attr -> select_attr 'NAME' '=' 'STRING';</tt>
+<br><tt>select_attr -> select_attr 'SIZE' '=' 'NUMBER';</tt>
+<br><tt>select_attr -> select_attr 'MULTIPLE' '=' 'MULTIPLE' ;</tt>
+<br><tt>select_attr -> select_attr 'MULTIPLE' ;</tt>
+<br><tt>select_attr -> ; /*empty*/</tt>
+<p><tt>select_cont -> select_cont option;</tt>
+<br><tt>select_cont -> option;</tt>
+<p><tt>option -> '&lt;OPTION' option_attr '>' data '&lt;/OPTION' '>' ;</tt>
+<br><tt>option -> '&lt;OPTION' option_attr '>' data ;</tt>
+<p><tt>option_attr -> 'VALUE' '=' 'STRING' option_attr_selected;</tt>
+<br><tt>option_attr -> option_attr_selected 'VALUE' '=' 'STRING';</tt>
+<br><tt>option_attr -> option_attr_selected ;</tt>
+<p><tt>option_attr_selected -> 'SELECTED';</tt>
+<br><tt>option_attr_selected -> 'SELECTED' '=' 'SELECTED';</tt>
+<p><tt>textarea -> '&lt;TEXTAREA' textarea_attr '>' data '&lt;/TEXTAREA'
+'>';</tt>
+<br><tt>textarea_attr -> 'NAME' '=' 'STRING' 'ROWS' '=' 'NUMBER' 'COLS'
+'=' 'NUMBER';</tt>
+<br><tt>textarea_attr -> 'NAME' '=' 'STRING' 'COLS' '=' 'NUMBER' 'ROWS'
+'=' 'NUMBER';</tt>
+<br><tt>textarea_attr -> 'ROWS' '=' 'NUMBER' 'NAME' '=' 'STRING' 'COLS'
+'=' 'NUMBER';</tt>
+<br><tt>textarea_attr -> 'ROWS' '=' 'NUMBER' 'COLS' '=' 'NUMBER' 'NAME'
+'=' 'STRING';</tt>
+<br><tt>textarea_attr -> 'COLS' '=' 'NUMBER' 'NAME' '=' 'STRING' 'ROWS'
+'=' 'NUMBER';</tt>
+<br><tt>textarea_attr -> 'COLS' '=' 'NUMBER' 'ROWS' '=' 'NUMBER' 'NAME'
+'=' 'STRING';</tt>
+<p><tt>block -> p;</tt>
+<br><tt>block -> list;</tt>
+<br><tt>block -> preformatted;</tt>
+<br><tt>block -> dl;</tt>
+<br><tt>block -> div;</tt>
+<br><tt>block -> center;</tt>
+<br><tt>block -> blockquote;</tt>
+<br><tt>block -> form;</tt>
+<br><tt>block -> isindex;</tt>
+<br><tt>block -> hr;</tt>
+<br><tt>block -> table ;</tt>
+<p><tt>//p -> '&lt;P' p_attr '>' p_cont;</tt>
+<br><tt>p -> '&lt;P' p_attr '>' p_cont '&lt;/P' '>';</tt>
+<p><tt>p_attr -> 'ALIGN' '=' align_val;</tt>
+<br><tt>p_attr -> ;</tt>
+<p><tt>p_cont -> text;//bylo empty</tt>
+<br><tt>p_cont -> p_cont text ;</tt>
+<p><tt>list -> ul;</tt>
+<br><tt>list -> ol;</tt>
+<br><tt>list -> dir;</tt>
+<br><tt>list -> menu;</tt>
+<p><tt>ul -> '&lt;UL' ul_attr '>' ul_cont '&lt;/UL' '>';</tt>
+<br><tt>ul_attr -> ul_attr_compact ul_attr_type;</tt>
+<br><tt>ul_attr -> ul_attr_type ul_attr_compact;</tt>
+<br><tt>ul_attr -> ul_attr_compact;</tt>
+<br><tt>ul_attr -> ul_attr_type;</tt>
+<br><tt>ul_attr -> ;</tt>
+<p><tt>ul_attr_type -> 'TYPE' '=' ulstyle;</tt>
+<br><tt>ul_attr_compact -> 'COMPACT' '=' 'COMPACT';</tt>
+<br><tt>ul_attr_compact -> 'COMPACT';</tt>
+<p><tt>ulstyle -> 'DISC';</tt>
+<br><tt>ulstyle -> 'SQUARE';</tt>
+<br><tt>ulstyle -> 'CIRCLE';</tt>
+<p><tt>ul_cont -> ul_cont ul_li ;</tt>
+<br><tt>ul_cont -> ; /*empty*/</tt>
+<p><tt>ul_li -> '&lt;LI' ul_li_attr '>' flow '&lt;/LI' '>';</tt>
+<br><tt>ul_li -> '&lt;LI' ul_li_attr '>' flow ;</tt>
+<p><tt>ul_li_attr -> 'TYPE' '=' ulstyle;</tt>
+<br><tt>ul_li_attr -> 'VALUE' '=' 'NUMBER' ;</tt>
+<br><tt>ul_li_attr -> 'VALUE' '=' 'NUMBER' 'TYPE' '=' ulstyle;</tt>
+<br><tt>ul_li_attr -> 'TYPE' '=' ulstyle 'VALUE' '=' 'NUMBER';</tt>
+<br><tt>ul_li_attr -> ;</tt>
+<p><tt>flow -> flow text;</tt>
+<br><tt>flow -> flow block;</tt>
+<br><tt>flow -> ; /*empty*/</tt>
+<p><tt>ol&nbsp;&nbsp; -> '&lt;OL' ol_attrs '>' ol_cont '&lt;/OL' '>' ;</tt>
+<br><tt>ol_attrs -> ol_attr ;</tt>
+<br><tt>ol_attr -> ol_attr 'TYPE' '=' 'STRING';</tt>
+<br><tt>ol_attr -> ol_attr 'TYPE' '=' 'NUMBER';</tt>
+<br><tt>ol_attr -> ol_attr 'START' '=' 'NUMBER';</tt>
+<br><tt>ol_attr -> ol_attr 'COMPACT' '=' 'COMPACT';</tt>
+<br><tt>ol_attr -> ol_attr 'COMPACT';</tt>
+<br><tt>ol_attr -> ; /*empty*/</tt>
+<p><tt>ol_cont -> ol_cont ol_li ;</tt>
+<br><tt>ol_cont -> ;/*empty*/</tt>
+<p><tt>ol_li&nbsp;&nbsp; -> '&lt;LI' ol_li_attr '>' flow '&lt;/LI' '>'
+;</tt>
+<br><tt>ol_li&nbsp;&nbsp; -> '&lt;LI' ol_li_attr '>' flow ;</tt>
+<br><tt>ol_li_attr -> ol_li_attr_type 'VALUE' '=' 'NUMBER' ;</tt>
+<br><tt>ol_li_attr -> 'VALUE' '=' 'NUMBER' ol_li_attr_type ;</tt>
+<br><tt>ol_li_attr -> ol_li_attr_type ;</tt>
+<br><tt>ol_li_attr -> 'VALUE' '=' 'NUMBER' ;</tt>
+<br><tt>ol_li_attr -> ;</tt>
+<p><tt>ol_li_attr_type -> 'TYPE' '=' 'STRING' ;</tt>
+<br><tt>ol_li_attr_type -> 'TYPE' '=' 'NUMBER' ;</tt>
+<p><tt>dir -> '&lt;DIR' dir_menu_attr '>' dir_menu_cont '&lt;/DIR' '>'
+;</tt>
+<br><tt>dir_menu_attr -> 'COMPACT' '=' 'COMPACT' ;</tt>
+<br><tt>dir_menu_attr -> 'COMPACT' ;</tt>
+<br><tt>dir_menu_attr -> ;/*empty*/</tt>
+<p><tt>dir_menu_cont -> dir_menu_cont text ;</tt>
+<br><tt>dir_menu_cont -> ;</tt>
+<p><tt>menu -> '&lt;MENU' dir_menu_attr '>' dir_menu_cont '&lt;/MENU' '>';</tt>
+<p><tt>preformatted -> pre ; /* xmp listing ? */</tt>
+<p><tt>pre&nbsp; -> '&lt;PRE' pre_attr '>' pre_cont '&lt;/PRE' '>' ;</tt>
+<br><tt>pre_attr -> 'WIDTH' '=' 'NUMBER' ;</tt>
+<br><tt>pre_attr -> ;/*empty*/</tt>
+<p><tt>dl -> '&lt;DL' dl_attr '>' dl_cont '&lt;/DL' '>' ;</tt>
+<br><tt>dl_attr -> 'COMPACT' '=' 'COMPACT' ;</tt>
+<br><tt>dl_attr -> 'COMPACT' ;</tt>
+<br><tt>dl_attr -> ;/*empty*/</tt>
+<p><tt>dl_cont -> dl_cont dt ;</tt>
+<br><tt>dl_cont -> dl_cont dd ;</tt>
+<br><tt>dl_cont -> ;/*empty*/</tt>
+<p><tt>dt -> '&lt;DT' '>' dt_cont '&lt;/DT' '>' ;</tt>
+<br><tt>dt -> '&lt;DT' '>' dt_cont ;</tt>
+<p><tt>dt_cont -> dt_cont text ;</tt>
+<br><tt>dt_cont -> ;/*empty*/</tt>
+<p><tt>dd -> '&lt;DD' '>' flow '&lt;/DD' '>' ;</tt>
+<br><tt>dd -> '&lt;DD' '>' flow&nbsp; ;</tt>
+<p><tt>div -> '&lt;DIV' 'ALIGN' '=' align_val '>' body_cont '&lt;/DIV'
+'>' ;</tt>
+<br><tt>div -> '&lt;DIV' '>' body_cont '&lt;/DIV' '>' ;</tt>
+<p><tt>center -> '&lt;CENTER' '>' body_cont '&lt;/CENTER' '>' ;</tt>
+<p><tt>blockquote -> '&lt;BLOCKQUOTE' '>' body_cont '&lt;/BLOCKQUOTE' '>'
+;</tt>
+<p><tt>form&nbsp;&nbsp; -> '&lt;FORM' form_attrs '>' form_cont '&lt;/FORM'
+'>' ;</tt>
+<br><tt>form_attrs -> form_attr ;</tt>
+<br><tt>form_attr -> form_attr 'ACTION' '=' 'STRING';</tt>
+<br><tt>form_attr -> form_attr 'METHOD' '=' httpmethod ;</tt>
+<br><tt>form_attr -> form_attr 'ENCTYPE' '=' 'STRING' ;</tt>
+<br><tt>form_attr -> ;</tt>
+<p><tt>form_cont -> body_cont ;</tt>
+<p><tt>hr&nbsp;&nbsp; -> '&lt;HR' hr_attrs '>' ;</tt>
+<br><tt>hr_attrs -> hr_attr ;</tt>
+<br><tt>hr_attr -> hr_attr 'ALIGN' '=' align_val ;</tt>
+<br><tt>hr_attr -> hr_attr 'NOSHADE' ;</tt>
+<br><tt>hr_attr -> hr_attr 'NOSHADE' '=' 'NOSHADE' ;</tt>
+<br><tt>hr_attr -> hr_attr 'SIZE' '=' 'NUMBER' ;</tt>
+<br><tt>hr_attr -> hr_attr 'WIDTH' '=' 'NUMBER' ;</tt>
+<br><tt>hr_attr -> hr_attr 'WIDTH' '=' 'PERCENT' ;</tt>
+<br><tt>hr_attr -> ;/*empty*/</tt>
+<p><tt>table&nbsp;&nbsp; -> '&lt;TABLE' table_attrs '>' table_cont '&lt;/TABLE'
+'>' ;</tt>
+<br><tt>table_attrs -> table_attr;</tt>
+<br><tt>table_attr -> table_attr 'ALIGN' '=' align_val ;</tt>
+<br><tt>table_attr -> table_attr 'WIDTH' '=' 'NUMBER' ;</tt>
+<br><tt>table_attr -> table_attr 'WIDTH' '=' 'PERCENT' ;</tt>
+<br><tt>table_attr -> table_attr 'BORDER' '=' 'NUMBER' ;</tt>
+<br><tt>table_attr -> table_attr 'BORDER' ;</tt>
+<br><tt>table_attr -> table_attr 'BORDER' '=' 'BORDER' ;</tt>
+<br><tt>table_attr -> table_attr 'CELLSPACING' '=' 'NUMBER' ;</tt>
+<br><tt>table_attr -> table_attr 'CELLPADDING' '=' 'NUMBER' ;</tt>
+<br><tt>table_attr -> ; /*empty*/</tt>
+<p><tt>table_cont -> caption table_cont1 ;</tt>
+<br><tt>table_cont -> table_cont1 ;</tt>
+<p><tt>table_cont1 -> tr ;</tt>
+<br><tt>table_cont1 -> table_cont1 tr ;</tt>
+<p><tt>caption -> '&lt;CAPTION' caption_attr '>' caption_cont '&lt;/CAPTION'
+'>' ;</tt>
+<br><tt>caption_attr -> 'ALIGN' '=' 'TOP' ;</tt>
+<br><tt>caption_attr -> 'ALIGN' '=' 'BOTTOM' ;</tt>
+<br><tt>caption_attr -> ;</tt>
+<p><tt>caption_cont -> ;/*empty*/</tt>
+<br><tt>caption_cont -> caption_cont text ;</tt>
+<p><tt>tr -> '&lt;TR' tr_attr '>' tr_cont '&lt;/TR' '>' ;</tt>
+<br><tt>tr -> '&lt;TR' tr_attr '>' tr_cont ;</tt>
+<p><tt>tr_attr -> 'ALIGN' '=' align_val 'VALIGN' '=' valign_val ;</tt>
+<br><tt>tr_attr -> 'VALIGN' '=' valign_val 'ALIGN' '=' align_val ;</tt>
+<br><tt>tr_attr -> 'VALIGN' valign_val ;</tt>
+<br><tt>tr_attr -> 'ALIGN' '=' align_val ;</tt>
+<br><tt>tr_attr -> ;</tt>
+<p><tt>valign_val -> 'TOP';</tt>
+<br><tt>valign_val -> 'MIDDLE';</tt>
+<br><tt>valign_val -> 'BOTTOM';</tt>
+<br><tt>valign_val -> 'BASELINE';</tt>
+<p><tt>tr_cont -> tr_cont td ;</tt>
+<br><tt>tr_cont -> tr_cont th ;</tt>
+<br><tt>tr_cont -> ;/*empty*/</tt>
+<p><tt>th -> '&lt;TH' th_td_attrs '>' body_cont '&lt;/TH' '>' ;</tt>
+<br><tt>th -> '&lt;TH' th_td_attrs '>' body_cont ;</tt>
+<p><tt>th_td_attrs -> th_td_attr ;</tt>
+<br><tt>th_td_attr -> th_td_attr 'ROWSPAN' '=' 'NUMBER' ;</tt>
+<br><tt>th_td_attr -> th_td_attr 'COLSPAN' '=' 'NUMBER' ;</tt>
+<br><tt>th_td_attr -> th_td_attr 'NOWRAP' ;</tt>
+<br><tt>th_td_attr -> th_td_attr 'NOWRAP' '=' 'NOWRAP' ;</tt>
+<br><tt>th_td_attr -> th_td_attr 'ALIGN' '=' align_val ;</tt>
+<br><tt>th_td_attr -> th_td_attr 'VALIGN' '=' valign_val ;</tt>
+<br><tt>th_td_attr -> th_td_attr 'WIDTH' '=' 'NUMBER' ;</tt>
+<br><tt>th_td_attr -> th_td_attr 'HEIGHT' '=' 'NUMBER' ;</tt>
+<br><tt>th_td_attr -> ; /*empty*/</tt>
+<p><tt>td -> '&lt;TD' th_td_attrs '>' body_cont '&lt;/TD' '>' ;</tt>
+<br><tt>td -> '&lt;TD' th_td_attrs '>' body_cont ;</tt>
+<p><tt>address&nbsp;&nbsp; -> '&lt;ADDRESS' '>' address_cont '&lt;/ADDRESS'
+'>' ;</tt>
+<br><tt>address_cont -> address_cont p ;</tt>
+<br><tt>address_cont -> address_cont text ;</tt>
+<br><tt>address_cont -> ;</tt>
+</code>
+<p>
+<hr WIDTH="90%">
+<center><font size="-2">Copyright (C) 1999 by <a href="form.html">Marek Gryber</a></font></center>
+
+</body>
+</html>
