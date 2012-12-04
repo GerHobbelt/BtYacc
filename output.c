@@ -132,6 +132,7 @@ static void print_one_comment(FILE *outfile, unsigned int outfile_idx, char cons
         }
         BtYacc_printf(outfile, "%s",
                     count_newlines(outfile_idx, get_section("comment_end")));
+		FREE(cmt);
     }
 }
 
