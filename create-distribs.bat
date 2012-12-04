@@ -2,7 +2,7 @@ rem
 rem create distribution files for www.hebbut.net
 rem
                           
-set name=btyacc-3.0.4.i_a-v2
+set name=btyacc-3.0.5.i_a-v1
                                                        
 mkdir .\distrib
 

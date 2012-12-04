@@ -49,7 +49,7 @@ BEGIN {
         
         printf "static char const * const %s[] =\n{\n", sec_id_name;
 
-        printf "    \"#line %d \\\"%s\\\"\",\n", FNR+1, fname; 
+        printf "    \"#line %d \\\"%s\\\"\",\n", FNR, fname; 
     } 
     else 
     {

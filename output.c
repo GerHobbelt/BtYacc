@@ -141,6 +141,8 @@ static void print_one_table(FILE *outfile, unsigned int outfile_idx, char const 
     int j;
     int i;
 
+	print_file_line_location(outfile, outfile_idx);
+
     BtYacc_printf(outfile, count_newlines(outfile_idx, get_section("int_table_start")),
                 count_newlines(outfile_idx, get_rflag_prefix()),
                 name,
@@ -165,6 +167,11 @@ static void print_one_table(FILE *outfile, unsigned int outfile_idx, char const 
                 (i < item_count - 1 ? get_section("int_table_entry_separator") : "")); /* no trailing comma for last array element: some languages don't like that */
     }
     BtYacc_puts(count_newlines(outfile_idx, get_section("int_table_end")), outfile);
+}
+
+void print_file_line_location(FILE *outfile, unsigned int outfile_idx)
+{
+    BtYacc_printf(outfile, count_newlines(outfile_idx, line_format), outline[outfile_idx] + 1, outfilename[outfile_idx]);
 }
 
 void output(void)
@@ -805,8 +812,6 @@ void output_table(void)
 {
     open_output_files();
 
-    //++outline[CODE_FILE];
-
     if (tflag)
         BtYacc_logf("YYTABLESIZE: %d\n", high);
 
@@ -815,7 +820,7 @@ void output_table(void)
         table_too_large_error(high);
     }
 
-    BtYacc_printf(code_file, get_section("table_size"), high);
+    BtYacc_printf(code_file, count_newlines(CODE_FILE, get_section("table_size")), high);
 
     print_one_comment(output_file, OUTPUT_FILE, "[i] ==> shift on conflict");
     print_one_table(output_file, OUTPUT_FILE, "yytable", high + 1, table);
@@ -1049,6 +1054,8 @@ static void output_templated_text(FILE *in)
     register int c;
     register int state; /* 0=middle of line, 1=start of line, 2=seen '#' */
 
+	print_file_line_location(code_file, CODE_FILE);
+
     state = 1;
 
     if ((c = getc(in)) == EOF)
@@ -1057,13 +1064,13 @@ static void output_templated_text(FILE *in)
     {
         if (c == '\n')
         {
-            ++outline[CODE_FILE];
             if (state == 2)
             {
-                BtYacc_printf(code_file, line_format, outline[CODE_FILE] + 1, code_file_name);
+				print_file_line_location(code_file, CODE_FILE);
                 state = 1;
                 continue;
             }
+            ++outline[CODE_FILE];
             state = 1;
         }
         else if (state == 1 && c == '#')
@@ -1136,8 +1143,7 @@ void output_stored_text(void)
 
     if (!lflag)
     {
-        ++outline[CODE_FILE];
-        BtYacc_printf(code_file, line_format, outline[CODE_FILE] + 1, code_file_name);
+		print_file_line_location(code_file, CODE_FILE);
     }
 }
 
@@ -1279,8 +1285,7 @@ void output_trailing_text(void)
             return;
         if (!lflag)
         {
-            ++outline[CODE_FILE];
-            BtYacc_printf(code_file, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+            BtYacc_printf(code_file, count_newlines(CODE_FILE, line_format), lineno - 1, (inc_file ? inc_file_name : input_file_name));
         }
         if (c == '\n')
             ++outline[CODE_FILE];
@@ -1292,10 +1297,10 @@ void output_trailing_text(void)
     {
         if (!lflag)
         {
-            ++outline[CODE_FILE];
-            BtYacc_printf(code_file, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+            BtYacc_printf(code_file, count_newlines(CODE_FILE, line_format), lineno - 1, (inc_file ? inc_file_name : input_file_name));
         }
-        do {
+        do 
+		{
             BtYacc_putc(c, code_file);
         } while ((c = *++cptr) != '\n');
         ++outline[CODE_FILE];
@@ -1319,8 +1324,7 @@ void output_trailing_text(void)
     }
     if (!lflag)
     {
-        ++outline[CODE_FILE];
-        BtYacc_printf(code_file, line_format, outline[CODE_FILE] + 1, code_file_name);
+		print_file_line_location(code_file, CODE_FILE);
     }
 }
 
@@ -1343,8 +1347,7 @@ void output_semantic_actions(void)
 
     if (!lflag)
     {
-        ++outline[CODE_FILE];
-        BtYacc_printf(code_file, line_format, outline[CODE_FILE] + 1, code_file_name);
+		print_file_line_location(code_file, CODE_FILE);
     }
 }
 
@@ -1397,6 +1400,8 @@ void write_section(char const * section_name)
     struct section *sl;
 
     open_output_files();
+
+	print_file_line_location(code_file, CODE_FILE);
 
     sl = lookup_section_name(section_name);
     section = sl->ptr;

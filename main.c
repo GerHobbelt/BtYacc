@@ -45,6 +45,8 @@ int unsigned CODE_FILE = 0;             /*  y.code.c (used when the -r option is
 int unsigned DEFINES_FILE = 1;          /*  y.tab.h                                         */
 int unsigned OUTPUT_FILE = 2;           /*  y.tab.c                                         */
 int unsigned outline[3] = {0};
+const char *outfilename[3] = {0};
+
 
 char *action_file_name = NULL;
 char *code_file_name = NULL;
@@ -658,6 +660,10 @@ void create_output_files(void)
             no_space();
         sprintf(verbose_file_name, get_section("VERBOSE_FILENAME"), target_dir, file_prefix);
     }
+
+	outfilename[CODE_FILE] = code_file_name;
+	outfilename[DEFINES_FILE] = defines_file_name;
+	outfilename[OUTPUT_FILE] = output_file_name;
 }
 
 

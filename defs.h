@@ -292,6 +292,7 @@ extern int unsigned CODE_FILE;              /*  y.code.c (used when the -r optio
 extern int unsigned DEFINES_FILE;           /*  y.tab.h                                         */
 extern int unsigned OUTPUT_FILE;            /*  y.tab.c                                         */
 extern int unsigned outline[3];
+extern const char *outfilename[3];
 
 extern char *action_file_name;
 extern char *code_file_name;
@@ -493,6 +494,7 @@ void free_action_row(action *);
 void free_parser(void);
 
 /* output.c */
+void print_file_line_location(FILE *outfile, unsigned int outfile_idx);
 void output(void);
 void output_rule_data(void);
 void output_yydefred(void);

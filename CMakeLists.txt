@@ -12,14 +12,14 @@ endif()
 
 set(BtYacc_SKELETON "${BtYacc_BINARY_DIR}/skeleton.c")
 add_custom_command(OUTPUT ${BtYacc_SKELETON}
-                   COMMAND "${AWK}" -f '${BtYacc_SOURCE_DIR}/skel2c' '${BtYacc_SOURCE_DIR}/btyaccpa.ske' > '${BtYacc_SKELETON}'
-                   DEPENDS "${BtYacc_SOURCE_DIR}/btyaccpa.ske" "${BtYacc_SOURCE_DIR}/skel2c"
+                   COMMAND "${AWK}" -f '${BtYacc_SOURCE_DIR}/skel2c' '${BtYacc_SOURCE_DIR}/btyaccpa.skeleton' > '${BtYacc_SKELETON}'
+                   DEPENDS "${BtYacc_SOURCE_DIR}/btyaccpa.skeleton" "${BtYacc_SOURCE_DIR}/skel2c"
                    COMMENT "The skeleton source file will be generated.")
 
 set(BtYacc_PUSH_SKELETON "${BtYacc_BINARY_DIR}/push_skel.c")
 add_custom_command(OUTPUT ${BtYacc_PUSH_SKELETON}
-                   COMMAND "${AWK}" -f '${BtYacc_SOURCE_DIR}/skel2c' '${BtYacc_SOURCE_DIR}/push.skel' > '${BtYacc_PUSH_SKELETON}'
-                   DEPENDS "${BtYacc_SOURCE_DIR}/push.skel" "${BtYacc_SOURCE_DIR}/skel2c"
+                   COMMAND "${AWK}" -f '${BtYacc_SOURCE_DIR}/skel2c' '${BtYacc_SOURCE_DIR}/push.skeleton' > '${BtYacc_PUSH_SKELETON}'
+                   DEPENDS "${BtYacc_SOURCE_DIR}/push.skeleton" "${BtYacc_SOURCE_DIR}/skel2c"
                    COMMENT "The push.skeleton source file will be generated.")
 
 add_definitions(-DBTYACC_BUILD_USE_CONFIGURATION_HEADER)

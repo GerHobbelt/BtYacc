@@ -6,7 +6,7 @@ HDRS          = defs.h mstring.h
 
 CFLAGS        = -ml -c
 
-LDFLAGS       =   /c
+LDFLAGS       = /c
 
 # Change LIBDIR to your compiler's library path
 LIBDIR        = L:\bc\lib
@@ -16,7 +16,7 @@ CLIB          = $(LIBDIR)\cl.lib
 LIBS          =
 
 LINKER        = tlink
-CC        = bcc
+CC            = bcc
 
 MAKEFILE      = Makefile.dos
 
@@ -31,7 +31,7 @@ SRCS          = closure.c error.c lalr.c log.c lr0.c main.c mkpar.c output.c  \
                 mstring.c reader.c skeleton.c push_skel.c symtab.c verbose.c warshall.c write.c
 
 OTHERS        = README README.BYACC \
-                Makefile btyaccpa.ske empty.y skel2c manpage
+                Makefile btyaccpa.skeleton empty.y skel2c manpage
 
 all:            $(PROGRAM)
 
@@ -52,11 +52,11 @@ $(PROGRAM):     $(OBJS) $(LIBS)
 program:        $(PROGRAM)
 
 
-skeleton.c: btyaccpa.ske
-        awk -f skel2c btyaccpa.ske >skeleton.c
+skeleton.c: btyaccpa.skeleton
+        awk -f skel2c btyaccpa.skeleton >skeleton.c
 
-push_skel.c: push.skel
-        awk -f skel2c push.skel >push_skel.c
+push_skel.c: push.skeleton
+        awk -f skel2c push.skeleton >push_skel.c
 
 ###
 closure.obj: defs.h

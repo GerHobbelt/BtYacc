@@ -191,12 +191,12 @@ SOURCE=.\README.BYACC
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\btyaccpa.ske
+SOURCE=.\btyaccpa.skeleton
 
 !IF  "$(CFG)" == "btyacc - Win32 Release"
 
 # Begin Custom Build - generate C skeleton for $(InputPath)
-InputPath=.\btyaccpa.ske
+InputPath=.\btyaccpa.skeleton
 
 "skeleton.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	awk -f skel2c $(InputPath) > skeleton.c
@@ -206,7 +206,7 @@ InputPath=.\btyaccpa.ske
 !ELSEIF  "$(CFG)" == "btyacc - Win32 Debug"
 
 # Begin Custom Build - generate C skeleton for $(InputPath)
-InputPath=.\btyaccpa.ske
+InputPath=.\btyaccpa.skeleton
 
 "skeleton.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	awk -f skel2c $(InputPath) > skeleton.c
@@ -218,12 +218,12 @@ InputPath=.\btyaccpa.ske
 # End Source File
 # Begin Source File
 
-SOURCE=.\push.skel
+SOURCE=.\push.skeleton
 
 !IF  "$(CFG)" == "btyacc - Win32 Release"
 
 # Begin Custom Build - generate C skeleton for $(InputPath)
-InputPath=.\push.skel
+InputPath=.\push.skeleton
 
 "push_skel.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	awk -f skel2c $(InputPath) > push_skel.c
@@ -233,7 +233,7 @@ InputPath=.\push.skel
 !ELSEIF  "$(CFG)" == "btyacc - Win32 Debug"
 
 # Begin Custom Build - generate C skeleton for $(InputPath)
-InputPath=.\push.skel
+InputPath=.\push.skeleton
 
 "push_skel.c" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	awk -f skel2c $(InputPath) > push_skel.c

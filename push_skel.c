@@ -1,5 +1,5 @@
 /*
-** This file generated automatically from push.skel
+** This file generated automatically from push.skeleton
 */
 
 #include "defs.h"
@@ -8,7 +8,7 @@
 
 static char const * const language[] =
 {
-    "#line 2 \"push.skel\"",
+    "#line 1 \"push.skeleton\"",
     "C",
     "",
     0
@@ -25,7 +25,7 @@ static char const * const language[] =
 
 static char const * const banner[] =
 {
-    "#line 15 \"push.skel\"",
+    "#line 14 \"push.skeleton\"",
     "/*",
     "**    \"@(#)push.skel, based on byacc 1.8 (Berkeley) 01/20/91\";",
     "*/",
@@ -83,7 +83,7 @@ static char const * const banner[] =
 
 static char const * const tables[] =
 {
-    "#line 68 \"push.skel\"",
+    "#line 67 \"push.skeleton\"",
     "",
     "#ifdef __cplusplus",
     "#ifndef _YACC_EXTERN_",
@@ -127,7 +127,7 @@ static char const * const tables[] =
 
 static char const * const header[] =
 {
-    "#line 107 \"push.skel\"",
+    "#line 106 \"push.skeleton\"",
     "",
     "#ifndef YYERRCODE",
     "#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.",
@@ -235,7 +235,7 @@ static char const * const header[] =
 
 static char const * const body[] =
 {
-    "#line 210 \"push.skel\"",
+    "#line 209 \"push.skeleton\"",
     "",
     "#ifndef YYNEWSTATE",
     "static struct yyparsestate *YYNEWSTATE(int size)",
@@ -617,7 +617,7 @@ static char const * const body[] =
 
 static char const * const trailer[] =
 {
-    "#line 587 \"push.skel\"",
+    "#line 586 \"push.skeleton\"",
     "",
     "    }",
     "",
@@ -968,7 +968,7 @@ static char const * const trailer[] =
 
 static char const * const line_position[] =
 {
-    "#line 933 \"push.skel\"",
+    "#line 932 \"push.skeleton\"",
     "#line %d \"%s\"",
     "",
     0
@@ -976,21 +976,21 @@ static char const * const line_position[] =
 
 static char const * const comment_start[] =
 {
-    "#line 936 \"push.skel\"",
+    "#line 935 \"push.skeleton\"",
     "/*",
     0
 };
 
 static char const * const comment_end[] =
 {
-    "#line 938 \"push.skel\"",
+    "#line 937 \"push.skeleton\"",
     "*/",
     0
 };
 
 static char const * const action_case_start[] =
 {
-    "#line 940 \"push.skel\"",
+    "#line 939 \"push.skeleton\"",
     "  case %d:",
     "",
     0
@@ -998,7 +998,7 @@ static char const * const action_case_start[] =
 
 static char const * const action_code[] =
 {
-    "#line 943 \"push.skel\"",
+    "#line 942 \"push.skeleton\"",
     "    %s;",
     "",
     "",
@@ -1007,7 +1007,7 @@ static char const * const action_code[] =
 
 static char const * const action_case_end[] =
 {
-    "#line 947 \"push.skel\"",
+    "#line 946 \"push.skeleton\"",
     "    break;",
     "",
     "",
@@ -1016,7 +1016,7 @@ static char const * const action_case_end[] =
 
 static char const * const action_if_not_yytrial_start[] =
 {
-    "#line 951 \"push.skel\"",
+    "#line 950 \"push.skeleton\"",
     "if (!yytrial)",
     "",
     0
@@ -1024,84 +1024,84 @@ static char const * const action_if_not_yytrial_start[] =
 
 static char const * const action_block_start[] =
 {
-    "#line 954 \"push.skel\"",
+    "#line 953 \"push.skeleton\"",
     "{",
     0
 };
 
 static char const * const action_block_end[] =
 {
-    "#line 956 \"push.skel\"",
+    "#line 955 \"push.skeleton\"",
     "}",
     0
 };
 
 static char const * const yyval_tag_reference[] =
 {
-    "#line 958 \"push.skel\"",
+    "#line 957 \"push.skeleton\"",
     "yyval.%s",
     0
 };
 
 static char const * const yyval_reference[] =
 {
-    "#line 960 \"push.skel\"",
+    "#line 959 \"push.skeleton\"",
     "yyval",
     0
 };
 
 static char const * const yyvsp_tag_reference[] =
 {
-    "#line 962 \"push.skel\"",
+    "#line 961 \"push.skeleton\"",
     "yyvsp[%d].%s",
     0
 };
 
 static char const * const yyvsp_reference[] =
 {
-    "#line 964 \"push.skel\"",
+    "#line 963 \"push.skeleton\"",
     "yyvsp[%d]",
     0
 };
 
 static char const * const rflag_prefix[] =
 {
-    "#line 966 \"push.skel\"",
+    "#line 965 \"push.skeleton\"",
     "static",
     0
 };
 
 static char const * const not_rflag_prefix[] =
 {
-    "#line 968 \"push.skel\"",
+    "#line 967 \"push.skeleton\"",
     "",
     0
 };
 
 static char const * const int_table_start[] =
 {
-    "#line 970 \"push.skel\"",
+    "#line 969 \"push.skeleton\"",
     "%sYshort %29s[%5d] = {%5d%s",
     0
 };
 
 static char const * const int_table_entry[] =
 {
-    "#line 972 \"push.skel\"",
+    "#line 971 \"push.skeleton\"",
     "%5d%s",
     0
 };
 
 static char const * const int_table_entry_separator[] =
 {
-    "#line 974 \"push.skel\"",
+    "#line 973 \"push.skeleton\"",
     ",",
     0
 };
 
 static char const * const int_table_end[] =
 {
-    "#line 976 \"push.skel\"",
+    "#line 975 \"push.skeleton\"",
     "",
     "};",
     "",
@@ -1110,7 +1110,7 @@ static char const * const int_table_end[] =
 
 static char const * const table_size[] =
 {
-    "#line 980 \"push.skel\"",
+    "#line 979 \"push.skeleton\"",
     "",
     "",
     "#define YYTABLESIZE %d",
@@ -1122,7 +1122,7 @@ static char const * const table_size[] =
 
 static char const * const defines_file_protection_start[] =
 {
-    "#line 987 \"push.skel\"",
+    "#line 986 \"push.skeleton\"",
     "",
     "#ifndef _BTYACC_DEFINES_H_",
     "#define _BTYACC_DEFINES_H_",
@@ -1134,7 +1134,7 @@ static char const * const defines_file_protection_start[] =
 
 static char const * const defines_file_protection_end[] =
 {
-    "#line 994 \"push.skel\"",
+    "#line 993 \"push.skeleton\"",
     "",
     "",
     "#endif /* _BTYACC_DEFINES_H_ */",
@@ -1145,14 +1145,14 @@ static char const * const defines_file_protection_end[] =
 
 static char const * const token_charset[] =
 {
-    "#line 1000 \"push.skel\"",
+    "#line 999 \"push.skeleton\"",
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$",
     0
 };
 
 static char const * const define_token[] =
 {
-    "#line 1002 \"push.skel\"",
+    "#line 1001 \"push.skeleton\"",
     "#define %-60s %5d",
     "",
     0
@@ -1160,7 +1160,7 @@ static char const * const define_token[] =
 
 static char const * const yystype_extern_decl[] =
 {
-    "#line 1005 \"push.skel\"",
+    "#line 1004 \"push.skeleton\"",
     "",
     "extern YYSTYPE yylval;",
     "",
@@ -1169,7 +1169,7 @@ static char const * const yystype_extern_decl[] =
 
 static char const * const define_default_yystype[] =
 {
-    "#line 1009 \"push.skel\"",
+    "#line 1008 \"push.skeleton\"",
     "",
     "#ifndef YYSTYPE",
     "typedef int YYSTYPE;",
@@ -1192,7 +1192,7 @@ static char const * const define_default_yystype[] =
 
 static char const * const union_decl_start[] =
 {
-    "#line 1027 \"push.skel\"",
+    "#line 1026 \"push.skeleton\"",
     "",
     "typedef union",
     0
@@ -1200,7 +1200,7 @@ static char const * const union_decl_start[] =
 
 static char const * const union_decl_end[] =
 {
-    "#line 1030 \"push.skel\"",
+    "#line 1029 \"push.skeleton\"",
     " yystype_t;",
     "#define YYSTYPE yystype_t",
     "",
@@ -1210,7 +1210,7 @@ static char const * const union_decl_end[] =
 
 static char const * const define_yymaxtoken[] =
 {
-    "#line 1035 \"push.skel\"",
+    "#line 1034 \"push.skeleton\"",
     "",
     "#define YYMAXTOKEN %5d",
     "",
@@ -1220,7 +1220,7 @@ static char const * const define_yymaxtoken[] =
 
 static char const * const define_yyfinal[] =
 {
-    "#line 1040 \"push.skel\"",
+    "#line 1039 \"push.skeleton\"",
     "",
     "#define YYFINAL %5d",
     "",
@@ -1230,7 +1230,7 @@ static char const * const define_yyfinal[] =
 
 static char const * const define_yydebug[] =
 {
-    "#line 1045 \"push.skel\"",
+    "#line 1044 \"push.skeleton\"",
     "",
     "#ifndef YYDEBUG",
     "#define YYDEBUG %d",
@@ -1242,14 +1242,14 @@ static char const * const define_yydebug[] =
 
 static char const * const debug_yy_null[] =
 {
-    "#line 1052 \"push.skel\"",
+    "#line 1051 \"push.skeleton\"",
     "0",
     0
 };
 
 static char const * const debug_yyname_strings_start[] =
 {
-    "#line 1054 \"push.skel\"",
+    "#line 1053 \"push.skeleton\"",
     "",
     "#if YYDEBUG",
     "%schar const *yyname[] = {",
@@ -1259,14 +1259,14 @@ static char const * const debug_yyname_strings_start[] =
 
 static char const * const debug_yyname_strings_separator[] =
 {
-    "#line 1059 \"push.skel\"",
+    "#line 1058 \"push.skeleton\"",
     ",",
     0
 };
 
 static char const * const debug_yyname_strings_end[] =
 {
-    "#line 1061 \"push.skel\"",
+    "#line 1060 \"push.skeleton\"",
     "};",
     "#endif",
     "",
@@ -1276,7 +1276,7 @@ static char const * const debug_yyname_strings_end[] =
 
 static char const * const debug_yyrule_strings_start[] =
 {
-    "#line 1066 \"push.skel\"",
+    "#line 1065 \"push.skeleton\"",
     "",
     "#if YYDEBUG",
     "%schar const *yyrule[] = {",
@@ -1286,14 +1286,14 @@ static char const * const debug_yyrule_strings_start[] =
 
 static char const * const debug_yyrule_strings_separator[] =
 {
-    "#line 1071 \"push.skel\"",
+    "#line 1070 \"push.skeleton\"",
     ",",
     0
 };
 
 static char const * const debug_yyrule_strings_end[] =
 {
-    "#line 1073 \"push.skel\"",
+    "#line 1072 \"push.skeleton\"",
     "};",
     "#endif",
     "",
@@ -1303,82 +1303,82 @@ static char const * const debug_yyrule_strings_end[] =
 
 static char const * const DEFINES_FILENAME[] =
 {
-    "#line 1078 \"push.skel\"",
+    "#line 1077 \"push.skeleton\"",
     "%s%s.tab.h",
     0
 };
 
 static char const * const OUTPUT_FILENAME[] =
 {
-    "#line 1080 \"push.skel\"",
+    "#line 1079 \"push.skeleton\"",
     "%s%s.tab.c",
     0
 };
 
 static char const * const CODE_FILENAME[] =
 {
-    "#line 1082 \"push.skel\"",
+    "#line 1081 \"push.skeleton\"",
     "%s%s.code.c",
     0
 };
 
 static char const * const VERBOSE_FILENAME[] =
 {
-    "#line 1084 \"push.skel\"",
+    "#line 1083 \"push.skeleton\"",
     "%s%s.output",
     0
 };
 
 struct section section_list_push[] = {
-    { "language", &language[0] },
-    { "banner", &banner[0] },
-    { "tables", &tables[0] },
-    { "header", &header[0] },
-    { "body", &body[0] },
-    { "trailer", &trailer[0] },
-    { "line_position", &line_position[0] },
-    { "comment_start", &comment_start[0] },
-    { "comment_end", &comment_end[0] },
-    { "action_case_start", &action_case_start[0] },
-    { "action_code", &action_code[0] },
-    { "action_case_end", &action_case_end[0] },
-    { "action_if_!yytrial_start", &action_if_not_yytrial_start[0] },
-    { "action_block_start", &action_block_start[0] },
-    { "action_block_end", &action_block_end[0] },
-    { "yyval.tag_reference", &yyval_tag_reference[0] },
-    { "yyval_reference", &yyval_reference[0] },
-    { "yyvsp.tag_reference", &yyvsp_tag_reference[0] },
-    { "yyvsp_reference", &yyvsp_reference[0] },
-    { "rflag_prefix", &rflag_prefix[0] },
-    { "!rflag_prefix", &not_rflag_prefix[0] },
-    { "int_table_start", &int_table_start[0] },
-    { "int_table_entry", &int_table_entry[0] },
-    { "int_table_entry_separator", &int_table_entry_separator[0] },
-    { "int_table_end", &int_table_end[0] },
-    { "table_size", &table_size[0] },
-    { "defines_file_protection_start", &defines_file_protection_start[0] },
-    { "defines_file_protection_end", &defines_file_protection_end[0] },
-    { "token_charset", &token_charset[0] },
-    { "define_token", &define_token[0] },
-    { "yystype_extern_decl", &yystype_extern_decl[0] },
-    { "define_default_yystype", &define_default_yystype[0] },
-    { "union_decl_start", &union_decl_start[0] },
-    { "union_decl_end", &union_decl_end[0] },
-    { "define_yymaxtoken", &define_yymaxtoken[0] },
-    { "define_yyfinal", &define_yyfinal[0] },
-    { "define_yydebug", &define_yydebug[0] },
-    { "debug_yy_null", &debug_yy_null[0] },
-    { "debug_yyname_strings_start", &debug_yyname_strings_start[0] },
-    { "debug_yyname_strings_separator", &debug_yyname_strings_separator[0] },
-    { "debug_yyname_strings_end", &debug_yyname_strings_end[0] },
-    { "debug_yyrule_strings_start", &debug_yyrule_strings_start[0] },
-    { "debug_yyrule_strings_separator", &debug_yyrule_strings_separator[0] },
-    { "debug_yyrule_strings_end", &debug_yyrule_strings_end[0] },
-    { "DEFINES_FILENAME", &DEFINES_FILENAME[0] },
-    { "OUTPUT_FILENAME", &OUTPUT_FILENAME[0] },
-    { "CODE_FILENAME", &CODE_FILENAME[0] },
-    { "VERBOSE_FILENAME", &VERBOSE_FILENAME[0] },
-    { 0, 0 } };
+	{ "language", &language[0] },
+	{ "banner", &banner[0] },
+	{ "tables", &tables[0] },
+	{ "header", &header[0] },
+	{ "body", &body[0] },
+	{ "trailer", &trailer[0] },
+	{ "line_position", &line_position[0] },
+	{ "comment_start", &comment_start[0] },
+	{ "comment_end", &comment_end[0] },
+	{ "action_case_start", &action_case_start[0] },
+	{ "action_code", &action_code[0] },
+	{ "action_case_end", &action_case_end[0] },
+	{ "action_if_!yytrial_start", &action_if_not_yytrial_start[0] },
+	{ "action_block_start", &action_block_start[0] },
+	{ "action_block_end", &action_block_end[0] },
+	{ "yyval.tag_reference", &yyval_tag_reference[0] },
+	{ "yyval_reference", &yyval_reference[0] },
+	{ "yyvsp.tag_reference", &yyvsp_tag_reference[0] },
+	{ "yyvsp_reference", &yyvsp_reference[0] },
+	{ "rflag_prefix", &rflag_prefix[0] },
+	{ "!rflag_prefix", &not_rflag_prefix[0] },
+	{ "int_table_start", &int_table_start[0] },
+	{ "int_table_entry", &int_table_entry[0] },
+	{ "int_table_entry_separator", &int_table_entry_separator[0] },
+	{ "int_table_end", &int_table_end[0] },
+	{ "table_size", &table_size[0] },
+	{ "defines_file_protection_start", &defines_file_protection_start[0] },
+	{ "defines_file_protection_end", &defines_file_protection_end[0] },
+	{ "token_charset", &token_charset[0] },
+	{ "define_token", &define_token[0] },
+	{ "yystype_extern_decl", &yystype_extern_decl[0] },
+	{ "define_default_yystype", &define_default_yystype[0] },
+	{ "union_decl_start", &union_decl_start[0] },
+	{ "union_decl_end", &union_decl_end[0] },
+	{ "define_yymaxtoken", &define_yymaxtoken[0] },
+	{ "define_yyfinal", &define_yyfinal[0] },
+	{ "define_yydebug", &define_yydebug[0] },
+	{ "debug_yy_null", &debug_yy_null[0] },
+	{ "debug_yyname_strings_start", &debug_yyname_strings_start[0] },
+	{ "debug_yyname_strings_separator", &debug_yyname_strings_separator[0] },
+	{ "debug_yyname_strings_end", &debug_yyname_strings_end[0] },
+	{ "debug_yyrule_strings_start", &debug_yyrule_strings_start[0] },
+	{ "debug_yyrule_strings_separator", &debug_yyrule_strings_separator[0] },
+	{ "debug_yyrule_strings_end", &debug_yyrule_strings_end[0] },
+	{ "DEFINES_FILENAME", &DEFINES_FILENAME[0] },
+	{ "OUTPUT_FILENAME", &OUTPUT_FILENAME[0] },
+	{ "CODE_FILENAME", &CODE_FILENAME[0] },
+	{ "VERBOSE_FILENAME", &VERBOSE_FILENAME[0] },
+	{ 0, 0 } };
 
 unsigned int section_list_push_count = 48;
 

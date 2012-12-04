@@ -679,7 +679,7 @@
 			Name="Generated Files"
 			>
 			<File
-				RelativePath="btyaccpa.ske"
+				RelativePath="btyaccpa.skeleton"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -863,7 +863,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="push.skel"
+				RelativePath="push.skeleton"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

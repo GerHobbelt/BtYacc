@@ -127,7 +127,7 @@
     <None Include="btyacc.sgml">
       <Filter>Extra Files</Filter>
     </None>
-    <None Include="btyacc-c.ske">
+    <None Include="btyacc-c.skeleton">
       <Filter>Extra Files</Filter>
     </None>
     <None Include="ChangeLog">
@@ -195,10 +195,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="btyaccpa.ske">
+    <CustomBuild Include="btyaccpa.skeleton">
       <Filter>Generated Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="push.skel">
+    <CustomBuild Include="push.skeleton">
       <Filter>Generated Files</Filter>
     </CustomBuild>
   </ItemGroup>

@@ -369,7 +369,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="!README.TXT" />
-    <None Include="btyacc-c.ske" />
+    <None Include="btyacc-c.skeleton" />
     <None Include="btyacc.1" />
     <None Include="btyacc.sgml" />
     <None Include="build.h.in" />
@@ -383,7 +383,7 @@
     <None Include="manpage" />
     <None Include="README" />
     <None Include="README.BYACC" />
-    <CustomBuild Include="btyaccpa.ske">
+    <CustomBuild Include="btyaccpa.skeleton">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug x86_x64|Win32'">generate C skeleton for %(FullPath)</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug x86_x64|Win32'">awk -f skel2c %(FullPath) &gt; skeleton.c
 </Command>
@@ -417,7 +417,7 @@
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">skeleton.c;%(Outputs)</Outputs>
     </CustomBuild>
-    <CustomBuild Include="push.skel">
+    <CustomBuild Include="push.skeleton">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug x86_x64|Win32'">generate C skeleton for %(FullPath)</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug x86_x64|Win32'">gawk -f skel2c %(FullPath) &gt; push_skel.c
 </Command>

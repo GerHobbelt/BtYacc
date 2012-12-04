@@ -37,7 +37,7 @@ SRCS	      = closure.c error.c lalr.c log.c lr0.c main.c mkpar.c output.c	\
 		mstring.c reader.c readskel.c skeleton.c push_skel.c symtab.c verbose.c warshall.c write.c
 
 OTHERS	      = README README.BYACC \
-		Makefile btyaccpa.ske push.skel empty.y skel2c manpage makefile.dos \
+		Makefile btyaccpa.skeleton push.skeleton empty.y skel2c manpage makefile.dos \
 		skeleton.c push_skel.c
 
 all:		$(PROGRAM) btyacc.1
@@ -83,11 +83,11 @@ zip:
 		zip btyacc.zip $(OTHERS) $(SRCS) $(HDRS) test/*.y
 		mv btyacc.zip btyacc-$(VERSION).zip
 
-skeleton.c: btyaccpa.ske skel2c
-		awk -f skel2c btyaccpa.ske > skeleton.c
+skeleton.c: btyaccpa.skeleton skel2c
+		awk -f skel2c btyaccpa.skeleton > skeleton.c
  
-push_skel.c: push.skel skel2c
-		awk -f skel2c push.skel > push_skel.c
+push_skel.c: push.skeleton skel2c
+		awk -f skel2c push.skeleton > push_skel.c
  
 etags TAGS:
 		etags *.c *.h

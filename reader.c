@@ -544,7 +544,7 @@ void copy_text(void)
     }
 
     if (!lflag)
-       BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+       BtYacc_printf(f, line_format, lineno - 1, (inc_file ? inc_file_name : input_file_name));
 
 loop:
     switch (c = *cptr++) {
@@ -596,7 +596,7 @@ void copy_union(void)
     dc_file = dflag ? union_file : text_file;
 
     if (!lflag)
-        BtYacc_printf(dc_file, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+        BtYacc_printf(dc_file, line_format, lineno - 1, (inc_file ? inc_file_name : input_file_name));
 
     BtYacc_printf(dc_file, get_section("union_decl_start"));
 
@@ -1829,7 +1829,7 @@ static char *insert_arg_rule(char *arg, char *tag)
         BtYacc_printf(f, "    %s \x01%u\x1f %s", get_section("comment_start"), rule, get_section("comment_end"));
 
         if (!lflag)
-            BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+            BtYacc_printf(f, line_format, lineno - 1, (inc_file ? inc_file_name : input_file_name));
 
         BtYacc_printf(f, get_section("action_code"), code);
 
@@ -1957,7 +1957,7 @@ void copy_action(void)
         trialaction = 1;
 
     if (!lflag)
-        BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+        BtYacc_printf(f, line_format, lineno - 1, (inc_file ? inc_file_name : input_file_name));
 
     if (*cptr == '=') ++cptr;
 
@@ -2153,7 +2153,7 @@ loop:
             BtYacc_printf(f, get_section("action_if_!yytrial_start"));
 
             if (!lflag)
-                BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+                BtYacc_printf(f, line_format, lineno - 1, (inc_file ? inc_file_name : input_file_name));
             trialaction = 0;
             goto loop;
         }
@@ -2226,7 +2226,7 @@ loop:
             BtYacc_printf(f, get_section("action_if_!yytrial_start"));
 
             if (!lflag)
-                BtYacc_printf(f, line_format, lineno, (inc_file ? inc_file_name : input_file_name));
+                BtYacc_printf(f, line_format, lineno - 1, (inc_file ? inc_file_name : input_file_name));
 
             goto loop;
         }
