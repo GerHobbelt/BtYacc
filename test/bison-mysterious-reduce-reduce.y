@@ -9,7 +9,11 @@ As per bison manual section 5.7: Mysterious Conflicts
 
 %token ID
 
+/* include debug code in the generated parser: */
 %debug
+
+/* produce a 'scannerless' parser, assign ALL tokens, including the 'ASCII' ones, a token number: */
+%scannerless
 
 %%
 %{
@@ -68,11 +72,15 @@ int yylex(void)
     {
         tok = ID;
     }
-    else if (ch == ':' || ch == ',')
+    else if (ch == ':')
     {
-        tok = ch;
+        tok = BTYACC_SYMBOL_BISON_MYSTERIOUS_REDUCE_REDUCE_COLON;
     }
-    fprintf(stderr, "lex -> $%02X '%c' [%s]\n", ch, (isprint(ch) ? ch : '?'), (tok < YYMAXTOKEN ? yyname[tok] : "illegal-token"));
+    else if (ch == ',')
+    {
+        tok = BTYACC_SYMBOL_BISON_MYSTERIOUS_REDUCE_REDUCE_COMMA;
+    }
+    fprintf(stderr, "lex -> $%02X '%c' [%s] --> token: %d\n", ch, (isprint(ch) ? ch : '?'), (tok <= YYMAXTOKEN ? yyname[tok] : "illegal-token"), tok);
     return tok;
 }
 

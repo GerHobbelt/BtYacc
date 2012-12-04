@@ -847,12 +847,14 @@ void output_defines(void)
     dc_file = dflag ? defines_file : code_file;
     dc_f_idx = dflag ? DEFINES_FILE : CODE_FILE;
 
-    if (dflag || 1) {
+    if (dflag) {
       BtYacc_printf(dc_file, count_newlines(dc_f_idx, get_section("defines_file_protection_start")));
     }
 
     for (i = 2; i < ntokens; ++i)
     {
+        char *d = NULL;
+
         s = symbol_name[i];
         if (is_C_identifier(s))
         {
@@ -875,12 +877,12 @@ void output_defines(void)
         {
             /* turn this token into something that's acceptable for the given output language: */
             char const *cset = get_section("token_charset");
-            char *d = MALLOC(strlen(s) * 3 + 12 + strlen(file_prefix));
             char *dp;
             char e = 0;
 
+            d = MALLOC(strlen(s) * 20 + 16 + strlen(file_prefix));
             if (!d) no_space();
-            sprintf(d, "BTYACC_SYMBOL_%s_", file_prefix);
+            sprintf(d, "BTYACC_SYMBOL_%s_", file_uc_prefix);
             dp = d + strlen(d);
             c = *s;
             if (c == '"')
@@ -901,9 +903,62 @@ void output_defines(void)
                 }
                 else
                 {
+                    static struct
+                    {
+                        char c;
+                        const char *str;
+                    } const character_names[] =
+                    {
+                        { '~', "tilde" },
+                        { '`', "backquote" },
+                        { '!', "exclamation_mark" },
+                        { '@', "at" },
+                        { '#', "hashtag" },
+                        { '$', "dollar" },
+                        { '%', "percent" },
+                        { '^', "circonflex" },
+                        { '&', "ampersand" },
+                        { '*', "star" },
+                        { '(', "open_brace" },
+                        { ')', "close_brace" },
+                        { '_', "underscore" },
+                        { '-', "minus" },
+                        { '+', "plus" },
+                        { '=', "is" },
+                        { '[', "open_square_bracket" },
+                        { ']', "close_square_bracket" },
+                        { '{', "open_curly_bracket" },
+                        { '}', "close_curly_bracket" },
+                        { ':', "colon" },
+                        { ';', "semicolon" },
+                        { '\'', "quote" },
+                        { '"', "doublequote" },
+                        { '<', "less_than" },
+                        { '>', "greater_than" },
+                        { ',', "comma" },
+                        { '.', "period" },
+                        { '?', "question_mark" },
+                        { '/', "slash" },
+                        { '\\', "backslash" },
+                        { '|', "pipe" },
+                        { 0, 0 }
+                    };
+                    int i;
+                    for (i = 0; character_names[i].c; i++)
+                    {
+                        if (character_names[i].c == *s)
+                        {
+                            strcpy(dp, character_names[i].str);
+                            strupr(dp);
+                            dp += strlen(character_names[i].str);
+                            goto done_this_char;
+                        }
+                    }
                     *dp++ = "0123456789ABCDEF"[(*s >> 4) & 0x0F];
                     *dp++ = "0123456789ABCDEF"[*s & 0x0F];
-                    *dp++ = '_';
+done_this_char:
+                    if (s[1] && (s[1] != e || s[2]))
+                        *dp++ = '_';
                 }
                 s++;
             }
@@ -912,6 +967,7 @@ void output_defines(void)
         }
 
         BtYacc_printf(dc_file, count_newlines(dc_f_idx, get_section("define_token")), s, symbol_value[i]);
+        FREE(d);
     }
 
     BtYacc_printf(dc_file, count_newlines(dc_f_idx, get_section("define_token")), "YYERRCODE", symbol_value[1]);
@@ -939,7 +995,7 @@ void output_defines(void)
         BtYacc_puts(count_newlines(DEFINES_FILE, get_section("yystype_extern_decl")), defines_file);
     }
 
-    if (dflag || 1) {
+    if (dflag) {
       BtYacc_printf(dc_file, count_newlines(dc_f_idx, get_section("defines_file_protection_end")));
     }
 }
@@ -1089,6 +1145,10 @@ void output_debug(void)
         if (s)
         {
             s = convert_to_C_string(s);
+        }
+        else if (i == 1)
+        {
+            s = "error";
         }
         else
         {

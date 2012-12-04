@@ -109,6 +109,7 @@ typedef enum keyword_code_enumeration
     START                           = 7,
     UNION                           = 8,
     IDENT                           = 9,
+    SCANNERLESS_ZERO_ASCII,
 
     /* [i_a] bison emulation additions */
     BISON_DEBUG                     = 110,
@@ -154,8 +155,8 @@ typedef enum symbol_class_enumeration
 
 typedef enum action_code_enumeration
 {
-SHIFT = 1,
-REDUCE = 2
+    SHIFT = 1,
+    REDUCE = 2
 } BtYacc_action_code;
 
 
@@ -198,7 +199,7 @@ struct bucket
     Yshort value;
     Yshort index;
     Yshort prec;
-    char classc;
+    char symbol_class;
     char assoc;
 };
 
@@ -275,11 +276,13 @@ extern char rflag;
 extern char tflag;
 extern char vflag;
 extern char Eflag;
+extern char ZEROflag;
 
 
 extern char *myname;
 extern char *target_dir;
 extern char *file_prefix;
+extern char *file_uc_prefix;
 extern char *name_prefix;
 extern char *name_uc_prefix;
 extern char *cptr;
@@ -471,6 +474,7 @@ void BtYacc_stop_test(void);
 #define BTYACC_INTERRUPTION_CHECK()
 #endif
 
+char *sanitize_to_varname(const char *in_str);
 char *allocate(unsigned);
 void create_temporary_files(void);
 void create_output_files(void);

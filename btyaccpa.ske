@@ -1404,6 +1404,10 @@ static void btyacc_debug_log_eol(const char *msg, ...)
 
 %% action_if_!yytrial_start
 if (!yytrial)
+{
+
+%% action_if_!yytrial_end
+} /* end: if (!yytrial) */
 
 %% action_block_start
 {

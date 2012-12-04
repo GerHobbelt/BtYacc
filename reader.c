@@ -357,6 +357,7 @@ static struct keyword { char name[20]; int token; } keywords[] = {
         { "pure-parser", BISON_PURE },                    /* [i_a] bison emulation additions */
         { "pure_parser", BISON_PURE },                    /* [i_a] bison emulation additions */
         { "right", RIGHT },
+        { "scannerless", SCANNERLESS_ZERO_ASCII },
         { "skeleton", BISON_SKELETON },                   /* [i_a] bison emulation additions */
         { "start", START },
         { "term", TOKEN },
@@ -769,7 +770,7 @@ bucket *get_literal(int store_literal)
     else
     {
         bp = lookup(cache);
-        bp->classc = TERM;
+        bp->symbol_class = TERM;
         if (n == 1 && bp->value == UNDEFINED)
             bp->value = *(unsigned char *)s;
     }
@@ -971,7 +972,7 @@ void declare_tokens(int assoc)
             return;
 
         if (bp == goal) tokenized_start(bp->name);
-        bp->classc = TERM;
+        bp->symbol_class = TERM;
 
         if (tag)
         {
@@ -1090,7 +1091,7 @@ void declare_start(void)
     if (!isalpha(c) && c != '_' && c != '.' && c != '$')
         syntax_error_ex(lineno, line, cptr, "expected a %%start terminal token or non-terminal");
     bp = get_name(1);
-    if (bp->classc == TERM)
+    if (bp->symbol_class == TERM)
         terminal_start(bp->name);
     if (goal && goal != bp)
         restarted_warning();
@@ -1148,6 +1149,9 @@ void read_declarations(void)
         case BISON_DEFINES:
             dflag = 1;
             break;
+        case SCANNERLESS_ZERO_ASCII:
+            ZEROflag = 1;
+            break;
         case BISON_LOCATIONS:
         case BISON_PURE:
         case BISON_YACC:
@@ -1185,7 +1189,7 @@ void read_declarations(void)
 
                 if (prefix && *prefix)
                 {
-                    name_prefix = prefix;
+                    name_prefix = sanitize_to_varname(prefix);
                     name_uc_prefix = strdup(prefix);
                     strupr(name_uc_prefix);
                 }
@@ -1224,6 +1228,8 @@ void read_declarations(void)
                 if (prefix && *prefix)
                 {
                     file_prefix = prefix;
+                    file_uc_prefix = sanitize_to_varname(file_prefix);
+                    strupr(file_uc_prefix);
                 }
                 else
                 {
@@ -1517,7 +1523,7 @@ static char *compile_arg(char **theptr, char *yyvaltag)
     {
         ++n;
 
-        if (pitem[i]->classc != ARGUMENT)
+        if (pitem[i]->symbol_class != ARGUMENT)
            ++maxoffset;
     }
 
@@ -1529,7 +1535,7 @@ static char *compile_arg(char **theptr, char *yyvaltag)
 
     for (j = 0, ++i; i < nitems; ++i)
     {
-        if (pitem[i]->classc != ARGUMENT)
+        if (pitem[i]->symbol_class != ARGUMENT)
             offsets[++j] = i - nitems + 1;
     }
     rhs = pitem + nitems - 1;
@@ -1710,7 +1716,7 @@ void advance_to_start(void)
     bp = get_name(1);
     if (goal == 0)
     {
-        if (bp->classc == TERM)
+        if (bp->symbol_class == TERM)
             terminal_start(bp->name);
         goal = bp;
     }
@@ -1733,9 +1739,9 @@ void advance_to_start(void)
 
 void start_rule(bucket *bp, int unsigned s_lineno)
 {
-    if (bp->classc == TERM)
+    if (bp->symbol_class == TERM)
         terminal_lhs(s_lineno);
-    bp->classc = NONTERM;
+    bp->symbol_class = NONTERM;
     if (!bp->index)
         bp->index = nrules;
     if (nrules >= maxrules)
@@ -1775,7 +1781,7 @@ void insert_empty_rule(void)
     last_symbol->next = bp;
     last_symbol = bp;
     bp->tag = plhs[nrules]->tag;
-    bp->classc = ACTION;
+    bp->symbol_class = ACTION;
     bp->args = 0;
 
     if ((nitems += 2) > maxitems)
@@ -1824,7 +1830,7 @@ static char *insert_arg_rule(char *arg, char *tag)
         BtYacc_printf(f, get_section("action_case_end"));
         insert_empty_rule();
         plhs[rule]->tag = tag;
-        plhs[rule]->classc = ARGUMENT;
+        plhs[rule]->symbol_class = ARGUMENT;
     }
     else
     {
@@ -1954,7 +1960,7 @@ void copy_action(void)
     {
         ++n;
 
-        if (pitem[i]->classc != ARGUMENT)
+        if (pitem[i]->symbol_class != ARGUMENT)
            ++maxoffset;
     }
 
@@ -1966,7 +1972,7 @@ void copy_action(void)
 
     for (j = 0, ++i; i < nitems; ++i)
     {
-        if (pitem[i]->classc != ARGUMENT)
+        if (pitem[i]->symbol_class != ARGUMENT)
             offsets[++j] = i - nitems + 1;
     }
     rhs = pitem + nitems - 1;
@@ -2170,6 +2176,10 @@ loop:
     case ';':
         if (depth > 0) goto loop;
 
+        if (!trialaction)
+        {
+            BtYacc_printf(f, "    %s", get_section("action_if_!yytrial_end"));
+        }
         BtYacc_puts("\n", f);
 
         if (!lflag) BtYacc_puts("#\n", f);
@@ -2193,6 +2203,8 @@ loop:
 
     case '}':
         if (--depth > 0) goto loop;
+        BtYacc_printf(f, "    %s", get_section("action_if_!yytrial_end"));
+
         c = nextc();
         if (c == '[' && !haveyyval)
         {
@@ -2364,15 +2376,15 @@ void check_symbols(void)
 {
     register bucket *bp;
 
-    if (goal->classc == UNKNOWN)
+    if (goal->symbol_class == UNKNOWN)
         undefined_goal(goal->name);
 
     for (bp = first_symbol; bp; bp = bp->next)
     {
-        if (bp->classc == UNKNOWN)
+        if (bp->symbol_class == UNKNOWN)
         {
             undefined_symbol_warning(bp->name);
-            bp->classc = TERM;
+            bp->symbol_class = TERM;
         }
     }
 }
@@ -2382,13 +2394,14 @@ void pack_symbols(void)
     register bucket *bp;
     register bucket **v;
     register int i, j, k, n;
+    const int TOKEN_IS_ASCII_CHAR_RANGE = (ZEROflag ? 1 : 256);
 
     nsyms = 2;
     ntokens = 1;
     for (bp = first_symbol; bp; bp = bp->next)
     {
         ++nsyms;
-        if (bp->classc == TERM) ++ntokens;
+        if (bp->symbol_class == TERM) ++ntokens;
     }
     start_symbol = ntokens;
     nvars = nsyms - ntokens;
@@ -2412,7 +2425,7 @@ void pack_symbols(void)
     j = start_symbol + 1;
     for (bp = first_symbol; bp; bp = bp->next)
     {
-        if (bp->classc == TERM)
+        if (bp->symbol_class == TERM)
             v[i++] = bp;
         else
             v[j++] = bp;
@@ -2443,20 +2456,32 @@ void pack_symbols(void)
         }
     }
     k = 0;
-    for (i = 1; i < ntokens; ++i)
+    if (TOKEN_IS_ASCII_CHAR_RANGE > 'Z' + 1)
     {
-        n = v[i]->value;
-        if (n > 256)
+        for (i = 1; i < ntokens; ++i)
         {
-            for (j = k++; j > 0 && symbol_value[j-1] > n; --j)
-                symbol_value[j] = symbol_value[j-1];
-            symbol_value[j] = n;
+            n = v[i]->value;
+            if (n > TOKEN_IS_ASCII_CHAR_RANGE)
+            {
+                for (j = k++; j > 0 && symbol_value[j-1] > n; --j)
+                    symbol_value[j] = symbol_value[j-1];
+                symbol_value[j] = n;
+            }
         }
     }
+    else
+    {
+        for (i = 1; i < ntokens; ++i)
+        {
+            v[i]->value = UNDEFINED;
+            ++k;
+        }
+    }
+    /* 'error' token: */
     if (v[1]->value == UNDEFINED)
-        v[1]->value = 256;
+        v[1]->value = TOKEN_IS_ASCII_CHAR_RANGE;
     j = 0;
-    n = 257;
+    n = TOKEN_IS_ASCII_CHAR_RANGE + 1;
     for (i = 2; i < ntokens; ++i)
     {
         if (v[i]->value == UNDEFINED)
@@ -2547,7 +2572,7 @@ void pack_grammar(void)
         while (pitem[j])
         {
             ritem[j] = pitem[j]->index;
-            if (pitem[j]->classc == TERM)
+            if (pitem[j]->symbol_class == TERM)
             {
                 prec = pitem[j]->prec;
                 assoc = pitem[j]->assoc;

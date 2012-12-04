@@ -59,12 +59,12 @@ static void unused_rules(void)
         if (!rules_used[i]) ++nunused;
 
     if (nunused)
-        {
+    {
         if (nunused == 1)
             BtYacc_logf("%s: 1 rule never reduced\n", myname);
         else
             BtYacc_logf("%s: %d rules never reduced\n", myname, nunused);
-        }
+    }
 }
 
 static void remove_conflicts(void)
@@ -78,49 +78,75 @@ static void remove_conflicts(void)
     SRconflicts = NEW2(nstates, Yshort);
     RRconflicts = NEW2(nstates, Yshort);
 
-    for (i = 0; i < nstates; ++i) {
+    for (i = 0; i < nstates; ++i)
+    {
         SRcount = 0;
         RRcount = 0;
         symbol = -1;
         pref = 0;
-        for (p = parser[i]; p; p = p->next) {
-            if (p->symbol != symbol) {
+        for (p = parser[i]; p; p = p->next)
+        {
+            if (p->symbol != symbol)
+            {
                 pref = p;
-                symbol = p->symbol; }
-            else if (i == final_state && symbol == 0) {
+                symbol = p->symbol;
+            }
+            else if (i == final_state && symbol == 0)
+            {
                 ++SRcount;
                 p->suppressed = 1;
                 if (!pref->suppressed)
-                    pref->suppressed = 1; }
-            else if (pref->action_code == SHIFT) {
-                if (pref->prec > 0 && p->prec > 0) {
-                    if (pref->prec < p->prec) {
+                    pref->suppressed = 1;
+            }
+            else if (pref->action_code == SHIFT)
+            {
+                if (pref->prec > 0 && p->prec > 0)
+                {
+                    if (pref->prec < p->prec)
+                    {
                         pref->suppressed = 2;
-                        pref = p; }
-                    else if (pref->prec > p->prec) {
-                        p->suppressed = 2; }
-                    else if (pref->assoc == LEFT) {
+                        pref = p;
+                    }
+                    else if (pref->prec > p->prec)
+                    {
+                        p->suppressed = 2;
+                    }
+                    else if (pref->assoc == LEFT)
+                    {
                         pref->suppressed = 2;
-                        pref = p; }
-                    else if (pref->assoc == RIGHT) {
-                        p->suppressed = 2; }
-                    else {
+                        pref = p;
+                    }
+                    else if (pref->assoc == RIGHT)
+                    {
+                        p->suppressed = 2;
+                    }
+                    else
+                    {
                         pref->suppressed = 2;
-                        p->suppressed = 2; } }
-                else {
+                        p->suppressed = 2;
+                    }
+                }
+                else
+                {
                     ++SRcount;
                     p->suppressed = 1;
                     if (!pref->suppressed)
-                        pref->suppressed = 1; } }
-            else {
+                        pref->suppressed = 1;
+                }
+            }
+            else
+            {
                 ++RRcount;
                 p->suppressed = 1;
                 if (!pref->suppressed)
-                    pref->suppressed = 1; } }
+                    pref->suppressed = 1;
+            }
+        }
         SRtotal += SRcount;
         RRtotal += RRcount;
         SRconflicts[i] = SRcount;
-        RRconflicts[i] = RRcount; }
+        RRconflicts[i] = RRcount;
+    }
 }
 
 static void total_conflicts(void)

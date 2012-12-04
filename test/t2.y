@@ -184,13 +184,15 @@ static Code *code_append(Code *l, Code *e)
 opt_scope($e):                                  [ $$ = $e; ]
     | CLCL                                      [ $$ = global_scope; ]
     | opt_scope ID CLCL                         [ Decl *d = lookup($1, $2);
-                                                  if (!d || !d->scope) YYERROR;
+                                                  if (!d || !d->scope)
+                                                    YYERROR;
                                                   $$ = d->scope; ]
     ;
 
 typename($e): opt_scope ID
                                                 [ Decl *d = lookup($1, $2);
-                                                  if (!d || !d->istype()) YYERROR;
+                                                  if (!d || !d->istype())
+                                                    YYERROR;
                                                   $$ = d->type; ]
     ;
 

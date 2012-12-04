@@ -23,11 +23,13 @@ char rflag = 0;
 char tflag = 0;
 char vflag = 0;
 char Eflag = 0;
+char ZEROflag = 0;
 
 char *target_dir = NULL;
 char *file_prefix = NULL;
-char *name_prefix = "yy";
-char *name_uc_prefix = NULL;
+char *file_uc_prefix = NULL;    /* file prefix in uppercase form, suitable for use as part of variable names */
+char *name_prefix = "yy";       /* suitable for use as part of variable names, i.e. [:alpha:][:alnum:_]*[:alnum:]? */
+char *name_uc_prefix = NULL;    /* name prefix in uppercase form, suitable for use as part of variable names */
 char *myname = "btyacc";
 #if defined(__MSDOS__) || defined(WIN32) || defined(__WIN32)
 #define DIR_CHAR '\\'
@@ -86,6 +88,38 @@ char  *rassoc = NULL;
 Yshort **derives = NULL;
 char *nullable = NULL;
 
+
+/*
+convert an input string to make it usable as a variable name, i.e.
+output string contains only [:alpha:][:alnum:_]*[:alnum:]?
+*/
+char *sanitize_to_varname(const char *in_str)
+{
+    char *s = strdup(in_str);
+    char *s2 = s;
+
+    if (!s) no_space();
+
+    if (*s && !isalpha(*s))
+    {
+        *s = 'y';
+    }
+    for (++s; *s; s++)
+    {
+        if (!isalnum(*s) && *s != '_')
+        {
+            *s = '_';
+        }
+    }
+    for (s--; s >= s2; s--)
+    {
+        if (*s == '_')
+            *s = 0;
+        else
+            break;
+    }
+    return s2;
+}
 
 static void file_deletion(FILE* f, char const * name)
 {
@@ -186,7 +220,9 @@ static void usage(void)
             "  -r           Write tables to `y.tab.c', code to `y.code.c'\n"
             "  -S x.skel    Select parser skeleton\n"
             "  -t           Include debugging code in generated parser\n"
-            "  -v           Write description of parser to `y.output'\n");
+            "  -v           Write description of parser to `y.output'\n"
+            "  -0           Generate a 'scannerless' parser, i.e. all tokens are assigned\n"
+            "               numbers, even the tokens identified by ASCII characters.\n");
   done(1);
 }
 
@@ -313,6 +349,10 @@ static void getargs(int argc, char **argv)
                 usage();
             continue;
 
+        case '0':
+            ZEROflag = 1;
+            break;
+
         default:
             usage();
         }
@@ -342,6 +382,10 @@ static void getargs(int argc, char **argv)
 
             case 'v':
                 vflag++;
+                break;
+
+            case '0':
+                ZEROflag = 1;
                 break;
 
             default:
@@ -381,28 +425,18 @@ no_more_options:;
     if (!file_prefix || !*file_prefix) {
         file_prefix = "y";
     }
+    file_uc_prefix = sanitize_to_varname(file_prefix);
+    strupr(file_uc_prefix);
 
-    if (name_prefix && *name_prefix) {
-        char *s2;
-
+    if (name_prefix && *name_prefix)
+    {
         if (0 == strcmp(name_prefix, "@") && 0 != strcmp(file_prefix, "y"))
         {
-            name_prefix = strdup(file_prefix);
+            name_prefix = file_prefix;
         }
 
         /* sanitize the prefix to be suitable as part of variable names: */
-        s2 = name_prefix;
-        if (*s2 && !isalpha(*s2) && *s2 != '_')
-        {
-            *s2 = 'y';
-        }
-        for (++s2; *s2; s2++)
-        {
-            if (!isalnum(*s2) && *s2 != '_')
-            {
-                *s2 = '_';
-            }
-        }
+        name_prefix = sanitize_to_varname(name_prefix);
     }
     if (!name_prefix || !*name_prefix) {
         name_prefix = "yy";
