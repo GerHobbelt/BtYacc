@@ -217,9 +217,9 @@ YYPOSN  yyretposn;
             do                                      \
             {                                       \
               if (yytrial)                          \
-                yymode = YY_DO_ACCEPT_RULE;         \     
+                yymode = YY_DO_ACCEPT_RULE;         \ 
               else                                  \
-                yymode = YY_EXIT_ACCEPT;            \  
+                yymode = YY_EXIT_ACCEPT;            \ 
               goto past_the_reduce_actions;         \
             } while(0)
 #define YYERROR                                     \ 
@@ -444,7 +444,7 @@ int yyparse(void)
     YY_DO_LOOP,
     YY_DO_SHIFT,
     YY_CHECK_REDUCE,
-    YY_DO_REDUCE,     
+    YY_DO_REDUCE,
     YY_DO_ACCEPT_RULE,
     YY_RAN_INTO_ERROR,
     YY_HANDLE_ERROR,
@@ -680,7 +680,7 @@ yyloop:
     /* fall through to YY_DO_SHIFT */
     yymode = YY_DO_SHIFT;
     continue;
-  } 
+  }
   // else: reduce?
   yymode = YY_CHECK_REDUCE;
   continue; // loop
@@ -696,8 +696,8 @@ case YY_DO_SHIFT:
     *++(yyps->psp) = yyposn;
     yymode = YY_DO_LOOP;
     continue; // loop
-  	   
-case YY_CHECK_REDUCE:	   
+
+case YY_CHECK_REDUCE:
   yyn = yyrindex[yystate];
   if (yyn != 0 &&
       (yyn += yychar) >= 0 &&
@@ -721,7 +721,7 @@ case YY_CHECK_REDUCE:
 
 case YY_RAN_INTO_ERROR:
   yynewerrflag = 0;
-   
+
 case YY_HANDLE_ERROR:
   if (yytrial)
   {
@@ -969,11 +969,11 @@ case YY_DO_REDUCE:
 #ifdef YYREDUCEPOSNFUNC
   reduce_posn = 1;
 #endif
-			
-  // set this up as the default destination and since we want to know if the user code 			
+
+  // set this up as the default destination and since we want to know if the user code
   // did set a different target via YYACCEPT and friends:
-  yymode = YY_DO_LOOP; 
-  
+  yymode = YY_DO_LOOP;
+
   switch (yyn)
   {
 

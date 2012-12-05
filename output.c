@@ -132,7 +132,7 @@ static void print_one_comment(FILE *outfile, unsigned int outfile_idx, char cons
         }
         BtYacc_printf(outfile, "%s",
                     count_newlines(outfile_idx, get_section("comment_end")));
-		FREE(cmt);
+        FREE(cmt);
     }
 }
 
@@ -141,7 +141,7 @@ static void print_one_table(FILE *outfile, unsigned int outfile_idx, char const 
     int j;
     int i;
 
-	print_file_line_location(outfile, outfile_idx);
+    print_file_line_location(outfile, outfile_idx);
 
     BtYacc_printf(outfile, count_newlines(outfile_idx, get_section("int_table_start")),
                 count_newlines(outfile_idx, get_rflag_prefix()),
@@ -1054,7 +1054,7 @@ static void output_templated_text(FILE *in)
     register int c;
     register int state; /* 0=middle of line, 1=start of line, 2=seen '#' */
 
-	print_file_line_location(code_file, CODE_FILE);
+    print_file_line_location(code_file, CODE_FILE);
 
     state = 1;
 
@@ -1066,7 +1066,7 @@ static void output_templated_text(FILE *in)
         {
             if (state == 2)
             {
-				print_file_line_location(code_file, CODE_FILE);
+                print_file_line_location(code_file, CODE_FILE);
                 state = 1;
                 continue;
             }
@@ -1143,7 +1143,7 @@ void output_stored_text(void)
 
     if (!lflag)
     {
-		print_file_line_location(code_file, CODE_FILE);
+        print_file_line_location(code_file, CODE_FILE);
     }
 }
 
@@ -1299,8 +1299,8 @@ void output_trailing_text(void)
         {
             BtYacc_printf(code_file, count_newlines(CODE_FILE, line_format), lineno - 1, (inc_file ? inc_file_name : input_file_name));
         }
-        do 
-		{
+        do
+        {
             BtYacc_putc(c, code_file);
         } while ((c = *++cptr) != '\n');
         ++outline[CODE_FILE];
@@ -1324,7 +1324,7 @@ void output_trailing_text(void)
     }
     if (!lflag)
     {
-		print_file_line_location(code_file, CODE_FILE);
+        print_file_line_location(code_file, CODE_FILE);
     }
 }
 
@@ -1347,7 +1347,7 @@ void output_semantic_actions(void)
 
     if (!lflag)
     {
-		print_file_line_location(code_file, CODE_FILE);
+        print_file_line_location(code_file, CODE_FILE);
     }
 }
 
@@ -1401,7 +1401,7 @@ void write_section(char const * section_name)
 
     open_output_files();
 
-	print_file_line_location(code_file, CODE_FILE);
+    print_file_line_location(code_file, CODE_FILE);
 
     sl = lookup_section_name(section_name);
     section = sl->ptr;

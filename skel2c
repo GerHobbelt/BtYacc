@@ -1,65 +1,65 @@
-BEGIN { 
+BEGIN {
     havesection = 0;
     nsec = 0;
 }
 
-/^%% *-+/ { 
-    if (havesection) 
+/^%% *-+/ {
+    if (havesection)
     {
         printf "    0\n};\n\n";
     }
     havesection = 0;
-    next; 
+    next;
 }
 
-/^%%/ { 
-    if (havesection) 
+/^%%/ {
+    if (havesection)
     {
         printf "    0\n};\n\n";
     }
-    if (NF >= 2) 
+    if (NF >= 2)
     {
-		fname = FILENAME;
+        fname = FILENAME;
 
-		gsub(/\\/, "/", fname);
-		gsub(/.*\//, "", fname);
-		gsub(/.*:/, "", fname);
+        gsub(/\\/, "/", fname);
+        gsub(/.*\//, "", fname);
+        gsub(/.*:/, "", fname);
 
-		fname_as_varname = fname;
-		gsub(/\..*/, "", fname_as_varname);
-		gsub(/[^a-zA-Z0-9_]+/, "_", fname_as_varname);
-		gsub(/_+/, "_", fname_as_varname);
+        fname_as_varname = fname;
+        gsub(/\..*/, "", fname_as_varname);
+        gsub(/[^a-zA-Z0-9_]+/, "_", fname_as_varname);
+        gsub(/_+/, "_", fname_as_varname);
 
-		if (nsec == 0)
-		{
-			printf  "/*\n** This file generated automatically from %s\n*/\n\n", FILENAME; 
-			printf "#include \"defs.h\"\n\n\n\n";
-		}
+        if (nsec == 0)
+        {
+            printf  "/*\n** This file generated automatically from %s\n*/\n\n", FILENAME;
+            printf "#include \"defs.h\"\n\n\n\n";
+        }
 
         havesection = 1;
         section = $2;
         seclist[nsec] = section;
 
-		sec_id_name = section;
-		gsub(/\!/, "not_", sec_id_name);
-		gsub(/\./, "_", sec_id_name);
+        sec_id_name = section;
+        gsub(/\!/, "not_", sec_id_name);
+        gsub(/\./, "_", sec_id_name);
 
         secnamelist[nsec] = sec_id_name;
         nsec = nsec + 1;
-        
+
         printf "static char const * const %s[] =\n{\n", sec_id_name;
 
-        printf "    \"#line %d \\\"%s\\\"\",\n", FNR, fname; 
-    } 
-    else 
+        printf "    \"#line %d \\\"%s\\\"\",\n", FNR, fname;
+    }
+    else
     {
         havesection = 0;
     }
-    next; 
+    next;
 }
 
-{ 
-    if (havesection) 
+{
+    if (havesection)
     {
         #gsub(/\\/, "\\\\");
         # Could use 'gsub(/\\/, "\\\\")' instead of the following
@@ -69,26 +69,26 @@ BEGIN {
         gsub(/\1/, "\\");
         gsub(/\t/, "\\t");
         gsub(/\"/, "\\\"");
-        printf "    \"%s\",\n", $0; 
-    } 
-    else 
+        printf "    \"%s\",\n", $0;
+    }
+    else
     {
-        print $0; 
+        print $0;
     }
 }
 
-END   { 
-    if (havesection) 
+END   {
+    if (havesection)
     {
-        printf "    0\n};\n\n"; 
+        printf "    0\n};\n\n";
     }
-    if (nsec > 0) 
+    if (nsec > 0)
     {
         printf "struct section section_list_%s[] = {\n", fname_as_varname;
         for (i = 0; i < nsec; ++i)
-		{
+        {
             printf "\t{ \"%s\", &%s[0] },\n", seclist[i], secnamelist[i];
-		}
+        }
         printf "\t{ 0, 0 } };\n\n"
         printf "unsigned int section_list_%s_count = %u;\n\n", fname_as_varname, nsec;
     }

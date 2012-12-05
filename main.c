@@ -661,9 +661,9 @@ void create_output_files(void)
         sprintf(verbose_file_name, get_section("VERBOSE_FILENAME"), target_dir, file_prefix);
     }
 
-	outfilename[CODE_FILE] = code_file_name;
-	outfilename[DEFINES_FILE] = defines_file_name;
-	outfilename[OUTPUT_FILE] = output_file_name;
+    outfilename[CODE_FILE] = code_file_name;
+    outfilename[DEFINES_FILE] = defines_file_name;
+    outfilename[OUTPUT_FILE] = output_file_name;
 }
 
 

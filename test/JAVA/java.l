@@ -9,152 +9,152 @@
 #include <YTAB.H>
 %}
 
-Separator	[\(\)\{\}\[\]\;\,\.]
-Delimiter1	[\=\>\<\!\~\?\:\+\-\*\/\&\|\^\%]
-HexDigit	[0-9a-fA-F]
-Digit		[0-9]
-OctalDigit	[0-7]
-TetraDigit	[0-3]
-NonZeroDigit	[1-9]
-Letter		[a-zA-Z_]
-AnyButSlash	[^\/]
-AnyButAstr	[^\*]
-BLK		[\b]
-TAB		[\t]
-FF		[\f]
-ESCCHR		[\\]
-CR		[\r]
-LF		[\n]
+Separator       [\(\)\{\}\[\]\;\,\.]
+Delimiter1      [\=\>\<\!\~\?\:\+\-\*\/\&\|\^\%]
+HexDigit        [0-9a-fA-F]
+Digit           [0-9]
+OctalDigit      [0-7]
+TetraDigit      [0-3]
+NonZeroDigit    [1-9]
+Letter          [a-zA-Z_]
+AnyButSlash     [^\/]
+AnyButAstr      [^\*]
+BLK             [\b]
+TAB             [\t]
+FF              [\f]
+ESCCHR          [\\]
+CR              [\r]
+LF              [\n]
 
-Escape		[\\]([r]|[n]|[b]|[f]|[t]|[\\])
-Identifier 	{Letter}({Letter}|{Digit})*
+Escape          [\\]([r]|[n]|[b]|[f]|[t]|[\\])
+Identifier      {Letter}({Letter}|{Digit})*
 
 Comment1        [\/][\*]({AnyButAstr}|[\*]{AnyButSlash})*[\*][\/]
 Comment2        [\/][\/].*
-Comment		({Comment1}|{Comment2})
-WhiteSpace	({CR}|{LF}|{FF}|{TAB}|{BLK}|[ ])
+Comment         ({Comment1}|{Comment2})
+WhiteSpace      ({CR}|{LF}|{FF}|{TAB}|{BLK}|[ ])
 
-Dimension	[\[]({WhiteSpace}|{Comment})*[\]]
+Dimension       [\[]({WhiteSpace}|{Comment})*[\]]
 
-IntSuffix	([l]|[L])
-DecimalNum	{NonZeroDigit}{Digit}*{IntSuffix}?
-OctalNum	[0]{OctalDigit}*{IntSuffix}?
-HexNum		[0]([x]|[X]){HexDigit}{HexDigit}*{IntSuffix}?
-IntegerLiteral	({DecimalNum}|{OctalNum}|{HexNum})
+IntSuffix       ([l]|[L])
+DecimalNum      {NonZeroDigit}{Digit}*{IntSuffix}?
+OctalNum        [0]{OctalDigit}*{IntSuffix}?
+HexNum          [0]([x]|[X]){HexDigit}{HexDigit}*{IntSuffix}?
+IntegerLiteral  ({DecimalNum}|{OctalNum}|{HexNum})
 
-Sign		([\+]|[\-])
-FlSuffix	([f]|[F]|[d][D])
-SignedInt	{Sign}?{Digit}+
-Expo		([e]|[E])
-ExponentPart	{Expo}{SignedInt}?
+Sign            ([\+]|[\-])
+FlSuffix        ([f]|[F]|[d][D])
+SignedInt       {Sign}?{Digit}+
+Expo            ([e]|[E])
+ExponentPart    {Expo}{SignedInt}?
 Float1          {Digit}+[\.]{Digit}+?{ExponentPart}?{FlSuffix}?
-Float2		[\.]{Digit}+{ExponentPart}?{FlSuffix}?
-Float3		{Digit}+{ExponentPart}{FlSuffix}?
-Float4		{Digit}+{FlSuffix}
-FloatingPoint	({Float1}|{Float2}|{Float3}|{Float4})
+Float2          [\.]{Digit}+{ExponentPart}?{FlSuffix}?
+Float3          {Digit}+{ExponentPart}{FlSuffix}?
+Float4          {Digit}+{FlSuffix}
+FloatingPoint   ({Float1}|{Float2}|{Float3}|{Float4})
 
-AnyChrChr	[^\\']
-AnyStrChr	[^\\"]
-Character	[\']({Escape}|{AnyChrChr})[\']
-String		[\"]({Escape}|{AnyStrChr})*[\"]
-Numeric  	({IntegerLiteral}|{FloatingPoint})
-Literal		({Numeric}|{Character}|{String})
+AnyChrChr       [^\\']
+AnyStrChr       [^\\"]
+Character       [\']({Escape}|{AnyChrChr})[\']
+String          [\"]({Escape}|{AnyStrChr})*[\"]
+Numeric         ({IntegerLiteral}|{FloatingPoint})
+Literal         ({Numeric}|{Character}|{String})
 
 
 
 %%
 
-"true"		{return LITERAL;}
-"false"		{return LITERAL;}
+"true"          {return LITERAL;}
+"false"         {return LITERAL;}
 
-{Separator}	{return yytext[0];}
-{Delimiter1}	{return yytext[0];}
-{Dimension}	{return OP_DIM;}
+{Separator}     {return yytext[0];}
+{Delimiter1}    {return yytext[0];}
+{Dimension}     {return OP_DIM;}
 
-"=="		{return OP_EQ;}
-"<="		{return OP_LE;}
-">="		{return OP_GE;}
-"!="		{return OP_NE;}
-"||"		{return OP_LOR;}
-"&&"		{return OP_LAND;}
-"++"		{return OP_INC;}
-"--"		{return OP_DEC;}
-">>"		{return OP_SHR;}
-"<<"		{return OP_SHL;}
-">>>"		{return OP_SHRR;}
-"+="		{return ASS_ADD;}
-"-="		{return ASS_SUB;}
-"*="		{return ASS_MUL;}
-"/="		{return ASS_DIV;}
-"&="		{return ASS_AND;}
-"|="		{return ASS_OR;}
-"^="		{return ASS_XOR;}
-"%="		{return ASS_MOD;}
-"<<="		{return ASS_SHL;}
-">>="		{return ASS_SHR;}
-">>>="		{return ASS_SHRR;}
+"=="            {return OP_EQ;}
+"<="            {return OP_LE;}
+">="            {return OP_GE;}
+"!="            {return OP_NE;}
+"||"            {return OP_LOR;}
+"&&"            {return OP_LAND;}
+"++"            {return OP_INC;}
+"--"            {return OP_DEC;}
+">>"            {return OP_SHR;}
+"<<"            {return OP_SHL;}
+">>>"           {return OP_SHRR;}
+"+="            {return ASS_ADD;}
+"-="            {return ASS_SUB;}
+"*="            {return ASS_MUL;}
+"/="            {return ASS_DIV;}
+"&="            {return ASS_AND;}
+"|="            {return ASS_OR;}
+"^="            {return ASS_XOR;}
+"%="            {return ASS_MOD;}
+"<<="           {return ASS_SHL;}
+">>="           {return ASS_SHR;}
+">>>="          {return ASS_SHRR;}
 
-"abstract"	{return ABSTRACT;}
+"abstract"      {return ABSTRACT;}
 "do"            {return DO;}
 "implements"    {return IMPLEMENTS;}
-"package"	{return PACKAGE;}
-"throw"		{return THROW;}
-"boolean"	{return BOOLEAN;}
-"double"	{return DOUBLE;}
-"import"	{return IMPORT;}
-"private"	{return PRIVATE;}
-"throws"	{return THROWS;}
-"break"		{return BREAK;}
-"else"		{return ELSE;}
-"inner"		{return INNER;}
-"protected"	{return PROTECTED;}
-"transient"	{return TRANSIENT;}
-"byte"		{return BYTE;}
-"extends"	{return EXTENDS;}
-"instanceof"	{return INSTANCEOF;}
-"public"	{return PUBLIC;}
-"try"		{return TRY;}
-"case"		{return CASE;}
-"final"		{return FINAL;}
-"int"		{return INT;}
-"rest"		{return REST;}
-"var"		{return VAR;}
-"cast"		{return CAST;}
-"finally"	{return FINALLY;}
-"interface"	{return INTERFACE;}
-"return"	{return RETURN;}
-"void"		{return VOID;}
-"catch"		{return CATCH;}
-"float"		{return FLOAT;}
-"long"		{return LONG;}
-"short"		{return SHORT;}
-"volatile"	{return VOLATILE;}
-"char"		{return CHAR;}
-"for"		{return FOR;}
-"native"	{return NATIVE;}
-"static"	{return STATIC;}
-"while"		{return WHILE;}
-"class"		{return CLASS;}
-"future"	{return FUTURE;}
-"new"		{return NEW;}
-"super"		{return SUPER;}
-"const"		{return CONST;}
-"generic"	{return GENERIC;}
-"null"		{return NULL;}
-"switch"	{return SWITCH;}
-"continue"	{return CONTINUE;}
-"goto"		{return GOTO;}
-"operator"	{return OPERATOR;}
-"synchronized"	{return SYNCHRONIZED;}
-"default"	{return DEFAULT;}
-"if"		{return IF;}
-"outer"		{return OUTER;}
-"this"		{return THIS;}
+"package"       {return PACKAGE;}
+"throw"         {return THROW;}
+"boolean"       {return BOOLEAN;}
+"double"        {return DOUBLE;}
+"import"        {return IMPORT;}
+"private"       {return PRIVATE;}
+"throws"        {return THROWS;}
+"break"         {return BREAK;}
+"else"          {return ELSE;}
+"inner"         {return INNER;}
+"protected"     {return PROTECTED;}
+"transient"     {return TRANSIENT;}
+"byte"          {return BYTE;}
+"extends"       {return EXTENDS;}
+"instanceof"    {return INSTANCEOF;}
+"public"        {return PUBLIC;}
+"try"           {return TRY;}
+"case"          {return CASE;}
+"final"         {return FINAL;}
+"int"           {return INT;}
+"rest"          {return REST;}
+"var"           {return VAR;}
+"cast"          {return CAST;}
+"finally"       {return FINALLY;}
+"interface"     {return INTERFACE;}
+"return"        {return RETURN;}
+"void"          {return VOID;}
+"catch"         {return CATCH;}
+"float"         {return FLOAT;}
+"long"          {return LONG;}
+"short"         {return SHORT;}
+"volatile"      {return VOLATILE;}
+"char"          {return CHAR;}
+"for"           {return FOR;}
+"native"        {return NATIVE;}
+"static"        {return STATIC;}
+"while"         {return WHILE;}
+"class"         {return CLASS;}
+"future"        {return FUTURE;}
+"new"           {return NEW;}
+"super"         {return SUPER;}
+"const"         {return CONST;}
+"generic"       {return GENERIC;}
+"null"          {return NULL;}
+"switch"        {return SWITCH;}
+"continue"      {return CONTINUE;}
+"goto"          {return GOTO;}
+"operator"      {return OPERATOR;}
+"synchronized"  {return SYNCHRONIZED;}
+"default"       {return DEFAULT;}
+"if"            {return IF;}
+"outer"         {return OUTER;}
+"this"          {return THIS;}
 
-{Identifier}	{return IDENTIFIER;}
+{Identifier}    {return IDENTIFIER;}
 
-{Literal}	{return LITERAL;}
+{Literal}       {return LITERAL;}
 
 {WhiteSpace}    {}
 
-{Comment}	{}
+{Comment}       {}
