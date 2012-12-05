@@ -54,6 +54,7 @@ C
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <assert.h>
 
 /* [i_a] MSVC doesn't define TRUE in the expected places; do it here to make sure we got it 'right' */
 #ifndef TRUE
@@ -144,8 +145,8 @@ extern _YACC_EXTERN_ char const *yyrule[];
 #define YYCALLREDUCEPOSN(e)                                                     \
     if (reduce_posn)                                                            \
     {                                                                           \
-      YYREDUCEPOSNFUNC(yyps->pos, &(yyps->psp)[1 - yym], &(yyps->vsp)[1 - yym], \
-               yym, yyps->psp - yyps->ps, yychar, yyposn, e);                   \
+      YYREDUCEPOSNFUNC(yyps->pos, &(yyps->psp)[1 - yyruletokencount], &(yyps->vsp)[1 - yyruletokencount], \
+               yyruletokencount, yyps->psp - yyps->ps, yychar, yyposn, e);                   \
       reduce_posn = 0;                                                          \
     }
 
@@ -154,7 +155,7 @@ extern _YACC_EXTERN_ char const *yyrule[];
 #endif
 
 
-#define YYPOSNARG(n) (yyps->psp[1 - yym + (n) - 1])
+#define YYPOSNARG(n) (yyps->psp[1 - yyruletokencount + (n) - 1])
 #define YYPOSNOUT    (yyps->pos)
 #endif
 
@@ -206,19 +207,45 @@ YYPOSN  yyposn;
 YYSTYPE yyretlval;
 YYPOSN  yyretposn;
 
-#define YYABORT  goto yyabort
-#define YYACCEPT goto yyaccept
-#define YYERROR  goto yyerrlab
-#define YYVALID                                      \
-            do {                                     \
-                if (yytrial)                         \
-                    goto yyvalid;                    \
+#define YYABORT                                     \
+            do                                      \
+            {                                       \
+              yymode = YY_EXIT_ABORT;               \
+              goto past_the_reduce_actions;         \
+            } while (0)
+#define YYACCEPT                                    \
+            do                                      \
+            {                                       \
+              if (yytrial)                          \
+                yymode = YY_DO_ACCEPT_RULE;         \     
+              else                                  \
+                yymode = YY_EXIT_ACCEPT;            \  
+              goto past_the_reduce_actions;         \
             } while(0)
-#define YYVALID_NESTED                               \
-            do {                                     \
-                if (yytrial                          \
-                    && yytrial->save == 0)           \
-                    goto yyvalid;                    \
+#define YYERROR                                     \ 
+            do                                      \
+            {                                       \
+              yymode = YY_RAN_INTO_ERROR;           \
+              goto past_the_reduce_actions;         \
+            } while (0)
+#define YYVALID                                     \
+            do                                      \
+            {                                       \
+              if (yytrial)                          \
+              {                                     \
+                yymode = YY_DO_ACCEPT_RULE;         \
+                goto past_the_reduce_actions;       \
+              }                                     \
+            } while(0)
+#define YYVALID_NESTED                              \
+            do                                      \
+            {                                       \
+              if (yytrial                           \
+                  && yytrial->save == 0)            \
+              {                                     \
+                yymode = YY_DO_ACCEPT_RULE;         \
+                goto past_the_reduce_actions;       \
+              }                                     \
             } while(0)
 
 struct YYParseState_s
@@ -405,13 +432,27 @@ static void btyacc_debug_log_eol(const char *msg, ...);
  */
 int yyparse(void)
 {
-  int yym, yyn, yychar, yynewerrflag;
+  int yychar, yynewerrflag;
   int unsigned yystate;
   YYParseState *yyerrctx = 0;
 
 #ifdef YYREDUCEPOSNFUNC
   int reduce_posn;
 #endif
+
+  enum {
+    YY_DO_LOOP,
+    YY_DO_SHIFT,
+    YY_CHECK_REDUCE,
+    YY_DO_REDUCE,     
+    YY_DO_ACCEPT_RULE,
+    YY_RAN_INTO_ERROR,
+    YY_HANDLE_ERROR,
+    YY_AM_IN_RECOVERY,
+
+    YY_EXIT_ABORT,
+    YY_EXIT_ACCEPT
+  } yymode = YY_DO_LOOP;
 
 #if YYDEBUG
   BTYACC_SET_YYDEBUG_FROM_ENV();
@@ -435,10 +476,19 @@ int yyparse(void)
 
 
   /* Main parsing loop */
+  {
+  int yyn;
+
 yyloop:
+  for(;;)
+  {
+  switch (yymode)
+  {
+  case YY_DO_LOOP:
   if ((yyn = yydefred[yystate]))
   {
-    goto yyreduce;
+    yymode = YY_DO_REDUCE;
+    continue; // loop
   }
 
   /* Read one token */
@@ -490,7 +540,10 @@ yyloop:
       yypath = save->save;
       ctry = save->ctry;
       if (save->state != yystate)
-        goto yyabort;
+      {
+        yymode = YY_EXIT_ABORT;
+        break; // exit loop
+      }
       yyFreeState(&save);
     }
     else
@@ -595,12 +648,14 @@ yyloop:
       if (yyps->errflag > 0)
         --yyps->errflag;
       yystate = yyctable[ctry];
-      goto yyshift;
+      yymode = YY_DO_SHIFT;
+      continue; // loop
     }
     else
     {
       yyn = yyctable[ctry];
-      goto yyreduce;
+      yymode = YY_DO_REDUCE;
+      continue; // loop
     }
   } /* End of code dealing with conflicts */
 
@@ -622,7 +677,15 @@ yyloop:
       --yyps->errflag;
     yystate = yytable[yyn];
 
-yyshift:
+    /* fall through to YY_DO_SHIFT */
+    yymode = YY_DO_SHIFT;
+    continue;
+  } 
+  // else: reduce?
+  yymode = YY_CHECK_REDUCE;
+  continue; // loop
+
+case YY_DO_SHIFT:
     if (yyps->ssp >= yyps->ss + yyps->stacksize - 1)
     {
       if (yyMoreStack(yyps))
@@ -631,8 +694,10 @@ yyshift:
     *++(yyps->ssp) = yystate;
     *++(yyps->vsp) = yylval;
     *++(yyps->psp) = yyposn;
-    goto yyloop;
-  }
+    yymode = YY_DO_LOOP;
+    continue; // loop
+  	   
+case YY_CHECK_REDUCE:	   
   yyn = yyrindex[yystate];
   if (yyn != 0 &&
       (yyn += yychar) >= 0 &&
@@ -640,20 +705,25 @@ yyshift:
       yycheck[yyn] == yychar)
   {
     yyn = yytable[yyn];
-    goto yyreduce;
+    yymode = YY_DO_REDUCE;
+    continue; // loop
   }
 
   /* According to the tables, neither shift nor reduce is OK here - error! */
   if (yyps->errflag)
-    goto yyinrecovery;
+  {
+    yymode = YY_AM_IN_RECOVERY;
+    continue; // loop
+  }
   yynewerrflag = 1;
-  goto yyerrhandler;
+  yymode = YY_HANDLE_ERROR;
+  continue; // loop
 
-yyerrlab:
+case YY_RAN_INTO_ERROR:
   yynewerrflag = 0;
-
-yyerrhandler:
-  while (yytrial)
+   
+case YY_HANDLE_ERROR:
+  if (yytrial)
   {
     int ctry;
     YYParseState *save = yytrial;
@@ -703,12 +773,14 @@ yyerrhandler:
     yyn = yyctable[ctry];
     if (yyn >= 0)
     {
-      goto yyreduce;
+      yymode = YY_DO_REDUCE;
+      continue; // loop
     }
     yyps->save /* yytrial */ = save->save;
     yyFreeState(&save);
 
     /* Nothing left on the stack -- error */
+    yynewerrflag = 1;
     if (!yytrial)
     {
 #if YYDEBUG
@@ -735,7 +807,12 @@ yyerrhandler:
       yystate = yyerrctx->state;
       yyFreeState(&yyerrctx);
     }
-    yynewerrflag = 1;
+    else
+    {
+      // loop through the trial stack by using the outer loop for this:
+      yymode = YY_HANDLE_ERROR;
+      continue; // loop
+    }
   }
   if (yynewerrflag)
   {
@@ -747,10 +824,11 @@ yyerrhandler:
   }
   ++yynerrs;
 
-yyinrecovery:
+case YY_AM_IN_RECOVERY:
   if (yyps->errflag < 3)
   {
     yyps->errflag = 3;
+    yymode = YY_AM_IN_RECOVERY; // used to detect whether we need to loop below
     for (;;)
     {
       yyn = yysindex[*(yyps->ssp)];
@@ -767,11 +845,9 @@ yyinrecovery:
                   yytable[yyn]);
         }
 #endif
-        /* Use label yyerrlab, so that compiler does not warn */
-        if (yyps->errflag != yyps->errflag)
-          goto yyerrlab;
         yystate = yytable[yyn];
-        goto yyshift;
+        yymode = YY_DO_SHIFT;
+        break; // break out of inner loop to continue looping in the outer one...
       }
       else
       {
@@ -784,7 +860,8 @@ yyinrecovery:
 #endif
         if (yyps->ssp <= yyps->ss)
         {
-          goto yyabort;
+          yymode = YY_EXIT_ABORT;
+          break; // break out of inner loop to continue looping in the outer one...
         }
         if (!yytrial)
         {
@@ -796,11 +873,16 @@ yyinrecovery:
         --(yyps->psp);
       }
     }
+    if (yymode != YY_AM_IN_RECOVERY)
+      continue; // loop
   }
   else
   {
     if (yychar == 0)
-      goto yyabort;
+    {
+      yymode = YY_EXIT_ABORT;
+      continue;
+    }
 #if YYDEBUG
     if (yydebug)
     {
@@ -820,25 +902,27 @@ yyinrecovery:
       YYDELETEPOSN(yyposn, 0);
     }
     yychar = YYEMPTY;
-    goto yyloop;
+    yymode = YY_DO_LOOP;
+    continue;
   }
 
   /* Reduce the rule */
-yyreduce:
-  yym = yylen[yyn];
+case YY_DO_REDUCE:
+  {
+  int yyruletokencount = yylen[yyn];
 #if YYDEBUG
   if (yydebug)
   {
     BTYACC_DEBUG_LOG_PARTIAL("btyacc[%3u,%2d%s]: reducing by rule %d (%s)",
             yystate, yydepth, (yytrial ? ",trial" : ""), yyn, yyrule[yyn]);
 #ifdef YYDBPR
-    if (yym > 0)
+    if (yyruletokencount > 0)
     {
       int i;
       BTYACC_DEBUG_LOG_PARTIAL(" <");
-      for (i = yym; i > 0; --i)
+      for (i = yyruletokencount; i > 0; --i)
       {
-        if (i != yym)
+        if (i != yyruletokencount)
           BTYACC_DEBUG_LOG_PARTIAL(", ");
         YYDBPR(yyps->vsp[1 - i]);
       }
@@ -848,7 +932,7 @@ yyreduce:
     BTYACC_DEBUG_LOG_EOL("\n");
   }
 #endif
-  if (yyps->ssp + 1 - yym >= yyps->ss + yyps->stacksize)
+  if (yyps->ssp + 1 - yyruletokencount >= yyps->ss + yyps->stacksize)
   {
     if (yyMoreStack(yyps))
       goto heap_alloc_error;
@@ -864,9 +948,9 @@ yyreduce:
 #endif
 #else
   /* RA: bison compatibility: default action is '$$ = $1;' */
-  if (yym > 0)
+  if (yyruletokencount > 0)
   {
-    yyps->val = yyps->vsp[1 - yym];
+    yyps->val = yyps->vsp[1 - yyruletokencount];
   }
 #endif
 
@@ -885,7 +969,11 @@ yyreduce:
 #ifdef YYREDUCEPOSNFUNC
   reduce_posn = 1;
 #endif
-
+			
+  // set this up as the default destination and since we want to know if the user code 			
+  // did set a different target via YYACCEPT and friends:
+  yymode = YY_DO_LOOP; 
+  
   switch (yyn)
   {
 
@@ -894,6 +982,10 @@ yyreduce:
   default:
     break;
   }
+
+past_the_reduce_actions:
+  if (yymode != YY_DO_LOOP)
+    continue; // loop
 
 #if YYDEBUG
 #if defined(YYDBPR)
@@ -915,12 +1007,14 @@ yyreduce:
   }
 #endif
 
-  yyps->ssp -= yym;
+  yyps->ssp -= yyruletokencount;
   yystate = *(yyps->ssp);
-  yyps->vsp -= yym;
-  yyps->psp -= yym;
+  yyps->vsp -= yyruletokencount;
+  yyps->psp -= yyruletokencount;
+  }
 
-  yym = yylhs[yyn];
+  {
+  int yym = yylhs[yyn];
   if (yystate == 0 && yym == 0)
   {
 #if YYDEBUG
@@ -958,8 +1052,17 @@ yyreduce:
 #endif
     }
     if (yychar == 0)
-      goto yyaccept;
-    goto yyloop;
+    {
+      if (yytrial)
+        yymode = YY_DO_ACCEPT_RULE;
+      else
+        yymode = YY_EXIT_ACCEPT;
+    }
+    else
+    {
+      assert(yymode == YY_DO_LOOP);   // has already been set further above...
+    }
+    continue; // loop
   }
 
   yyn = yygindex[yym];
@@ -987,17 +1090,20 @@ yyreduce:
   *++(yyps->ssp) = yystate;
   *++(yyps->vsp) = yyps->val;
   *++(yyps->psp) = yyps->pos;
-  goto yyloop;
+  }
+  yymode = YY_DO_LOOP;
+  continue;
 
 
   /*
    * Reduction declares that this path is valid.
    * Set yypath and do a full parse.
    */
-yyvalid:
+case YY_DO_ACCEPT_RULE:
   if (yypath)
   {
-    goto yyabort;
+    yymode = YY_EXIT_ABORT;
+    continue; // loop;
   }
   while (yytrial)
   {
@@ -1010,9 +1116,9 @@ yyvalid:
   if (yydebug)
   {
     BTYACC_DEBUG_LOG_EOL("btyacc[%3d,%2d%s]: CONFLICT trial successful, "
-            "backtracking to state %d, %d tokens\n",
-            yystate, yydepth, (yytrial ? ",trial" : ""),
-            yypath->state, (int)(yylvp - yylvals - yypath->lexeme));
+                         "backtracking to state %d, %d tokens\n",
+                         yystate, yydepth, (yytrial ? ",trial" : ""),
+                         yypath->state, (int)(yylvp - yylvals - yypath->lexeme));
   }
 #endif
   if (yyerrctx)
@@ -1030,7 +1136,8 @@ yyvalid:
   yylpp = yylpsns + yypath->lexeme;
   yylexp = yylexemes + yypath->lexeme;
   yystate = yypath->state;
-  goto yyloop;
+  yymode = YY_DO_LOOP;
+  continue;
 
 
 heap_alloc_error:
@@ -1041,7 +1148,7 @@ heap_alloc_error:
             yystate, (yytrial ? ",trial" : ""));
   }
 #endif
-yyabort:
+case YY_EXIT_ABORT:
   {
     YYSTYPE *pv;
     YYPOSN *pp;
@@ -1076,9 +1183,9 @@ yyabort:
     return 1;
   }
 
-yyaccept:
-  if (yytrial)
-    goto yyvalid;
+case YY_EXIT_ACCEPT:
+  //if (yytrial)         -- these two lines have moved into the code spots where the 'goto yyaccept' was before.
+  //  goto yyvalid;
   if (yyerrctx)
   {
     yyFreeState(&yyerrctx);
@@ -1096,6 +1203,9 @@ yyaccept:
     yyFreeState(&save);
   }
   return 0;
+  }
+  }
+  }
 }
 
 
