@@ -41,7 +41,7 @@ static void set_state_table(void)
 {
     register core *sp;
 
-    state_table = NEW2(nstates, core *);
+    state_table = NEW2(nstates, state_table[0]);
     for (sp = first_state; sp; sp = sp->next)
         state_table[sp->number] = sp;
 }
@@ -52,7 +52,7 @@ static void set_accessing_symbol(void)
 {
     register core *sp;
 
-    accessing_symbol = NEW2(nstates, Yshort);
+    accessing_symbol = NEW2(nstates, accessing_symbol[0]);
     for (sp = first_state; sp; sp = sp->next)
         accessing_symbol[sp->number] = sp->accessing_symbol;
 }
@@ -63,7 +63,7 @@ static void set_shift_table(void)
 {
     register shifts *sp;
 
-    shift_table = NEW2(nstates, shifts *);
+    shift_table = NEW2(nstates, shift_table[0]);
     for (sp = first_shift; sp; sp = sp->next)
         shift_table[sp->number] = sp;
 }
@@ -74,7 +74,7 @@ static void set_reduction_table(void)
 {
     register reductions *rp;
 
-    reduction_table = NEW2(nstates, reductions *);
+    reduction_table = NEW2(nstates, reduction_table[0]);
     for (rp = first_reduction; rp; rp = rp->next)
         reduction_table[rp->number] = rp;
 }
@@ -115,7 +115,7 @@ static void initialize_LA(void)
   register int i, j, k;
   register reductions *rp;
 
-  lookaheads = NEW2(nstates + 1, Yshort);
+  lookaheads = NEW2(nstates + 1, lookaheads[0]);
 
   k = 0;
 
@@ -128,9 +128,9 @@ static void initialize_LA(void)
     }
   lookaheads[nstates] = k;
 
-  LA = NEW2(k * tokensetsize, unsigned);
-  LAruleno = NEW2(k, Yshort);
-  lookback = NEW2(k, shorts *);
+  LA = NEW2(k * tokensetsize, LA[0]);
+  LAruleno = NEW2(k, LAruleno[0]);
+  lookback = NEW2(k, lookback[0]);
 
   k = 0;
 
@@ -159,9 +159,9 @@ static void set_goto_map(void)
     register int state2;
     register int state1;
 
-    goto_map = NEW2(nvars + 1, Yshort);
+    goto_map = NEW2(nvars + 1, goto_map[0]);
     goto_map -= ntokens;
-    temp_map = NEW2(nvars + 1, Yshort);
+    temp_map = NEW2(nvars + 1, temp_map[0]);
     temp_map -= ntokens;
 
     ngotos = 0;
@@ -194,8 +194,8 @@ static void set_goto_map(void)
   goto_map[nsyms] = ngotos;
   temp_map[nsyms] = ngotos;
 
-  from_state = NEW2(ngotos, Yshort);
-  to_state = NEW2(ngotos, Yshort);
+  from_state = NEW2(ngotos, from_state[0]);
+  to_state = NEW2(ngotos, to_state[0]);
 
   for (sp = first_shift; sp; sp = sp->next)
     {
@@ -308,8 +308,8 @@ static void digraph(Yshort** relation)
   register int i;
 
   infinity = ngotos + 2;
-  INDEX = NEW2(ngotos + 1, Yshort);
-  VERTICES = NEW2(ngotos + 1, Yshort);
+  INDEX = NEW2(ngotos + 1, INDEX[0]);
+  VERTICES = NEW2(ngotos + 1, VERTICES[0]);
   top = 0;
 
   R = relation;
@@ -344,10 +344,10 @@ static void initialize_F(void)
   register int nwords;
 
   nwords = ngotos * tokensetsize;
-  F = NEW2(nwords, unsigned);
+  F = NEW2(nwords, F[0]);
 
-  reads = NEW2(ngotos, Yshort *);
-  edge = NEW2(ngotos + 1, Yshort);
+  reads = NEW2(ngotos, reads[0]);
+  edge = NEW2(ngotos + 1, edge[0]);
   nedges = 0;
 
   rowp = F;
@@ -377,7 +377,7 @@ static void initialize_F(void)
 
           if (nedges)
             {
-              reads[i] = rp = NEW2(nedges + 1, Yshort);
+              reads[i] = rp = NEW2(nedges + 1, rp[0]);
 
               for (j = 0; j < nedges; ++j)
                 rp[j] = edge[j];
@@ -421,7 +421,7 @@ static void add_lookback_edge(int stateno, int ruleno, int gotono)
     }
     assert(found);
 
-    sp = NEW(shorts);
+    sp = NEW(sp[0]);
     sp->next = lookback[i];
     sp->value = gotono;
     lookback[i] = sp;
@@ -437,7 +437,7 @@ static Yshort** transpose(Yshort** R, int n)
   register int i;
   register int k;
 
-  nedges = NEW2(n, Yshort);
+  nedges = NEW2(n, nedges[0]);
 
   for (i = 0; i < n; ++i)
     {
@@ -449,15 +449,15 @@ static Yshort** transpose(Yshort** R, int n)
         }
     }
 
-  new_R = NEW2(n, Yshort *);
-  temp_R = NEW2(n, Yshort *);
+  new_R = NEW2(n, new_R[0]);
+  temp_R = NEW2(n, temp_R[0]);
 
   for (i = 0; i < n; ++i)
     {
       k = nedges[i];
       if (k > 0)
         {
-          sp = NEW2(k + 1, Yshort);
+          sp = NEW2(k + 1, sp[0]);
           new_R[i] = sp;
           temp_R[i] = sp;
           sp[k] = -1;
@@ -502,9 +502,9 @@ static void build_relations(void)
   register Yshort *states;
   register Yshort **new_includes;
 
-  includes = NEW2(ngotos, Yshort *);
-  edge = NEW2(ngotos + 1, Yshort);
-  states = NEW2(maxrhs + 1, Yshort);
+  includes = NEW2(ngotos, includes[0]);
+  edge = NEW2(ngotos + 1, edge[0]);
+  states = NEW2(maxrhs + 1, states[0]);
 
   for (i = 0; i < ngotos; ++i)
     {
@@ -553,7 +553,7 @@ static void build_relations(void)
 
       if (nedges)
         {
-          includes[i] = shortp = NEW2(nedges + 1, Yshort);
+          includes[i] = shortp = NEW2(nedges + 1, shortp[0]);
 
           for (j = 0; j < nedges; ++j)
             shortp[j] = edge[j];

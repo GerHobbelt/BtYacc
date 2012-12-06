@@ -36,11 +36,11 @@ bucket* make_bucket(char const * name)
     register bucket *bp;
 
     assert(name);
-    bp = (bucket *) MALLOC(sizeof(bucket));
+    bp = (bucket *) NEW(bp[0]);
     if (bp == 0) no_space();
     bp->link = 0;
     bp->next = 0;
-    bp->name = MALLOC(strlen(name) + 1);
+    bp->name = strdup(name);
     if (bp->name == 0) no_space();
     bp->tag = 0;
     bp->value = UNDEFINED;
@@ -51,9 +51,6 @@ bucket* make_bucket(char const * name)
     bp->args = -1;
     bp->argnames = 0;
     bp->argtags = 0;
-
-    if (bp->name == 0) no_space();
-    strcpy(bp->name, name);
 
     return (bp);
 }
@@ -83,14 +80,12 @@ bucket* lookup(char const * name)
 
 void create_symbol_table(void)
 {
-    register int i;
     register bucket *bp;
 
-    symbol_table = (bucket **) MALLOC(TABLE_SIZE*sizeof(bucket *));
+    symbol_table = (bucket **) NEW2(TABLE_SIZE, symbol_table[0]);
     if (symbol_table == 0) no_space();
 
-    for (i = 0; i < TABLE_SIZE; ++i)
-        symbol_table[i] = 0;
+	/* The symbol_table[] array has been completely zeroed by NEW2() */
 
     bp = make_bucket("error");
     bp->index = 1;

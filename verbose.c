@@ -15,7 +15,7 @@ void verbose(void)
 
     if (!vflag) return;
 
-    null_rules = (Yshort *) MALLOC(nrules * sizeof(null_rules[0]));
+    null_rules = (Yshort *) NEW2(nrules, null_rules[0]);
     if (null_rules == 0) no_space();
 
     BtYacc_puts("\f\n", verbose_file);
@@ -104,10 +104,13 @@ void print_state(int state)
 
 void print_conflicts(int state)
 {
-    register int symbol, act, number;
-    register action *p;
+    int symbol;
+	BtYacc_action_code act;
+	int number;
+    action *p;
 
-    symbol = act = number = -1;
+    symbol = number = -1;
+	act = UNDEFINED_ACTION;
     for (p = parser[state]; p; p = p->next)
     {
         if (p->suppressed == 2)

@@ -44,7 +44,7 @@ static int ifdef_skip = 0;
 char *defd_vars[MAX_DEFD_VARS] = {NULL};
 
 static bucket *goal = NULL;
-static int prec = 0;
+static Yshort prec = 0;
 static int gensym = 0;
 static char last_was_action = 0;
 
@@ -64,7 +64,7 @@ int cachec(int c)
     assert(cinc >= 0);
     if (cinc >= cache_size)
     {
-        cache = REALLOC(cache, cache_size += 256);
+        cache = REALLOC(cache, cache_size += 256, cache[0]);
         if (!cache) no_space();
     }
     return cache[cinc++] = c;
@@ -117,7 +117,7 @@ NextLine:
   {
     if (++i + 1 >= linesize)
     {
-      line = REALLOC(line, linesize += LINESIZE);
+      line = REALLOC(line, linesize += LINESIZE, line[0]);
       if (!line)
         no_space();
     }
@@ -224,12 +224,10 @@ NextLine:
         error(lineno, 0, 0, "Preprocessor variable %s already defined", var_name);
       }
     }
-    *ps = MALLOC(strlen(var_name)+1);
-
+    *ps = strdup(var_name);
     if (*ps == 0)
        no_space();
 
-    strcpy(*ps, var_name);
     *++ps = NULL;
     goto NextLine;
   }
@@ -566,11 +564,13 @@ loop:
         goto loop;
     case '%':
     case '\\':
-        if (*cptr == '}') {
+        if (*cptr == '}') 
+		{
             if (need_newline) BtYacc_putc('\n', f);
             ++cptr;
             FREE(t_line);
-            return; }
+            return; 
+		}
         /* fall through */
     default:
         BtYacc_putc(c, f);
@@ -898,8 +898,8 @@ char    *s;
     if (ntags >= tagmax)
     {
         tagmax += 16;
-        tag_table = tag_table ? RENEW(tag_table, tagmax, char *)
-                              : NEW2(tagmax, char *);
+        tag_table = tag_table ? RENEW(tag_table, tagmax, tag_table[0])
+                              : NEW2(tagmax, tag_table[0]);
         if (tag_table == 0) no_space();
     }
     s = MALLOC(len + 1);
@@ -950,7 +950,7 @@ char    *b = cptr;
     return cache_tag(b, (int)(cptr - b));
 }
 
-void declare_tokens(int assoc)
+void declare_tokens(BtYacc_keyword_code assoc)
 {
     register int c;
     register bucket *bp;
@@ -1032,8 +1032,8 @@ int     args = 0, c;
 
     ++cptr; /* skip close paren */
     bp->args = args;
-    bp->argnames = NEW2(args, char *);
-    bp->argtags = NEW2(args, char *);
+    bp->argnames = NEW2(args, bp->argnames[0]);
+    bp->argtags = NEW2(args, bp->argtags[0]);
     if (!bp->argnames) no_space();
     if (!bp->argtags) no_space();
     while (--args >= 0)
@@ -1110,7 +1110,7 @@ void read_declarations(void)
     char *t_cptr;
 
     cache_size = 256;
-    cache = MALLOC(cache_size);
+    cache = (char *)NEW2(cache_size, cache[0]);
     if (cache == 0) no_space();
 
     for (;;)
@@ -1248,7 +1248,6 @@ void read_declarations(void)
             {
                 char **ps;
                 char *var_name = s + 1;
-                extern char *defd_vars[];
                 for (ps = &defd_vars[0]; *ps; ps++)
                 {
                     if(strcmp(*ps,var_name) == 0)
@@ -1256,8 +1255,8 @@ void read_declarations(void)
                         error(lineno, line, t_cptr, "Preprocessor variable %s already defined", var_name);
                     }
                 }
-                *ps = MALLOC(strlen(var_name)+1);
-                strcpy(*ps, var_name);
+                *ps = strdup(var_name);
+				if (!*ps) no_space();
                 *++ps = NULL;
             }
             break;
@@ -1285,7 +1284,7 @@ void initialize_grammar(void)
 {
     nitems = 4;
     maxitems = 300;
-    pitem = NEW2(maxitems, bucket *);
+    pitem = NEW2(maxitems, pitem[0]);
     if (pitem == 0) no_space();
     pitem[0] = 0;
     pitem[1] = 0;
@@ -1294,17 +1293,17 @@ void initialize_grammar(void)
 
     nrules = 3;
     maxrules = 100;
-    plhs = NEW2(maxrules, bucket *);
+    plhs = NEW2(maxrules, plhs[0]);
     if (plhs == 0) no_space();
     plhs[0] = 0;
     plhs[1] = 0;
     plhs[2] = 0;
-    rprec = NEW2(maxrules, Yshort);
+    rprec = NEW2(maxrules, rprec[0]);
     if (rprec == 0) no_space();
     rprec[0] = 0;
     rprec[1] = 0;
     rprec[2] = 0;
-    rassoc = NEW2(maxrules, char);
+    rassoc = NEW2(maxrules, rassoc[0]);
     if (rassoc == 0) no_space();
     rassoc[0] = TOKEN;
     rassoc[1] = TOKEN;
@@ -1314,18 +1313,18 @@ void initialize_grammar(void)
 void expand_items(void)
 {
     maxitems += 300;
-    pitem = RENEW(pitem, maxitems, bucket *);
+    pitem = RENEW(pitem, maxitems, pitem[0]);
     if (pitem == 0) no_space();
 }
 
 void expand_rules(void)
 {
     maxrules += 100;
-    plhs = RENEW(plhs, maxrules, bucket *);
+    plhs = RENEW(plhs, maxrules, plhs[0]);
     if (plhs == 0) no_space();
-    rprec = RENEW(rprec, maxrules, Yshort);
+    rprec = RENEW(rprec, maxrules, rprec[0]);
     if (rprec == 0) no_space();
-    rassoc = RENEW(rassoc, maxrules, char);
+    rassoc = RENEW(rassoc, maxrules, rassoc[0]);
     if (rassoc == 0) no_space();
 }
 
@@ -1459,8 +1458,8 @@ int     i, redec=0;
     {
         a->args = argslen;
         if (!a->args) return;
-        a->argnames = NEW2(argslen, char *);
-        a->argtags = NEW2(argslen, char *);
+        a->argnames = NEW2(argslen, a->argnames[0]);
+        a->argtags = NEW2(argslen, a->argtags[0]);
         if (!a->argnames || !a->argtags)
             no_space();
     }
@@ -1535,7 +1534,7 @@ static char *compile_arg(char **theptr, char *yyvaltag)
 
     if (maxoffset > 0)
     {
-        offsets = NEW2(maxoffset+1, Yshort);
+        offsets = NEW2(maxoffset+1, offsets[0]);
         if (offsets == 0) no_space();
     }
 
@@ -1656,7 +1655,7 @@ struct arg_cache        *entry;
 
 static void insert_arg_cache(char *code, int rule)
 {
-struct arg_cache        *entry = NEW(struct arg_cache);
+struct arg_cache        *entry = NEW(entry[0]);
 int                     i;
 
     if (!entry) no_space();
@@ -1972,7 +1971,7 @@ void copy_action(void)
 
     if (maxoffset > 0)
     {
-        offsets = NEW2(maxoffset+1, Yshort);
+        offsets = NEW2(maxoffset+1, offsets[0]);
         if (offsets == 0) no_space();
     }
 
@@ -2256,6 +2255,16 @@ loop:
     }
 }
 
+/*
+Decode %... token following a rule.
+
+Expected tokens are:
+  %%
+  %\
+  %prec <terminal>
+  %=prec <terminal>
+  %dprec <number>
+*/
 int mark_symbol(void)
 {
     register int c;
@@ -2358,15 +2367,17 @@ void pack_names(void)
     register bucket *bp;
     register char *p, *s, *t;
 
-    name_pool_size = 13;  /* 13 == sizeof("$end") + sizeof("$accept") */
+    name_pool_size = sizeof("$end") + sizeof("$accept");
     for (bp = first_symbol; bp; bp = bp->next)
         name_pool_size += (int)strlen(bp->name) + 1;
     name_pool = MALLOC(name_pool_size);
     if (name_pool == 0) no_space();
 
-    strcpy(name_pool, "$accept");
-    strcpy(name_pool+8, "$end");
-    t = name_pool + 13;
+	t = name_pool;
+    strcpy(t, "$accept");
+	t += strlen(t) + 1;
+    strcpy(t, "$end");
+	t += strlen(t) + 1;
     for (bp = first_symbol; bp; bp = bp->next)
     {
         p = t;
@@ -2412,16 +2423,16 @@ void pack_symbols(void)
     start_symbol = ntokens;
     nvars = nsyms - ntokens;
 
-    symbol_name = NEW2(nsyms, char *);
+    symbol_name = NEW2(nsyms, symbol_name[0]);
     if (symbol_name == 0) no_space();
-    symbol_value = NEW2(nsyms, Yshort);
+    symbol_value = NEW2(nsyms, symbol_value[0]);
     if (symbol_value == 0) no_space();
-    symbol_prec = NEW2(nsyms, Yshort);
+    symbol_prec = NEW2(nsyms, symbol_prec[0]);
     if (symbol_prec == 0) no_space();
-    symbol_assoc = MALLOC(nsyms);
+    symbol_assoc = NEW2(nsyms, symbol_assoc[0]);
     if (symbol_assoc == 0) no_space();
 
-    v = NEW2(nsyms, bucket *);
+    v = NEW2(nsyms, v[0]);
     if (v == 0) no_space();
 
     v[0] = 0;
@@ -2531,17 +2542,18 @@ void pack_symbols(void)
 void pack_grammar(void)
 {
     register int i, j;
-    int assoc, prec;
+    BtYacc_keyword_code assoc;
+	Yshort prec;
 
-    ritem = NEW2(nitems, Yshort);
+    ritem = NEW2(nitems, ritem[0]);
     if (ritem == 0) no_space();
-    rlhs = NEW2(nrules, Yshort);
+    rlhs = NEW2(nrules, rlhs[0]);
     if (rlhs == 0) no_space();
-    rrhs = NEW2(nrules+1, Yshort);
+    rrhs = NEW2(nrules+1, rrhs[0]);
     if (rrhs == 0) no_space();
-    rprec = RENEW(rprec, nrules, Yshort);
+    rprec = RENEW(rprec, nrules, rprec[0]);
     if (rprec == 0) no_space();
-    rassoc = RENEW(rassoc, nrules, char);
+    rassoc = RENEW(rassoc, nrules, rassoc[0]);
     if (rassoc == 0) no_space();
 
     ritem[0] = -1;

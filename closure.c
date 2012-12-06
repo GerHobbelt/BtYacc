@@ -128,7 +128,7 @@ static void set_EFF(void)
     register int rule;
 
     rowsize = WORDSIZE(nvars);
-    EFF = NEW2(nvars * rowsize, unsigned);
+    EFF = NEW2(nvars * rowsize, EFF[0]);
 
     row = EFF;
 
@@ -170,7 +170,7 @@ void set_first_derives(void)
 
   rulesetsize = WORDSIZE(nrules);
   varsetsize = WORDSIZE(nvars);
-  first_derives = NEW2(nvars * rulesetsize, unsigned);
+  first_derives = NEW2(nvars * rulesetsize, first_derives[0]);
   first_derives -= ntokens * rulesetsize;
 
   set_EFF();

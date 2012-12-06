@@ -38,7 +38,7 @@ static void allocate_itemsets(void)
     register Yshort *symbol_count;
 
     count = 0;
-    symbol_count = NEW2(nsyms, Yshort);
+    symbol_count = NEW2(nsyms, symbol_count[0]);
 
     item_end = ritem + nitems;
 
@@ -52,8 +52,8 @@ static void allocate_itemsets(void)
         }
     }
 
-    kernel_base = NEW2(nsyms, Yshort *);
-    kernel_items = NEW2(count, Yshort);
+    kernel_base = NEW2(nsyms, kernel_base[0]);
+    kernel_items = NEW2(count, kernel_items[0]);
 
     count = 0;
     max = 0;
@@ -67,16 +67,16 @@ static void allocate_itemsets(void)
     }
 
     shift_symbol = symbol_count;
-    kernel_end = NEW2(nsyms, Yshort *);
+    kernel_end = NEW2(nsyms, kernel_end[0]);
 }
 
 
 static void allocate_storage(void)
 {
     allocate_itemsets();
-    shiftset = NEW2(nsyms, Yshort);
-    redset = NEW2(nrules + 1, Yshort);
-    state_set = NEW2(nitems, core *);
+    shiftset = NEW2(nsyms, shiftset[0]);
+    redset = NEW2(nrules + 1, redset[0]);
+    state_set = NEW2(nitems, state_set[0]);
 }
 
 
@@ -228,7 +228,7 @@ static void initialize_states(void)
     for (i = 0; start_derives[i] >= 0; ++i)
         continue;
 
-    p = (core *) MALLOC(sizeof(core) + i*sizeof(Yshort));
+    p = (core *) MALLOC(sizeof(p[0]) + i * sizeof(p->items[0]));
     if (p == 0) no_space();
 
     p->next = 0;
@@ -366,8 +366,8 @@ static void save_shifts(void)
 static void generate_states(void)
 {
     allocate_storage();
-    itemset = NEW2(nitems, Yshort);
-    ruleset = NEW2(WORDSIZE(nrules), unsigned);
+    itemset = NEW2(nitems, itemset[0]);
+    ruleset = NEW2(WORDSIZE(nrules), ruleset[0]);
     set_first_derives();
     initialize_states();
 
@@ -499,8 +499,8 @@ static void set_derives(void)
     register int lhs;
     register Yshort *rules;
 
-    derives = NEW2(nsyms, Yshort *);
-    rules = NEW2(nvars + nrules, Yshort);
+    derives = NEW2(nsyms, derives[0]);
+    rules = NEW2(nvars + nrules, rules[0]);
 
     k = 0;
 
@@ -539,11 +539,11 @@ static void set_nullable(void)
     register int empty;
     int done;
 
-    nullable = MALLOC(nsyms);
+    nullable = NEW2(nsyms, nullable[0]);
     if (nullable == 0) no_space();
 
     for (i = 0; i < nsyms; ++i)
-                nullable[i] = 0;
+        nullable[i] = 0;
 
     done = 0;
     while (!done)

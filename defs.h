@@ -99,17 +99,17 @@ typedef int Yshort;
 
 typedef enum keyword_code_enumeration
 {
-    TOKEN                           = 0,
-    LEFT                            = 1,
-    RIGHT                           = 2,
-    NONASSOC                        = 3,
-    MARK                            = 4,
-    TEXT                            = 5,
-    TYPE                            = 6,
-    START                           = 7,
-    UNION                           = 8,
-    IDENT                           = 9,
-    SCANNERLESS_ZERO_ASCII,
+    TOKEN                           =  0,
+    LEFT                            =  1,
+    RIGHT                           =  2,
+    NONASSOC                        =  3,
+    MARK                            =  4,
+    TEXT                            =  5,
+    TYPE                            =  6,
+    START                           =  7,
+    UNION                           =  8,
+    IDENT                           =  9,
+    SCANNERLESS_ZERO_ASCII          = 10,
 
     /* [i_a] bison emulation additions */
     BISON_DEBUG                     = 110,
@@ -155,6 +155,8 @@ typedef enum symbol_class_enumeration
 
 typedef enum action_code_enumeration
 {
+	UNDEFINED_ACTION = 0,
+
     SHIFT = 1,
     REDUCE = 2
 } BtYacc_action_code;
@@ -162,26 +164,26 @@ typedef enum action_code_enumeration
 
 /*  character macros  */
 
-#define IS_IDENT(c)     (isalnum(c) || (c) == '_' || (c) == '.' || (c) == '$')
-#define IS_OCTAL(c)     ((c) >= '0' && (c) <= '7')
+#define IS_IDENT(c)				(isalnum(c) || (c) == '_' || (c) == '.' || (c) == '$')
+#define IS_OCTAL(c)				((c) >= '0' && (c) <= '7')
 #define NUMERIC_VALUE(c)        ((c) - '0')
 
 
 /*  symbol macros  */
 
-#define ISTOKEN(s)      ((s) < start_symbol)
-#define ISVAR(s)        ((s) >= start_symbol)
+#define ISTOKEN(s)				((s) < start_symbol)
+#define ISVAR(s)				((s) >= start_symbol)
 
 
 /*  storage allocation macros  */
 
+#define MALLOC(n)       malloc((unsigned)(n))
 #define CALLOC(k,n)     calloc((unsigned)(k), (unsigned)(n))
 #define FREE(x)         do { free((char*)(x)); x = 0; } while (0)
-#define MALLOC(n)       malloc((unsigned)(n))
-#define NEW(t)          ((t*)allocate(sizeof(t)))
-#define NEW2(n,t)       ((t*)allocate((unsigned)((n) * sizeof(t))))
-#define REALLOC(p,n)    (realloc((char*)(p), (unsigned)(n)))
-#define RENEW(p,n,t)    ((t*)realloc((char*)(p), (unsigned)((n) * sizeof(t))))
+#define NEW(t)          (allocate(sizeof(t)))
+#define NEW2(n,t)       (allocate((unsigned)((n) * sizeof(t))))
+#define REALLOC(p,n,t)  (realloc((char*)(p), (unsigned)((n) * sizeof(t))))
+#define RENEW(p,n,t)    (realloc((char*)(p), (unsigned)((n) * sizeof(t))))
 
 
 /*  the structure of a symbol table entry  */
@@ -198,9 +200,9 @@ struct bucket
     Yshort args;
     Yshort value;
     Yshort index;
-    Yshort prec;
+    Yshort prec;				/* precedence: UNDEFINED or number > 0 */
     char symbol_class;
-    char assoc;
+    BtYacc_keyword_code assoc;	/* associativity: LEFT/RIGHT/NONASSOC/other */
 };
 
 
@@ -250,9 +252,9 @@ struct action
     struct action *next;
     Yshort symbol;
     Yshort number;
-    Yshort prec;
-    char   action_code;
-    char   assoc;
+    Yshort prec;				/* precedence: UNDEFINED or number > 0 */
+    BtYacc_action_code action_code;
+    BtYacc_keyword_code assoc;	/* associativity: LEFT/RIGHT/NONASSOC/other */
     char   suppressed;
 };
 
@@ -329,13 +331,13 @@ extern int   start_symbol;
 extern char  **symbol_name;
 extern Yshort *symbol_value;
 extern Yshort *symbol_prec;
-extern char  *symbol_assoc;
+extern BtYacc_keyword_code *symbol_assoc;
 
 extern Yshort *ritem;
 extern Yshort *rlhs;
 extern Yshort *rrhs;
 extern Yshort *rprec;
-extern char  *rassoc;
+extern BtYacc_keyword_code *rassoc;
 
 extern Yshort **derives;
 extern char *nullable;
@@ -476,7 +478,7 @@ void BtYacc_stop_test(void);
 #endif
 
 char *sanitize_to_varname(const char *in_str);
-char *allocate(unsigned);
+void *allocate(unsigned int size);
 void create_temporary_files(void);
 void create_output_files(void);
 void open_temporary_files(void);
@@ -537,7 +539,7 @@ int is_reserved(char const * name);
 bucket *get_name(int store_name);
 int get_number(void);
 char *get_tag(void);
-void declare_tokens(int);
+void declare_tokens(BtYacc_keyword_code assoc);
 void declare_types(void);
 void declare_start(void);
 void read_declarations(void);

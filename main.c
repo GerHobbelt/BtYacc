@@ -80,13 +80,13 @@ int   start_symbol = 0;
 char  **symbol_name = NULL;
 Yshort *symbol_value = NULL;
 Yshort *symbol_prec = NULL;
-char  *symbol_assoc = NULL;
+BtYacc_keyword_code *symbol_assoc = NULL;
 
 Yshort *ritem = NULL;
 Yshort *rlhs = NULL;           /* array of left-hand side token for rules (rule number is the array index) */
 Yshort *rrhs = NULL;
 Yshort *rprec = NULL;
-char  *rassoc = NULL;
+BtYacc_keyword_code *rassoc = NULL;
 Yshort **derives = NULL;
 char *nullable = NULL;
 
@@ -495,7 +495,7 @@ no_more_options:;
         target_dir = "";
 }
 
-char *allocate(unsigned n)
+void *allocate(unsigned n)
 {
     register char *p;
 

@@ -201,7 +201,7 @@ void output_rule_data(void)
 {
     register int i;
     register int j;
-    Yshort *rules = CALLOC(nrules, sizeof(rules[0]));
+    Yshort *rules = NEW2(nrules, rules[0]);
 
     if (!rules) no_space();
 
@@ -232,7 +232,7 @@ void output_rule_data(void)
 void output_yydefred(void)
 {
     register int i, j;
-    Yshort *states = CALLOC(nstates, sizeof(states[0]));
+    Yshort *states = NEW2(nstates, states[0]);
 
     if (!states) no_space();
 
@@ -275,7 +275,7 @@ static void token_actions(void)
     register Yshort *actionrow, *r, *s;
     register action *p;
 
-    actionrow = NEW2(3 * ntokens, Yshort);
+    actionrow = NEW2(3 * ntokens, actionrow[0]);
     for (i = 0; i < nstates; ++i)
     {
         if (parser[i])
@@ -371,8 +371,8 @@ static void token_actions(void)
             width[2 * nstates + i] = 0;
             if (shiftcount > 0)
             {
-                froms[i] = r = NEW2(shiftcount, Yshort);
-                tos[i] = s = NEW2(shiftcount, Yshort);
+                froms[i] = r = NEW2(shiftcount, r[0]);
+                tos[i] = s = NEW2(shiftcount, s[0]);
                 min = MAXSHORT;
                 max = 0;
                 for (j = 0; j < ntokens; ++j)
@@ -391,8 +391,8 @@ static void token_actions(void)
             }
             if (reducecount > 0)
             {
-                froms[nstates + i] = r = NEW2(reducecount, Yshort);
-                tos[nstates + i] = s = NEW2(reducecount, Yshort);
+                froms[nstates + i] = r = NEW2(reducecount, r[0]);
+                tos[nstates + i] = s = NEW2(reducecount, s[0]);
                 min = MAXSHORT;
                 max = 0;
                 for (j = 0; j < ntokens; ++j)
@@ -411,8 +411,8 @@ static void token_actions(void)
             }
             if (conflictcount > 0)
             {
-                froms[2 * nstates + i] = r = NEW2(conflictcount, Yshort);
-                tos[2 * nstates + i] = s = NEW2(conflictcount, Yshort);
+                froms[2 * nstates + i] = r = NEW2(conflictcount, r[0]);
+                tos[2 * nstates + i] = s = NEW2(conflictcount, s[0]);
                 min = MAXSHORT;
                 max = 0;
                 for (j = 0; j < ntokens; ++j)
@@ -459,8 +459,8 @@ static void save_column(int symbol, int default_state)
 
     symno = symbol_value[symbol] + 3 * nstates;
 
-    froms[symno] = sp1 = sp = NEW2(count, Yshort);
-    tos[symno] = sp2 = NEW2(count, Yshort);
+    froms[symno] = sp1 = sp = NEW2(count, sp1[0]);
+    tos[symno] = sp2 = NEW2(count, sp2[0]);
 
     for (i = m; i < n; ++i)
     {
@@ -481,12 +481,12 @@ static void pack_table(void)
     register int place;
     register int state;
 
-    base = NEW2(nvectors, Yshort);
-    pos = NEW2(nentries, Yshort);
+    base = NEW2(nvectors, base[0]);
+    pos = NEW2(nentries, pos[0]);
 
     maxtable = 1000;
-    table = NEW2(maxtable, Yshort);
-    check = NEW2(maxtable, Yshort);
+    table = NEW2(maxtable, table[0]);
+    check = NEW2(maxtable, check[0]);
 
     lowzero = 0;
     high = 0;
@@ -557,13 +557,13 @@ static int default_goto(int symbol)
 static void goto_actions(void)
 {
     register int i, j, k;
-    Yshort *states = CALLOC(nstates, sizeof(states[0]));
+    Yshort *states = NEW2(nstates, states[0]);
 
     if (!states) no_space();
 
     open_output_files();
 
-    state_count = NEW2(nstates, Yshort);
+    state_count = NEW2(nstates, state_count[0]);
 
     print_one_comment(output_file, OUTPUT_FILE, "[state (symbol)] ==> default goto state");
     k = default_goto(start_symbol + 1);
@@ -590,7 +590,7 @@ static void sort_actions(void)
   register int t;
   register int w;
 
-  order = NEW2(nvectors, Yshort);
+  order = NEW2(nvectors, order[0]);
   nentries = 0;
 
   for (i = 0; i < nvectors; ++i)
@@ -620,12 +620,12 @@ void output_actions(void)
 {
     nvectors = 3 * nstates + nvars;
 
-    froms = NEW2(nvectors, Yshort *);
-    tos = NEW2(nvectors, Yshort *);
-    tally = NEW2(nvectors, Yshort);
-    width = NEW2(nvectors, Yshort);
+    froms = NEW2(nvectors, froms[0]);
+    tos = NEW2(nvectors, tos[0]);
+    tally = NEW2(nvectors, tally[0]);
+    width = NEW2(nvectors, width[0]);
     if (SRtotal + RRtotal)
-        conflicts = NEW2(4 * (SRtotal + RRtotal), Yshort);
+        conflicts = NEW2(4 * (SRtotal + RRtotal), conflicts[0]);
     else
         conflicts = 0;
     nconflicts = 0;
@@ -746,9 +746,9 @@ int pack_vector(int vector)
 
                 newmax = maxtable;
                 do { newmax += 200; } while (newmax <= loc);
-                table = (Yshort *) REALLOC(table, newmax*sizeof(Yshort));
+                table = (Yshort *) REALLOC(table, newmax, table[0]);
                 if (table == 0) no_space();
-                check = (Yshort *) REALLOC(check, newmax*sizeof(Yshort));
+                check = (Yshort *) REALLOC(check, newmax, check[0]);
                 if (check == 0) no_space();
                 for (l  = maxtable; l < newmax; ++l)
                 {
@@ -1171,13 +1171,12 @@ void output_debug(void)
     }
     BtYacc_printf(code_file, count_newlines(CODE_FILE, get_section("define_yymaxtoken")), max);
 
-    symnam = (char **) MALLOC((max+1)*sizeof(char *));
+    symnam = (char **) NEW2(max + 1, symnam[0]);
     if (symnam == 0) no_space();
 
-    /* Note that it is  not necessary to initialize the element         */
-    /* symnam[max].                                                     */
-    for (i = 0; i < max; ++i)
-        symnam[i] = 0;
+	/* Note that it is not necessary to zero the element symnam[max]. */
+    /* The symnam[] array has been zeroed completely by NEW2() */
+
     for (i = ntokens - 1; i >= 2; --i)
         symnam[symbol_value[i]] = symbol_name[i];
     symnam[0] = "end-of-file";

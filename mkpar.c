@@ -39,11 +39,10 @@ static void unused_rules(void)
     register int i;
     register action *p;
 
-    rules_used = (Yshort *) MALLOC(nrules * sizeof(Yshort));
+    rules_used = (Yshort *) NEW2(nrules, rules_used[0]);
     if (rules_used == 0) no_space();
 
-    for (i = 0; i < nrules; ++i)
-        rules_used[i] = 0;
+	/* the rules_used[] array has been zeroed completely by NEW2() */
 
     for (i = 0; i < nstates; ++i)
     {
@@ -78,8 +77,8 @@ static void remove_conflicts(void)
 
     SRtotal = 0;
     RRtotal = 0;
-    SRconflicts = NEW2(nstates, Yshort);
-    RRconflicts = NEW2(nstates, Yshort);
+    SRconflicts = NEW2(nstates, SRconflicts[0]);
+    RRconflicts = NEW2(nstates, RRconflicts[0]);
 
     for (i = 0; i < nstates; ++i)
     {
@@ -176,7 +175,7 @@ static void defreds(void)
 {
     register int i;
 
-    defred = NEW2(nstates, Yshort);
+    defred = NEW2(nstates, defred[0]);
     for (i = 0; i < nstates; ++i)
         defred[i] = sole_reduction(i);
 }
@@ -185,7 +184,7 @@ void make_parser(void)
 {
     register int i;
 
-    parser = NEW2(nstates, action *);
+    parser = NEW2(nstates, parser[0]);
     for (i = 0; i < nstates; ++i)
         parser[i] = parse_actions(i);
 
@@ -225,7 +224,7 @@ action *get_shifts(int stateno)
             symbol = accessing_symbol[k];
             if (ISTOKEN(symbol))
             {
-                temp = NEW(action);
+                temp = NEW(temp[0]);
                 temp->next = actions;
                 temp->symbol = symbol;
                 temp->number = k;
@@ -282,7 +281,7 @@ action *add_reduce(action *actions, int ruleno, int symbol)
         next = next->next;
     }
 
-    temp = NEW(action);
+    temp = NEW(temp[0]);
     temp->next = next;
     temp->symbol = symbol;
     temp->number = ruleno;
