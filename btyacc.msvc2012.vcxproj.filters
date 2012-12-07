@@ -193,6 +193,9 @@
     <None Include="test\bison-mysterious-reduce-reduce.y">
       <Filter>Extra Files\Test Files</Filter>
     </None>
+    <None Include="test\test-precedence.y">
+      <Filter>Extra Files\Test Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="btyaccpa.skeleton">

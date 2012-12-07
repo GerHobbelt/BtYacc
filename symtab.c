@@ -45,7 +45,7 @@ bucket* make_bucket(char const * name)
     bp->tag = 0;
     bp->value = UNDEFINED;
     bp->index = 0;
-    bp->prec = 0;
+    bp->prec = UNDEFINED;
     bp->symbol_class = UNKNOWN;
     bp->assoc = TOKEN;
     bp->args = -1;

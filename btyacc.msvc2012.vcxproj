@@ -462,6 +462,7 @@
     <None Include="test\ftp.y" />
     <None Include="test\t1.y" />
     <None Include="test\t2.y" />
+    <None Include="test\test-precedence.y" />
     <None Include="test\test.y" />
     <None Include="VERSION.TXT" />
   </ItemGroup>

@@ -44,7 +44,7 @@ static int ifdef_skip = 0;
 char *defd_vars[MAX_DEFD_VARS] = {NULL};
 
 static bucket *goal = NULL;
-static Yshort prec = 0;
+static Yshort precedence_max = 0;
 static int gensym = 0;
 static char last_was_action = 0;
 
@@ -280,7 +280,7 @@ char *skip_comment(void)
     return cptr = s + 2;
 }
 
-int nextc(void)
+int nextc(int only_skip_whitespace)
 {
     register char *s;
 
@@ -299,8 +299,6 @@ int nextc(void)
         case '\f':
         case '\r':
         case '\v':
-        case ',':
-        case ';':
             ++s;
             break;
         case '\\':
@@ -318,7 +316,17 @@ int nextc(void)
                 if ((s = get_line()) == 0) return EOF;
                 break;
             }
-            /* fall through */
+            
+			if (0 /* fall through */)
+			{
+        case ',':
+        case ';':
+				if (!only_skip_whitespace)
+				{
+					++s;
+					break;
+				}
+			}
         default:
             cptr = s;
             return *s;
@@ -326,63 +334,70 @@ int nextc(void)
     }
 }
 
-static struct keyword { char name[20]; int token; } keywords[] = {
-        { "binary", NONASSOC },
-        { "debug", BISON_DEBUG },                         /* [i_a] bison emulation additions */
-        { "define", BISON_DEFINE },                       /* [i_a] bison emulation additions */
-        { "defines", BISON_DEFINES },                     /* [i_a] bison emulation additions */
-        { "destructor", BISON_DESTRUCTOR },               /* [i_a] bison emulation additions */
-        { "dprec", BISON_DPREC },                         /* [i_a] bison emulation additions */
-        { "error-verbose", BISON_ERR_VERBOSE },           /* [i_a] bison emulation additions */
-        { "error_verbose", BISON_ERR_VERBOSE },           /* [i_a] bison emulation additions */
-        { "expect", BISON_EXPECT },                       /* [i_a] bison emulation additions */
-        { "file-prefix", BISON_FILE_PREFIX },             /* [i_a] bison emulation additions */
-        { "file_prefix", BISON_FILE_PREFIX },             /* [i_a] bison emulation additions */
-        { "fixed-output-files", BISON_YACC },             /* [i_a] bison emulation additions */
-        { "fixed_output_files", BISON_YACC },             /* [i_a] bison emulation additions */
-        { "glr-parser", BISON_GLR_PARSER },               /* [i_a] bison emulation additions */
-        { "glr_parser", BISON_GLR_PARSER },               /* [i_a] bison emulation additions */
-        { "ident", IDENT },
-        { "left", LEFT },
-        { "lex-param", BISON_LEX_PARAM },                 /* [i_a] bison emulation additions */
-        { "lex_param", BISON_LEX_PARAM },                 /* [i_a] bison emulation additions */
-        { "locations", BISON_LOCATIONS },                 /* [i_a] bison emulation additions */
-        { "merge", BISON_MERGE },                         /* [i_a] bison emulation additions */
-        { "name-prefix", BISON_NAME_PREFIX },             /* [i_a] bison emulation additions */
-        { "name_prefix", BISON_NAME_PREFIX },             /* [i_a] bison emulation additions */
-        { "no-lines", BISON_NO_LINES },                   /* [i_a] bison emulation additions */
-        { "no_lines", BISON_NO_LINES },                   /* [i_a] bison emulation additions */
-        { "nonassoc", NONASSOC },
-        { "nterm", BISON_NTERM },                         /* [i_a] bison emulation additions */
-        { "output", BISON_OUTPUT },                       /* [i_a] bison emulation additions */
-        { "parse-param", BISON_PARSE_PARAM },             /* [i_a] bison emulation additions */
-        { "prec", BISON_PREC },                           /* [i_a] bison emulation additions */
-        { "printer", BISON_PRINTER },                     /* [i_a] bison emulation additions */
-        { "pure-parser", BISON_PURE },                    /* [i_a] bison emulation additions */
-        { "pure_parser", BISON_PURE },                    /* [i_a] bison emulation additions */
-        { "right", RIGHT },
-        { "scannerless", SCANNERLESS_ZERO_ASCII },
-        { "skeleton", BISON_SKELETON },                   /* [i_a] bison emulation additions */
-        { "start", START },
-        { "term", TOKEN },
-        { "token", TOKEN },
-        { "token-table", BISON_TOKEN_TABLE },             /* [i_a] bison emulation additions */
-        { "type", TYPE },
-        { "union", UNION },
-        { "verbose", BISON_VERBOSE },                     /* [i_a] bison emulation additions */
-        { "yacc", BISON_YACC },                           /* [i_a] bison emulation additions */
+static struct keyword { 
+	const char *name; 
+	BtYacc_keyword_code token; 
+} keywords[] = 
+{
+    { "binary", NONASSOC },
+    { "debug", BISON_DEBUG },                         /* [i_a] bison emulation additions */
+    { "define", BISON_DEFINE },                       /* [i_a] bison emulation additions */
+    { "defines", BISON_DEFINES },                     /* [i_a] bison emulation additions */
+    { "destructor", BISON_DESTRUCTOR },               /* [i_a] bison emulation additions */
+    { "dprec", BISON_DPREC },                         /* [i_a] bison emulation additions */
+    { "error-verbose", BISON_ERR_VERBOSE },           /* [i_a] bison emulation additions */
+    { "error_verbose", BISON_ERR_VERBOSE },           /* [i_a] bison emulation additions */
+    { "expect", BISON_EXPECT },                       /* [i_a] bison emulation additions */
+    { "file-prefix", BISON_FILE_PREFIX },             /* [i_a] bison emulation additions */
+    { "file_prefix", BISON_FILE_PREFIX },             /* [i_a] bison emulation additions */
+    { "fixed-output-files", BISON_YACC },             /* [i_a] bison emulation additions */
+    { "fixed_output_files", BISON_YACC },             /* [i_a] bison emulation additions */
+    { "glr-parser", BISON_GLR_PARSER },               /* [i_a] bison emulation additions */
+    { "glr_parser", BISON_GLR_PARSER },               /* [i_a] bison emulation additions */
+    { "ident", IDENT },
+    { "left", LEFT },
+    { "lex-param", BISON_LEX_PARAM },                 /* [i_a] bison emulation additions */
+    { "lex_param", BISON_LEX_PARAM },                 /* [i_a] bison emulation additions */
+    { "locations", BISON_LOCATIONS },                 /* [i_a] bison emulation additions */
+    { "merge", BISON_MERGE },                         /* [i_a] bison emulation additions */
+    { "name-prefix", BISON_NAME_PREFIX },             /* [i_a] bison emulation additions */
+    { "name_prefix", BISON_NAME_PREFIX },             /* [i_a] bison emulation additions */
+    { "no-lines", BISON_NO_LINES },                   /* [i_a] bison emulation additions */
+    { "no_lines", BISON_NO_LINES },                   /* [i_a] bison emulation additions */
+    { "nonassoc", NONASSOC },
+    { "nterm", BISON_NTERM },                         /* [i_a] bison emulation additions */
+    { "output", BISON_OUTPUT },                       /* [i_a] bison emulation additions */
+    { "parse-param", BISON_PARSE_PARAM },             /* [i_a] bison emulation additions */
+    { "prec", BISON_PREC },                           /* [i_a] bison emulation additions */
+    { "prefer", PREFER },
+    { "printer", BISON_PRINTER },                     /* [i_a] bison emulation additions */
+    { "pure-parser", BISON_PURE },                    /* [i_a] bison emulation additions */
+    { "pure_parser", BISON_PURE },                    /* [i_a] bison emulation additions */
+    { "right", RIGHT },
+    { "scannerless", SCANNERLESS_ZERO_ASCII },
+    { "skeleton", BISON_SKELETON },                   /* [i_a] bison emulation additions */
+    { "start", START },
+    { "term", TOKEN },
+    { "token", TOKEN },
+    { "token-table", BISON_TOKEN_TABLE },             /* [i_a] bison emulation additions */
+    { "type", TYPE },
+    { "union", UNION },
+    { "verbose", BISON_VERBOSE },                     /* [i_a] bison emulation additions */
+    { "yacc", BISON_YACC },                           /* [i_a] bison emulation additions */
 };
 
 static int search_strcmp(void const * key, void const * element)
 {
-  return strcmp((const char *)key, (const char *)element);
+	const struct keyword *kwd = (const struct keyword *)element;
+
+	return strcmp((const char *)key, kwd->name);
 }
 
-int keyword(void)
+BtYacc_keyword_code keyword(int fail_when_no_keyword)
 {
-  register int  c;
-  char          *t_cptr = cptr;
-  struct keyword        *key;
+  int c;
+  char *t_cptr = cptr;
+  const struct keyword *key;
 
   c = *++cptr;
   if (isalpha(c))
@@ -395,7 +410,7 @@ int keyword(void)
     }
     cachec(NUL);
 
-    key = bsearch(cache, keywords, sizeof(keywords)/sizeof(keywords[0]),
+    key = (const struct keyword *)bsearch(cache, keywords, sizeof(keywords)/sizeof(keywords[0]),
                        sizeof(*key), search_strcmp);
     if (key)
         return key->token;
@@ -410,9 +425,11 @@ int keyword(void)
     if (c == '0') return TOKEN;
     if (c == '2') return NONASSOC;
   }
-  syntax_error_ex(lineno, line, t_cptr, "expected a keyword or one of these: [ %%{  %%%%  %%\\  %%<  %%>  %%0  %%2 ]");
-  /*NOTREACHED*/
-  return 0;
+  if (fail_when_no_keyword) 
+  {
+	syntax_error_ex(lineno, line, t_cptr, "expected a keyword or one of these: [ %%{  %%%%  %%\\  %%<  %%>  %%0  %%2 ]");
+  }
+  return NOT_A_KEYWORD;
 }
 
 void copy_ident(void)
@@ -421,7 +438,7 @@ void copy_ident(void)
 
     open_output_files();
 
-    if ((c = nextc()) == EOF) unexpected_EOF();
+    if ((c = nextc(0)) == EOF) unexpected_EOF();
     if (c != '"') syntax_error_ex(lineno, line, cptr, "expected a quoted #indent string");
     ++outline[OUTPUT_FILE];
     BtYacc_puts("#ident \"", output_file);
@@ -918,7 +935,7 @@ char *get_tag(void)
     char *t_cptr = t_line + (cptr - line);
 
     ++cptr;
-    c = nextc();
+    c = nextc(0);
     if (c == EOF) unexpected_EOF();
     if (!isalpha(c) && c != '_' && c != '$')
         illegal_tag(t_lineno, t_line, t_cptr);
@@ -929,7 +946,7 @@ char *get_tag(void)
         c = *++cptr;
     } while (IS_IDENT(c));
 
-    c = nextc();
+    c = nextc(0);
     if (c == EOF) unexpected_EOF();
     if (c != '>')
         illegal_tag(t_lineno, t_line, t_cptr);
@@ -957,14 +974,14 @@ void declare_tokens(BtYacc_keyword_code assoc)
     int value;
     char *tag = 0;
 
-    if (assoc != TOKEN) ++prec;
+    if (assoc != TOKEN) ++precedence_max;
 
-    c = nextc();
+    c = nextc(0);
     if (c == EOF) unexpected_EOF();
     if (c == '<')
     {
         tag = get_tag();
-        c = nextc();
+        c = nextc(0);
         if (c == EOF) unexpected_EOF();
     }
 
@@ -989,13 +1006,13 @@ void declare_tokens(BtYacc_keyword_code assoc)
 
         if (assoc != TOKEN)
         {
-            if (bp->prec && prec != bp->prec)
+            if (bp->prec > 0 && precedence_max != bp->prec)
                 reprec_warning(bp->name);
             bp->assoc = assoc;
-            bp->prec = prec;
+            bp->prec = precedence_max;
         }
 
-        c = nextc();
+        c = nextc(0);
         if (c == EOF) unexpected_EOF();
         value = UNDEFINED;
         if (isdigit(c))
@@ -1004,7 +1021,7 @@ void declare_tokens(BtYacc_keyword_code assoc)
             if (bp->value != UNDEFINED && value != bp->value)
                 revalued_warning(bp->name);
             bp->value = value;
-            c = nextc();
+            c = nextc(0);
             if (c == EOF) unexpected_EOF();
         }
     }
@@ -1021,11 +1038,11 @@ int     args = 0, c;
 
     for (;;)
     {
-        c = nextc();
+        c = nextc(0);
         if (c == EOF) unexpected_EOF();
         if (c != '<') syntax_error_ex(lineno, line, cptr, "expected an <argument_type>");
         tags[args++] = get_tag();
-        c = nextc();
+        c = nextc(0);
         if (c == ')') break;
         if (c == EOF) unexpected_EOF();
     }
@@ -1049,21 +1066,21 @@ void declare_types(void)
     register bucket *bp=0;
     char *tag=0;
 
-    c = nextc();
+    c = nextc(0);
     if (c == '<')
     {
         tag = get_tag();
-        c = nextc();
+        c = nextc(0);
     }
     if (c == EOF) unexpected_EOF();
 
     for (;;)
     {
-        c = nextc();
+        c = nextc(0);
         if (isalpha(c) || c == '_' || c == '.' || c == '$')
         {
             bp = get_name(1);
-            if (nextc() == '(')
+            if (nextc(0) == '(')
                 declare_argtypes(bp);
             else
                 bp->args = 0;
@@ -1092,7 +1109,7 @@ void declare_start(void)
     register int c;
     register bucket *bp;
 
-    c = nextc();
+    c = nextc(0);
     if (c == EOF) unexpected_EOF();
     if (!isalpha(c) && c != '_' && c != '.' && c != '$')
         syntax_error_ex(lineno, line, cptr, "expected a %%start terminal token or non-terminal");
@@ -1106,7 +1123,8 @@ void declare_start(void)
 
 void read_declarations(void)
 {
-    register int c, k;
+    register int c;
+	BtYacc_keyword_code k;
     char *t_cptr;
 
     cache_size = 256;
@@ -1115,14 +1133,14 @@ void read_declarations(void)
 
     for (;;)
     {
-        c = nextc();
-        if (c == EOF) unexpected_EOF();
-        if (c != '%') syntax_error_ex(lineno, line, cptr, "expected a %%-prefixed declaration command, e.g. %%token, %%left, %%right, %%ident, %%{ ... %%}, %%union");
+        c = nextc(0);
+        if (c == EOF) 
+			unexpected_EOF();
+        if (c != '%') 
+			syntax_error_ex(lineno, line, cptr, "expected a %%-prefixed declaration command, e.g. %%token, %%left, %%right, %%ident, %%{ ... %%}, %%union");
         t_cptr = cptr;
-        switch (k = keyword())
+        switch (k = keyword(1))
         {
-        default:
-            break;
         case MARK:
             return;
         case IDENT:
@@ -1158,12 +1176,6 @@ void read_declarations(void)
         case SCANNERLESS_ZERO_ASCII:
             ZEROflag = 1;
             break;
-        case BISON_LOCATIONS:
-        case BISON_PURE:
-        case BISON_YACC:
-        case BISON_ERR_VERBOSE:
-            /* ignore */
-            break;
         case BISON_DEBUG:
             if (!tflag) tflag = 1;
             break;
@@ -1173,11 +1185,11 @@ void read_declarations(void)
                 char *prefix;
 
                 /* = prefix */
-                c = nextc();
+                c = nextc(0);
                 if (c == '=')
                 {
                     cptr++;
-                    c = nextc();
+                    c = nextc(0);
                 }
                 if (c == '\'' || c == '"')
                 {
@@ -1211,11 +1223,11 @@ void read_declarations(void)
                 char *prefix;
 
                 /* = prefix */
-                c = nextc();
-                if (k == '=')
+                c = nextc(0);
+                if (c == '=')
                 {
                     cptr++;
-                    c = nextc();
+                    c = nextc(0);
                 }
                 if (c == '\'' || c == '"')
                 {
@@ -1248,6 +1260,7 @@ void read_declarations(void)
             {
                 char **ps;
                 char *var_name = s + 1;
+
                 for (ps = &defd_vars[0]; *ps; ps++)
                 {
                     if(strcmp(*ps,var_name) == 0)
@@ -1261,19 +1274,7 @@ void read_declarations(void)
             }
             break;
 #endif
-        case BISON_PREC:
-        case BISON_DPREC:
-        case BISON_MERGE:
-        case BISON_EXPECT:
-        case BISON_GLR_PARSER:
-        case BISON_LEX_PARAM:
-        case BISON_OUTPUT:
-        case BISON_PARSE_PARAM:
-        case BISON_SKELETON:
-        case BISON_TOKEN_TABLE:
-        case BISON_DESTRUCTOR:
-        case BISON_PRINTER:
-        case BISON_NTERM:
+		default:
             unsupported_feature(lineno, line, t_cptr);
             break;
         }
@@ -1696,10 +1697,10 @@ void advance_to_start(void)
 
     for (;;)
     {
-        c = nextc();
+        c = nextc(0);
         if (c != '%') break;
         s_cptr = cptr;
-        switch (keyword())
+        switch (keyword(1))
         {
         case MARK:
             no_grammar();
@@ -1715,7 +1716,7 @@ void advance_to_start(void)
         }
     }
 
-    c = nextc();
+    c = nextc(0);
     if (!isalpha(c) && c != '_' && c != '.' && c != '_')
         syntax_error_ex(lineno, line, cptr, "expected a terminal token or non-terminal");
     bp = get_name(1);
@@ -1727,14 +1728,14 @@ void advance_to_start(void)
     }
 
     s_lineno = lineno;
-    c = nextc();
+    c = nextc(0);
     if (c == EOF) unexpected_EOF();
     if (c == '(')
     {
         ++cptr;
         args = copy_args(&argslen);
         if (args == 0) no_space();
-        c = nextc();
+        c = nextc(0);
     }
     if (c != ':') syntax_error_ex(lineno, line, cptr, "expected a colon ':' starting the rule definition");
     start_rule(bp, s_lineno);
@@ -1801,7 +1802,7 @@ void insert_empty_rule(void)
     plhs[nrules] = plhs[nrules-1];
     plhs[nrules-1] = bp;
     rprec[nrules] = rprec[nrules-1];
-    rprec[nrules-1] = 0;
+    rprec[nrules-1] = UNDEFINED;
     rassoc[nrules] = rassoc[nrules-1];
     rassoc[nrules-1] = TOKEN;
 }
@@ -1861,13 +1862,13 @@ void add_symbol(void)
     else
         bp = get_name(1);
 
-    c = nextc();
+    c = nextc(0);
     if (c == '(')
     {
         ++cptr;
         args = copy_args(&argslen);
         if (args == 0) no_space();
-        c = nextc();
+        c = nextc(0);
     }
     if (c == ':')
     {
@@ -2138,7 +2139,7 @@ loop:
     {
         --depth;
         BtYacc_printf(f, "\n    %s", get_section("action_block_end"));
-        c = nextc();
+        c = nextc(0);
         if (c == '[' && !haveyyval)
         {
             goto loop;
@@ -2210,7 +2211,7 @@ loop:
         if (--depth > 0) goto loop;
         BtYacc_printf(f, get_section("action_if_!yytrial_end"));
 
-        c = nextc();
+        c = nextc(0);
         if (c == '[' && !haveyyval)
         {
             trialaction = 1;
@@ -2262,13 +2263,16 @@ Expected tokens are:
   %%
   %\
   %prec <terminal>
-  %=prec <terminal>
+  %= <terminal>
   %dprec <number>
 */
 int mark_symbol(void)
 {
-    register int c;
-    register bucket *bp;
+    int c;
+	bucket defbp = {0};
+    bucket *bp = &defbp;
+	BtYacc_keyword_code k = BISON_PREC;
+	char *t_cptr = cptr;
 
     c = cptr[1];
     if (c == '%' || c == '\\')
@@ -2278,27 +2282,87 @@ int mark_symbol(void)
     }
 
     if (c == '=')
+	{
         cptr += 2;
-    else if ((c == 'p' || c == 'P') &&
-             ((c = cptr[2]) == 'r' || c == 'R') &&
-             ((c = cptr[3]) == 'e' || c == 'E') &&
-             ((c = cptr[4]) == 'c' || c == 'C') &&
-             ((c = cptr[5], !IS_IDENT(c))))
-        cptr += 5;
-    else
-        syntax_error_ex(lineno, line, cptr, "expected a PRECedence");
+	}
+    else 
+	{
+		k = keyword(0);
+		switch (k)
+		{
+		case BISON_PREC:
+		case BISON_DPREC:
+		case LEFT:
+		case RIGHT:
+		case NONASSOC:
+		case PREFER:
+			break;
 
-    c = nextc();
-    if (isalpha(c) || c == '_' || c == '.' || c == '$')
-        bp = get_name(1);
-    else if (c == '\'' || c == '"')
-        bp = get_literal(1);
-    else
-    {
-        syntax_error_ex(lineno, line, cptr, "expected a terminal, non-terminal token or simple token literal string");
-        /*NOTREACHED*/
-        return 0;
-    }
+		default:
+	        syntax_error_ex(lineno, line, t_cptr, "expected a PRECedence");
+		}
+	}
+
+	defbp.assoc = k;
+	defbp.prec = UNDEFINED;
+
+	switch (k)
+	{
+	case PREFER:
+		// 'prefer' does assign a default, high, precedence: the last one wins.
+		defbp.prec = ++precedence_max;
+	case LEFT:
+	case RIGHT:
+	case NONASSOC:
+	case BISON_PREC:
+	case BISON_DPREC:		/* this one is followed by a numeric value: */
+		c = nextc(1);
+		if (isalpha(c) || c == '_' || c == '.' || c == '$')
+			bp = get_name(1);
+		else if (c == '\'' || c == '"')
+			bp = get_literal(1);
+		else if (isdigit(c))
+		{
+			bp->prec = get_number();
+			if (bp->prec <= 0)
+				syntax_error_ex(lineno, line, t_cptr, "expected a positive, non-zero rule's precedence value following the %% keyword: %s", t_cptr);
+		}
+		else if (k == BISON_PREC)
+		{
+			syntax_error_ex(lineno, line, t_cptr, "expected a terminal, non-terminal token or simple token literal string identifying this rule's precedence");
+			/*NOTREACHED*/
+			return 0;
+		}
+
+		if (bp)
+		{
+			switch (k)
+			{
+			// these override the associativity of the given precedence token:
+			case LEFT:
+			case RIGHT:
+			case NONASSOC:
+				if (bp != &defbp)
+					defbp = *bp;
+				bp = &defbp;
+				defbp.assoc = k;
+				break;
+
+			case PREFER:
+				break;
+
+			default:
+				if (bp->prec <= 0)
+					syntax_error_ex(lineno, line, t_cptr, "expected a token with an associated positive, non-zero precedence to follow %%%s", bp->name);
+				break;
+			}
+		}
+		else
+		{
+			bp = &defbp;
+		}
+		break;
+	}
 
     if (rprec[nrules] != UNDEFINED && bp->prec != rprec[nrules])
         prec_redeclared();
@@ -2317,7 +2381,7 @@ void read_grammar(void)
 
     for (;;)
     {
-        c = nextc();
+        c = nextc(0);
         if (c == EOF) break;
         if (isalpha(c) || c == '_' || c == '.' || c == '$' || c == '\'' ||
                 c == '"')

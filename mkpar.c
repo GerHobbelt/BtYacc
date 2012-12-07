@@ -130,10 +130,31 @@ static void remove_conflicts(void)
                 }
                 else
                 {
-                    ++SRcount;
-                    p->suppressed = 1;
-                    if (!pref->suppressed)
-                        pref->suppressed = 1;
+                    if (p->prec > 0 && pref->prec < p->prec)
+                    {
+                        pref->suppressed = 2;
+                        pref = p;
+                    }
+                    else if (pref->prec > 0 && pref->prec > p->prec)
+                    {
+                        p->suppressed = 2;
+                    }
+                    else if (pref->assoc == LEFT && p->assoc != LEFT && p->assoc != RIGHT && p->assoc != NONASSOC)
+                    {
+                        pref->suppressed = 2;
+                        pref = p;
+                    }
+                    else if (pref->assoc == RIGHT && p->assoc != LEFT && p->assoc != RIGHT && p->assoc != NONASSOC)
+                    {
+                        p->suppressed = 2;
+                    }
+                    else
+                    {
+						++SRcount;
+						p->suppressed = 1;
+						if (!pref->suppressed)
+							pref->suppressed = 1;
+					}
                 }
             }
             else

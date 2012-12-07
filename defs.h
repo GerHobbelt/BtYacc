@@ -99,6 +99,8 @@ typedef int Yshort;
 
 typedef enum keyword_code_enumeration
 {
+	NOT_A_KEYWORD					= -1,
+
     TOKEN                           =  0,
     LEFT                            =  1,
     RIGHT                           =  2,
@@ -110,6 +112,7 @@ typedef enum keyword_code_enumeration
     UNION                           =  8,
     IDENT                           =  9,
     SCANNERLESS_ZERO_ASCII          = 10,
+	PREFER                          = 11,
 
     /* [i_a] bison emulation additions */
     BISON_DEBUG                     = 110,
@@ -526,8 +529,8 @@ int cachec(int);
 char *get_line(void);
 char *dup_line(void);
 char *skip_comment(void);
-int nextc(void);
-int keyword(void);
+int nextc(int only_skip_whitespace);
+BtYacc_keyword_code keyword(int fail_when_no_keyword);
 void copy_ident(void);
 void copy_string(int, FILE *, FILE *);
 void copy_comment(FILE *, FILE *);
