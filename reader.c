@@ -564,7 +564,8 @@ void copy_text(void)
        BtYacc_printf(f, line_format, lineno - 1, (inc_file ? inc_file_name : input_file_name));
 
 loop:
-    switch (c = *cptr++) {
+    switch (c = *cptr++) 
+    {
     case '\n':
         BtYacc_putc('\n', f);
         need_newline = 0;
@@ -594,7 +595,8 @@ loop:
     default:
         BtYacc_putc(c, f);
         need_newline = 1;
-        goto loop; }
+        goto loop; 
+      }
 }
 
 void copy_union(void)

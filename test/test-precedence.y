@@ -1,3 +1,7 @@
+%{
+#include "test-framework-header.h"
+%}
+
 %debug
 %verbose
 

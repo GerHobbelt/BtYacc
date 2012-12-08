@@ -1,10 +1,5 @@
 %{
-#include <stdlib.h>
-
-typedef double yystype_t;
-#define YYSTYPE	yystype_t
-
-#define YYDBPR(yystype)    BTYACC_DEBUG_LOG_PARTIAL("%f", (double)(yystype))
+#include "test-framework-header.h"
 %}
 
 %debug

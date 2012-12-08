@@ -171,7 +171,10 @@ static void print_one_table(FILE *outfile, unsigned int outfile_idx, char const 
 
 void print_file_line_location(FILE *outfile, unsigned int outfile_idx)
 {
-    BtYacc_printf(outfile, count_newlines(outfile_idx, line_format), outline[outfile_idx] + 1, outfilename[outfile_idx]);
+    if (!lflag)
+    {
+        BtYacc_printf(outfile, count_newlines(outfile_idx, line_format), outline[outfile_idx] + 1, outfilename[outfile_idx]);
+    }
 }
 
 void output(void)
@@ -899,6 +902,9 @@ void output_defines(void)
       BtYacc_printf(dc_file, count_newlines(dc_f_idx, get_section("defines_file_protection_start")));
     }
 
+    // write a couple of newlines before we start writing token defines:
+    BtYacc_printf(dc_file, count_newlines(dc_f_idx, "\n\n\n/* blurb */\n\n\n"));
+
     for (i = 2; i < ntokens; ++i)
     {
         char *d = NULL;
@@ -926,12 +932,17 @@ void output_defines(void)
             /* turn this token into something that's acceptable for the given output language: */
             char const *cset = get_section("token_charset");
             char *dp;
+            const char *literal_token_naming_tpl;
+            char *symstr;
             char e = 0;
+            int buflen;
 
-            d = MALLOC(strlen(s) * 20 + 16 + strlen(file_prefix));
-            if (!d) no_space();
-            sprintf(d, "BTYACC_SYMBOL_%s_", file_uc_prefix);
-            dp = d + strlen(d);
+            literal_token_naming_tpl = get_section("literal_token_name_template");
+
+            // first construct the replacement string for the literal token:
+            buflen = strlen(s) * (1 + sizeof("close_square_bracket")) /* longest replacement string */;                 
+            dp = symstr = MALLOC(buflen + 1);
+            if (!symstr) no_space();
             c = *s;
             if (c == '"')
             {
@@ -1011,7 +1022,24 @@ done_this_char:
                 s++;
             }
             *dp = 0;
-            s = d;
+
+            // now expand the template once, it might want the file_prefix in there:
+            buflen = 1 + strlen(literal_token_naming_tpl) + strlen(file_uc_prefix);
+            dp = MALLOC(buflen);
+            if (!dp) no_space();
+            snprintf(dp, buflen, literal_token_naming_tpl, file_uc_prefix);
+
+            /*
+            Now we have an expanded template, where the '%%s' in there is now a '%s' 
+            ready to receive the constructed token string:
+            */
+            buflen = 1 + strlen(dp) + strlen(symstr);
+            s = MALLOC(buflen);
+            if (!s) no_space();
+            snprintf(s, buflen, dp, symstr);
+
+            FREE(symstr);
+            FREE(dp);
         }
 
         BtYacc_printf(dc_file, count_newlines(dc_f_idx, get_section("define_token")), s, symbol_value[i]);
@@ -1141,10 +1169,7 @@ void output_stored_text(void)
 
     output_templated_text(text_file);
 
-    if (!lflag)
-    {
-        print_file_line_location(code_file, CODE_FILE);
-    }
+    print_file_line_location(code_file, CODE_FILE);
 }
 
 
@@ -1323,10 +1348,8 @@ void output_trailing_text(void)
         ++outline[CODE_FILE];
         BtYacc_putc('\n', code_file);
     }
-    if (!lflag)
-    {
-        print_file_line_location(code_file, CODE_FILE);
-    }
+
+    print_file_line_location(code_file, CODE_FILE);
 }
 
 
@@ -1346,10 +1369,7 @@ void output_semantic_actions(void)
 
     output_templated_text(action_file);
 
-    if (!lflag)
-    {
-        print_file_line_location(code_file, CODE_FILE);
-    }
+    print_file_line_location(code_file, CODE_FILE);
 }
 
 

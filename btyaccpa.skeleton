@@ -481,8 +481,9 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: CONFLICT: following successful trial parse\n",
-                yystate, yydepth, (yytrial ? ",trial" :""));
+        BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: CONFLICT: following successful trial parse; LA(1) = %d (%s)\n",
+                yystate, yydepth, (yytrial ? ",trial" :""),
+                yychar, ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
       }
 #endif
       /* Switch to the next conflict context */
@@ -500,8 +501,9 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        BTYACC_DEBUG_LOG_PARTIAL("btyacc[%3u,%2d%s]: CONFLICT. ",
-                yystate, yydepth, (yytrial ? ",trial" : ""));
+        BTYACC_DEBUG_LOG_PARTIAL("btyacc[%3u,%2d%s]: CONFLICT. LA(1) = %d (%s) : ",
+                yystate, yydepth, (yytrial ? ",trial" : ""),
+                yychar, ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
         if (yytrial)
           BTYACC_DEBUG_LOG_EOL("ALREADY in conflict, continuing trial parse.\n");
         else
@@ -525,7 +527,9 @@ yyloop:
 #if YYDEBUG
         if (yydebug && yychar >= 0)
         {
-          BTYACC_DEBUG_LOG_EOL("btyacc[%s]: backtracking 1 token\n", (yytrial ? "trial" : "---"));
+          BTYACC_DEBUG_LOG_EOL("btyacc[%s]: backtracking 1 token: %d (%s)\n", 
+                  (yytrial ? "trial" : "---"),
+                  ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
         }
 #endif
 
@@ -581,8 +585,9 @@ yyloop:
 #if YYDEBUG
       if (yydebug)
       {
-        BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: shifting to state %d\n",
-                yystate, yydepth, (yytrial ? ",trial" : ""), yyctable[ctry]);
+        BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: shifting to state %d, LA(1) = %d (%s)\n",
+                yystate, yydepth, (yytrial ? ",trial" : ""), yyctable[ctry],
+                yychar, ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
       }
 #endif
       if (yychar < 0)
@@ -613,8 +618,9 @@ yyloop:
 #if YYDEBUG
     if (yydebug)
     {
-      BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: shifting to state %d\n",
-              yystate, yydepth, (yytrial ? ",trial" : ""), yytable[yyn]);
+      BTYACC_DEBUG_LOG_EOL("btyacc[%3u,%2d%s]: shifting to state %d; LA(1) = %d (%s)\n",
+              yystate, yydepth, (yytrial ? ",trial" : ""), yytable[yyn],
+              yychar, ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
     }
 #endif
     yychar = YYEMPTY;
@@ -740,7 +746,7 @@ yyerrhandler:
   if (yynewerrflag)
   {
 #ifdef YYERROR_DETAILED
-    yyerror_detailed("parse error", yychar, yylval, yyposn);
+    yyerror_detailed("parse error", yychar, yylval, yyposn, yystate);
 #else
     yyerror("parse error");
 #endif
@@ -829,8 +835,9 @@ yyreduce:
 #if YYDEBUG
   if (yydebug)
   {
-    BTYACC_DEBUG_LOG_PARTIAL("btyacc[%3u,%2d%s]: reducing by rule %d (%s)",
-            yystate, yydepth, (yytrial ? ",trial" : ""), yyn, yyrule[yyn]);
+    BTYACC_DEBUG_LOG_PARTIAL("btyacc[%3u,%2d%s]: reducing by rule %d (%s); LA(1) = %d (%s)",
+            yystate, yydepth, (yytrial ? ",trial" : ""), yyn, yyrule[yyn],
+            yychar, ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
 #ifdef YYDBPR
     if (yym > 0)
     {
@@ -975,8 +982,9 @@ yyreduce:
 #if YYDEBUG
   if (yydebug)
   {
-    BTYACC_DEBUG_LOG_EOL("btyacc[%3d,%2d%s]: reduced, shifting to state %d\n",
-            *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""), yystate);
+    BTYACC_DEBUG_LOG_EOL("btyacc[%3d,%2d%s]: reduced, shifting to state %d; LA(1) = %d (%s)\n",
+            *(yyps->ssp), yydepth, (yytrial ? ",trial" : ""), yystate,
+            yychar, ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
   }
 #endif
   if (yyps->ssp >= yyps->ss + yyps->stacksize - 1)
@@ -1462,6 +1470,11 @@ static
 
 %% token_charset
 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$
+%% literal_token_name_template
+YYSYMBOL_%%s
+%% --- was: BTYACC_SYMBOL_%s_%%s (%s ~ yacc filename prefix)
+%% --- WARNING: the '%%s' MUST be in there or the literal token expansion won't make it into the symbol name proper!
+
 %% define_token
 #define %-60s %5d
 

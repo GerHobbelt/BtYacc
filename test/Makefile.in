@@ -177,8 +177,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 TEST_GRAMMARS := $(wildcard test*.y)
 TEST_APPLICATIONS := $(patsubst %.y,%,$(TEST_GRAMMARS))
-BTYACC = ../btyacc
-BTYACC_OPTIONS = -tt -v
+TEST_OUTPUT_SOURCEFILES := $(patsubst %.y,%.tab.c,$(TEST_GRAMMARS))
+BTYACC_OPTIONS = -v -l
 FRAMEWORK_DEPS = \
 	test-framework-header.h \
 	test-framework-tail.h \
@@ -440,8 +440,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-am
-
 clean-am: clean-generic mostlyclean-am
 
 distclean: distclean-am
@@ -527,19 +525,31 @@ uninstall-am:
 
 .PHONY: all clean
 
-all: $(TEST_APPLICATIONS)
+all: ../btyacc $(TEST_OUTPUT_SOURCEFILES) $(TEST_APPLICATIONS) 
 
-%.c: %.y 
-	$(BTYACC) $(BTYACC_OPTIONS) $<
+%.tab.c: %.y ../btyacc
+	../btyacc $(BTYACC_OPTIONS) $<
 
-%: %.c $(FRAMEWORK_DEPS)
-	$(CC) -O2 -o $@ $<
+%: %.tab.c $(FRAMEWORK_DEPS)
+	$(CC) -ggdb -O0 -Wall -Wno-unused-function -o $@ $<
 
 #portability-config.h: portability-config.h.in Makefile.in configure
 #	@./configure
 
-BTYACC:
+# just a helper rule for development: make sure we use the latest BTYACC build
+../btyacc: 							  \
+			$(wildcard ../*.[ch])     \
+			$(wildcard ../*.skeleton) \
+			../skel2c                 \
+			../Makefile
 	@cd ..; make
+	@cd .; make clean
+
+clean:
+	@rm -f $(TEST_APPLICATIONS)
+	@rm -f $(patsubst %.y,%.tab.c,$(TEST_GRAMMARS))
+	@rm -f $(patsubst %.y,%.output,$(TEST_GRAMMARS))
+	@rm -f *.o
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

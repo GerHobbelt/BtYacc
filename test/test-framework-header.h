@@ -64,6 +64,9 @@ BtYacc test grammars: Framework Header Section
 
 
 
+#define YYERROR_DETAILED
+
+
 
 
 typedef double yystype_t;

@@ -4,9 +4,9 @@
 
 TEST_GRAMMARS := $(wildcard test*.y)
 TEST_APPLICATIONS := $(patsubst %.y,%,$(TEST_GRAMMARS))
+TEST_OUTPUT_SOURCEFILES := $(patsubst %.y,%.tab.c,$(TEST_GRAMMARS))
 
-BTYACC = ../btyacc
-BTYACC_OPTIONS = -tt -v
+BTYACC_OPTIONS = -v -l
 
 FRAMEWORK_DEPS = \
 	test-framework-header.h \
@@ -16,19 +16,33 @@ FRAMEWORK_DEPS = \
 
 .PHONY: all clean
 
-all: $(TEST_APPLICATIONS)
+all: ../btyacc $(TEST_OUTPUT_SOURCEFILES) $(TEST_APPLICATIONS) 
 
-%.c: %.y 
-	$(BTYACC) $(BTYACC_OPTIONS) $<
+%.tab.c: %.y ../btyacc
+	../btyacc $(BTYACC_OPTIONS) $<
 
-%: %.c $(FRAMEWORK_DEPS)
-	$(CC) -O2 -o $@ $<
+%: %.tab.c $(FRAMEWORK_DEPS)
+	$(CC) -ggdb -O0 -Wall -Wno-unused-function -o $@ $<
 
 
 #portability-config.h: portability-config.h.in Makefile.in configure
 #	@./configure
 
-BTYACC:
-	@cd ..; make
 
+# just a helper rule for development: make sure we use the latest BTYACC build
+../btyacc: 							  \
+			$(wildcard ../*.[ch])     \
+			$(wildcard ../*.skeleton) \
+			../skel2c                 \
+			../Makefile
+	@cd ..; make
+	@cd .; make clean
+
+
+
+clean:
+	@rm -f $(TEST_APPLICATIONS)
+	@rm -f $(patsubst %.y,%.tab.c,$(TEST_GRAMMARS))
+	@rm -f $(patsubst %.y,%.output,$(TEST_GRAMMARS))
+	@rm -f *.o
 
