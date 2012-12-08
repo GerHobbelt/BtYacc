@@ -237,7 +237,7 @@ static void initialize_states(void)
     p->accessing_symbol = 0;
     p->nitems = i;
 
-    for (i = 0;  start_derives[i] >= 0; ++i)
+    for (i = 0; start_derives[i] >= 0; ++i)
         p->items[i] = rrhs[start_derives[i]];
 
     first_state = last_state = this_state = p;
@@ -397,6 +397,8 @@ void show_cores(void)
     int i, j, k, n;
     int itemno;
 
+	if (tflag < 1) return;
+
     BtYacc_logf("\n\nLR0: cores:\n\n");
 
     k = 0;
@@ -432,8 +434,19 @@ void show_ritems(void)
 {
     int i;
 
+	if (tflag < 1) return;
+
+    BtYacc_logf("\n\nLR0: ritems (right-hand items):\n\n");
+
     for (i = 0; i < nitems; ++i)
-        BtYacc_logf("ritem[%d] = %d\n", i, ritem[i]);
+	{
+		Yshort item = ritem[i];
+
+		if (item >= 0)
+			BtYacc_logf("ritem[%5d] = %5d :                %s\n", i, item, symbol_name[item]);
+		else
+			BtYacc_logf("ritem[%5d] = %5d : rlhs = %5d : %s\n", i, item, rlhs[-item], symbol_name[rlhs[-item]]);
+	}
 }
 
 
@@ -442,6 +455,10 @@ void show_ritems(void)
 void show_rrhs(void)
 {
     int i;
+
+	if (tflag < 1) return;
+
+    BtYacc_logf("\n\nLR0: rrhs:\n\n");
 
     for (i = 0; i < nrules; ++i)
         BtYacc_logf("rrhs[%d] = %d\n", i, rrhs[i]);
@@ -453,7 +470,9 @@ void show_rrhs(void)
 void show_shifts(void)
 {
     shifts *p;
-    int i, j, k;
+    int i, j, k, l;
+
+	if (tflag < 1) return;
 
     BtYacc_logf("\n\nLR0: shifts:\n\n");
 
@@ -465,28 +484,50 @@ void show_shifts(void)
         BtYacc_logf("shift %d, number = %d, nshifts = %d\n", k, p->number,
                 p->nshifts);
         j = p->nshifts;
+		l = 0;
         for (i = 0; i < j; ++i)
-            BtYacc_logf("    %d\n", p->shift[i]);
+		{
+            BtYacc_logf(" %5d", p->shift[i]);
+			if (++l == 10)
+			{
+				l = 0;
+				BtYacc_logs("\n");
+			}
+		}
+		if (l)
+			BtYacc_logs("\n");
     }
+	BtYacc_logs("\n");
 }
 
 
 static void print_derives(void)
 {
-    register int i;
-    register Yshort *sp;
+    int i;
+    int j;
+    Yshort *sp;
 
-    BtYacc_logf("\n\nLR0: DERIVES:\n\n");
+	if (tflag < 1) return;
+
+    BtYacc_logf("\n\nLR0: DERIVES:\n");
 
     for (i = start_symbol; i < nsyms; ++i)
     {
-        BtYacc_logf("%-30s derives ", symbol_name[i]);
+        BtYacc_logf("\n%-30s derives\n", symbol_name[i]);
 
+		j = 0;
         for (sp = derives[i]; *sp >= 0; ++sp)
         {
-            BtYacc_logf("  %d", *sp);
+            BtYacc_logf(" %5d", *sp);
+			++j;
+			if (j == 10)
+			{
+				j = 0;
+		        BtYacc_logf("\n");
+			}
         }
-        BtYacc_logf("\n");
+		if (j)
+			BtYacc_logf("\n");
     }
 
     BtYacc_logf("\n");
@@ -520,10 +561,7 @@ static void set_derives(void)
         k++;
     }
 
-    if (tflag > 1)
-    {
-        print_derives();
-    }
+    print_derives();
 }
 
 void free_derives(void)
@@ -595,4 +633,9 @@ void lr0(void)
     set_derives();
     set_nullable();
     generate_states();
+    
+	show_cores();
+	show_ritems();
+	show_rrhs();
+	show_shifts();
 }

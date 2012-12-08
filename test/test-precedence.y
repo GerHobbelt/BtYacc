@@ -1,25 +1,33 @@
 %debug
 %verbose
 
+%left '+' '-'
+%left '*' '/'
+%prec '&'
+%prec '%'
+%prec '=' '<' '>'
+
 %token NUM
 
 %%
 
-expr: expr '+' expr				%left %prefer
-    | expr '-' expr				%left %prefer
-    | expr '*' expr				%left %prefer
-    | expr '/' expr				%left %prefer
-    | expr '&' expr				%right %prefer
-    | expr '%' expr				%left  %prefer
-    | expr '=' '=' expr			%right %prefer
-    | expr '!' '=' expr			%right %prefer
-    | expr '<' expr				%left %prefer
-    | expr '>' expr				%left %prefer
-    | '-' expr					%prefer
-    | '+' expr					%dprec 31
-    | '!' expr					%prefer
-    | '&' expr					%prefer
-    | expr '%'					%prefer
+expr: expr '+' expr				
+    | expr '-' expr				
+    | expr '*' expr				
+    | expr '/' expr				
+    | expr '&' expr				
+    | expr '%' expr				
+    | expr '=' '=' expr			
+    | expr '!' '=' expr			
+    | expr '<' expr				
+    | expr '>' expr				
+    | '-' expr					
+    | '+' expr					
+    /*| '+' '+' expr		/* this one is reduce/reduce with previous: ambiguous grammar rule! */			
+    | expr '+' '+' 				
+    | '!' expr				%prefer		
+    | '&' expr					
+    | expr '%'					
 	| value						
     ;
 

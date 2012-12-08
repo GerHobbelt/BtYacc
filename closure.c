@@ -26,11 +26,27 @@ void finalize_closure(void)
 static void print_closure(int n)
 {
   register Yshort *isp;
+  int i;
 
   BtYacc_logf("\n\nclosure: n = %d\n\n", n);
 
+  BtYacc_logs("itemset:\n");
+  i = 0;
   for (isp = itemset; isp < itemsetend; ++isp)
-    BtYacc_logf("   %d\n", *isp);
+  {
+    BtYacc_logf(" %5d", *isp);
+	++i;
+	if (i == 10)
+	{
+		i = 0;
+		BtYacc_logs("\n");
+	}
+  }
+  if (i)
+  {
+	BtYacc_logs("\n");
+  }
+  BtYacc_logs("\n");
 }
 
 
@@ -121,7 +137,7 @@ static void print_first_derives(void)
 static void set_EFF(void)
 {
     register unsigned *row;
-    register int symbol;
+    register Yshort symbol;
     register Yshort *sp;
     register int rowsize;
     register int i;

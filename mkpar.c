@@ -69,6 +69,24 @@ static void unused_rules(void)
     }
 }
 
+/*
+Return TRUE when the action has been explicitly assigned 
+a particular associativity.
+*/
+int is_assigned_explicit_associativity(BtYacc_keyword_code assoc)
+{
+	switch (assoc)
+	{
+	case LEFT:
+	case RIGHT:
+	case NONASSOC:
+		return 1;
+		
+	default:
+		return 0;
+	}
+}
+
 static void remove_conflicts(void)
 {
     register int i;
@@ -139,12 +157,21 @@ static void remove_conflicts(void)
                     {
                         p->suppressed = 2;
                     }
-                    else if (pref->assoc == LEFT && p->assoc != LEFT && p->assoc != RIGHT && p->assoc != NONASSOC)
+                    else if (pref->assoc == LEFT && !is_assigned_explicit_associativity(p->assoc))
                     {
                         pref->suppressed = 2;
                         pref = p;
                     }
-                    else if (pref->assoc == RIGHT && p->assoc != LEFT && p->assoc != RIGHT && p->assoc != NONASSOC)
+                    else if (pref->assoc == RIGHT && !is_assigned_explicit_associativity(p->assoc))
+                    {
+                        p->suppressed = 2;
+                    }
+                    else if (p->assoc == LEFT && !is_assigned_explicit_associativity(pref->assoc))
+                    {
+                        pref->suppressed = 2;
+                        pref = p;
+                    }
+                    else if (p->assoc == RIGHT && !is_assigned_explicit_associativity(pref->assoc))
                     {
                         p->suppressed = 2;
                     }

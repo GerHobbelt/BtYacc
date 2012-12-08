@@ -997,7 +997,7 @@ void output_defines(void)
                         if (character_names[i].c == *s)
                         {
                             strcpy(dp, character_names[i].str);
-                            strupr(dp);
+                            strupper(dp);
                             dp += strlen(character_names[i].str);
                             goto done_this_char;
                         }

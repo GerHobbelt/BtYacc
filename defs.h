@@ -136,9 +136,9 @@ typedef enum keyword_code_enumeration
     BISON_DESTRUCTOR                = 128,
     BISON_PRINTER                   = 129,
     BISON_NTERM                     = 130,
-    BISON_DPREC                     = 131,
+    DPREC_PRIO                      = 131,
     BISON_MERGE                     = 132,
-    BISON_PREC                      = 133
+    PREC                            = 133
 } BtYacc_keyword_code;
 
 typedef enum symbol_class_enumeration
@@ -204,7 +204,7 @@ struct bucket
     Yshort value;
     Yshort index;
     Yshort prec;				/* precedence: UNDEFINED or number > 0 */
-    char symbol_class;
+    BtYacc_symbol_class symbol_class;
     BtYacc_keyword_code assoc;	/* associativity: LEFT/RIGHT/NONASSOC/other */
 };
 
@@ -306,6 +306,7 @@ extern char *input_file_name;
 extern char *output_file_name;
 extern char *text_file_name;
 extern char *union_file_name;
+extern char *log_file_name;
 extern char *verbose_file_name;
 
 extern FILE *inc_file;
@@ -318,6 +319,7 @@ extern FILE *input_file;
 extern FILE *output_file;
 extern FILE *text_file;
 extern FILE *union_file;
+extern FILE *log_file;
 extern FILE *verbose_file;
 
 extern int nitems;
@@ -330,7 +332,7 @@ extern int ntags;
 extern char unionized;
 extern char const *line_format;
 
-extern int   start_symbol;
+extern Yshort start_symbol;
 extern char  **symbol_name;
 extern Yshort *symbol_value;
 extern Yshort *symbol_prec;
@@ -480,6 +482,7 @@ void BtYacc_stop_test(void);
 #define BTYACC_INTERRUPTION_CHECK()
 #endif
 
+void strupper(char *str);
 char *sanitize_to_varname(const char *in_str);
 void *allocate(unsigned int size);
 void create_temporary_files(void);
@@ -489,6 +492,7 @@ void open_output_files(void);
 int main(int, char **);
 
 /* mkpar.c */
+int is_assigned_explicit_associativity(BtYacc_keyword_code assoc);
 void make_parser(void);
 action *parse_actions(int);
 action *get_shifts(int);

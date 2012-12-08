@@ -344,7 +344,7 @@ static struct keyword {
     { "define", BISON_DEFINE },                       /* [i_a] bison emulation additions */
     { "defines", BISON_DEFINES },                     /* [i_a] bison emulation additions */
     { "destructor", BISON_DESTRUCTOR },               /* [i_a] bison emulation additions */
-    { "dprec", BISON_DPREC },                         /* [i_a] bison emulation additions */
+    { "dprec", DPREC_PRIO },                          /* %dprec N: assign explicit precedence number N to rule X */
     { "error-verbose", BISON_ERR_VERBOSE },           /* [i_a] bison emulation additions */
     { "error_verbose", BISON_ERR_VERBOSE },           /* [i_a] bison emulation additions */
     { "expect", BISON_EXPECT },                       /* [i_a] bison emulation additions */
@@ -368,8 +368,10 @@ static struct keyword {
     { "nterm", BISON_NTERM },                         /* [i_a] bison emulation additions */
     { "output", BISON_OUTPUT },                       /* [i_a] bison emulation additions */
     { "parse-param", BISON_PARSE_PARAM },             /* [i_a] bison emulation additions */
-    { "prec", BISON_PREC },                           /* [i_a] bison emulation additions */
-    { "prefer", PREFER },
+    { "prec", PREC },                                 /* %prec TOKEN: declare a token with precedence according to order of appearance; 
+													     when used after a rule, it is like %dprec, but referring to terminal TOKEN for association/precedence data */
+    { "prefer", PREFER },                             /* %prefer: like %dprec, similar to the %prefer mentioned in the Anna Bekkerman thesis: 
+													     assigns precedence to a rule; later rules get higher precedence. */
     { "printer", BISON_PRINTER },                     /* [i_a] bison emulation additions */
     { "pure-parser", BISON_PURE },                    /* [i_a] bison emulation additions */
     { "pure_parser", BISON_PURE },                    /* [i_a] bison emulation additions */
@@ -1156,6 +1158,7 @@ void read_declarations(void)
         case LEFT:
         case RIGHT:
         case NONASSOC:
+		case PREC:
             declare_tokens(k);
             break;
         case TYPE:
@@ -1209,7 +1212,7 @@ void read_declarations(void)
                 {
                     name_prefix = sanitize_to_varname(prefix);
                     name_uc_prefix = strdup(prefix);
-                    strupr(name_uc_prefix);
+                    strupper(name_uc_prefix);
                 }
                 else
                 {
@@ -1247,7 +1250,7 @@ void read_declarations(void)
                 {
                     file_prefix = prefix;
                     file_uc_prefix = sanitize_to_varname(file_prefix);
-                    strupr(file_uc_prefix);
+                    strupper(file_uc_prefix);
                 }
                 else
                 {
@@ -2271,7 +2274,7 @@ int mark_symbol(void)
     int c;
 	bucket defbp = {0};
     bucket *bp = &defbp;
-	BtYacc_keyword_code k = BISON_PREC;
+	BtYacc_keyword_code k = PREC;
 	char *t_cptr = cptr;
 
     c = cptr[1];
@@ -2290,8 +2293,8 @@ int mark_symbol(void)
 		k = keyword(0);
 		switch (k)
 		{
-		case BISON_PREC:
-		case BISON_DPREC:
+		case PREC:
+		case DPREC_PRIO:
 		case LEFT:
 		case RIGHT:
 		case NONASSOC:
@@ -2314,8 +2317,8 @@ int mark_symbol(void)
 	case LEFT:
 	case RIGHT:
 	case NONASSOC:
-	case BISON_PREC:
-	case BISON_DPREC:		/* this one is followed by a numeric value: */
+	case PREC:
+	case DPREC_PRIO:		/* this one is followed by a numeric value: */
 		c = nextc(1);
 		if (isalpha(c) || c == '_' || c == '.' || c == '$')
 			bp = get_name(1);
@@ -2327,7 +2330,7 @@ int mark_symbol(void)
 			if (bp->prec <= 0)
 				syntax_error_ex(lineno, line, t_cptr, "expected a positive, non-zero rule's precedence value following the %% keyword: %s", t_cptr);
 		}
-		else if (k == BISON_PREC)
+		else if (k == PREC)
 		{
 			syntax_error_ex(lineno, line, t_cptr, "expected a terminal, non-terminal token or simple token literal string identifying this rule's precedence");
 			/*NOTREACHED*/
@@ -2649,25 +2652,34 @@ void pack_grammar(void)
         }
         rlhs[i] = plhs[i]->index;
         rrhs[i] = j;
-        assoc = TOKEN;
-        prec = 0;
+        assoc = rassoc[i] /* was: TOKEN, but may be LEFT/RIGHT/NONASSOC when rule had an explicit %left/%right/%nonassoc precedence modifier */;
+        prec = rprec[i] /* UNDEFINED or 0 */;
         while (pitem[j])
         {
             ritem[j] = pitem[j]->index;
-            if (pitem[j]->symbol_class == TERM)
-            {
-                prec = pitem[j]->prec;
-                assoc = pitem[j]->assoc;
-            }
+			if (pitem[j]->symbol_class == TERM)
+			{
+				/*
+				Only determine rule precedence and associativity by taking those
+				values from the right-most terminal when the rule itself hasn't
+				already been 'overridden' via %prefer/%prec/%dprec and / or
+				%left/%right/%nonassoc
+				*/
+				if (rprec[i] == UNDEFINED)
+				{
+					prec = pitem[j]->prec;
+				}
+				if (!is_assigned_explicit_associativity(rassoc[i]))
+				{
+					assoc = pitem[j]->assoc;
+				}
+			}
             ++j;
         }
         ritem[j] = -i;
         ++j;
-        if (rprec[i] == UNDEFINED)
-        {
-            rprec[i] = prec;
-            rassoc[i] = assoc;
-        }
+        rprec[i] = prec;
+        rassoc[i] = assoc;
     }
     rrhs[i] = j;
     FREE(plhs);

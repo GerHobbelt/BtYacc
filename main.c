@@ -4,6 +4,7 @@
 
 #include "defs.h"
 #include "log.h"
+#include "write.h"
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,6 +56,7 @@ char *input_file_name = "";
 char *output_file_name = NULL;
 char *text_file_name = NULL;
 char *union_file_name = NULL;
+char *log_file_name = NULL;
 char *verbose_file_name = NULL;
 
 FILE *action_file = NULL;       /*  a temp file, used to save actions associated    */
@@ -68,6 +70,7 @@ FILE *text_file = NULL;         /*  a temp file, used to save text until all    
 FILE *union_file = NULL;        /*  a temp file, used to save the union             */
                                 /*  definition until all symbol have been           */
                                 /*  defined                                         */
+FILE *log_file = NULL;          /*  a temp file, used to save LR/LALR/... log info  */
 FILE *verbose_file = NULL;      /*  y.output                                        */
 
 int nitems = 0;
@@ -76,7 +79,7 @@ int nsyms = 0;                  /* the total number of TERMinals and non-termina
 int ntokens = 0;                /* the total number of TERMinals */
 int nvars = 0;                  /* the total number of non-terminals */
 
-int   start_symbol = 0;
+Yshort start_symbol = 0;
 char  **symbol_name = NULL;
 Yshort *symbol_value = NULL;
 Yshort *symbol_prec = NULL;
@@ -123,6 +126,20 @@ char *sanitize_to_varname(const char *in_str)
     return s2;
 }
 
+/*
+strupper() is not known on all platforms, so we provide our own equivalent:
+
+convert the input string to all-uppercase
+*/
+void strupper(char *str)
+{
+	while (*str)
+	{
+		*str = toupper(*str);
+		++str;
+	}
+}
+
 static void file_deletion(FILE* f, char const * name)
 {
    if (f)
@@ -144,9 +161,46 @@ static void file_deletion(FILE* f, char const * name)
 
 void done(int k)
 {
+    if (defines_file)
+	{
+		fclose(defines_file);
+		defines_file = NULL;
+	}
+    if (output_file)
+	{
+		fclose(output_file);
+		output_file = NULL;
+	}
+    if (code_file)
+	{
+		fclose(code_file);
+		code_file = NULL;
+	}
+    if (verbose_file)
+	{
+		int c;
+
+        if (fclose(log_file))
+        {
+           perror("log_file: fclose");
+           abort();
+        }
+
+        log_file = fopen(log_file_name, "r");
+        if (log_file == NULL) open_error(log_file_name);
+        while ((c = getc(log_file)) != EOF)
+        {
+          BtYacc_putc(c, verbose_file);
+        }
+
+		fclose(verbose_file);
+		verbose_file = NULL;
+	}
+
     file_deletion(action_file, action_file_name);
     file_deletion(text_file, text_file_name);
     file_deletion(union_file, union_file_name);
+    file_deletion(log_file, log_file_name);
     exit(k);
 }
 
@@ -428,7 +482,7 @@ no_more_options:;
         file_prefix = "y";
     }
     file_uc_prefix = sanitize_to_varname(file_prefix);
-    strupr(file_uc_prefix);
+    strupper(file_uc_prefix);
 
     if (name_prefix && *name_prefix)
     {
@@ -444,7 +498,7 @@ no_more_options:;
         name_prefix = "yy";
     }
     name_uc_prefix = strdup(name_prefix);
-    strupr(name_uc_prefix);
+    strupper(name_uc_prefix);
 
     if (target_dir && *target_dir)
     {
@@ -595,29 +649,39 @@ void create_temporary_files(void)
     if (union_file_name == 0)
        no_space();
 
+    log_file_name = (char *)MALLOC(i);
+
+    if (log_file_name == 0)
+       no_space();
+
     strcpy(action_file_name, tmpdir);
     strcpy(text_file_name, tmpdir);
     strcpy(union_file_name, tmpdir);
+    strcpy(log_file_name, tmpdir);
 
     if (len)
     {
         action_file_name[len] = DIR_CHAR;
         text_file_name[len] = DIR_CHAR;
         union_file_name[len] = DIR_CHAR;
+        log_file_name[len] = DIR_CHAR;
         ++len;
     }
 
     strcpy(action_file_name + len, temp_form);
     strcpy(text_file_name + len, temp_form);
     strcpy(union_file_name + len, temp_form);
+    strcpy(log_file_name + len, temp_form);
 
     action_file_name[len + 5] = 'a';
     text_file_name[len + 5] = 't';
     union_file_name[len + 5] = 'u';
+    log_file_name[len + 5] = 'l';
 
     action_file = create_temporary_file(action_file_name);
     text_file = create_temporary_file(text_file_name);
     union_file = create_temporary_file(union_file_name);
+    log_file = create_temporary_file(log_file_name);
 }
 
 
