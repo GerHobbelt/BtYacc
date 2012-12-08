@@ -5,9 +5,7 @@
 #include "defs.h"
 #include "log.h"
 #include "write.h"
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
+
 #if defined(__MSDOS__) || defined(WIN32) || defined(__WIN32)
 #include <io.h> /* mktemp() */
 #undef HAVE_MKSTEMP
@@ -100,7 +98,7 @@ output string contains only [:alpha:][:alnum:_]*[:alnum:]?
 */
 char *sanitize_to_varname(const char *in_str)
 {
-    char *s = strdup(in_str);
+    char *s = STRDUP(in_str);
     char *s2 = s;
 
     if (!s) no_space();
@@ -159,26 +157,52 @@ static void file_deletion(FILE* f, char const * name)
 }
 
 
-void done(int k)
+
+/*
+ * memory cleanup routine which is called at the end of the crm114 run.
+ *
+ * Note: this routine *also* called when an error occurred (e.g. out of memory)
+ *    so tread carefully here: do not assume all these pointers are filled.
+ */
+static void final_cleanup(void)
 {
+	FREE(defred);
+	free_action_order();
+	FREE(rules_used);
+	FREE(SRconflicts);
+	FREE(RRconflicts);
+	free_nullable();
+	free_derives();
+	free_section_cache();
+    FREE(ritem);
+	FREE(rlhs);
+	FREE(rrhs);
+	FREE(rprec);
+	FREE(rassoc);
+    FREE(symbol_name);
+    FREE(symbol_value);
+    FREE(symbol_prec);
+    FREE(symbol_assoc);
+	free_reader_buffers();
+
     if (defines_file)
-	{
-		fclose(defines_file);
-		defines_file = NULL;
-	}
+    {
+        fclose(defines_file);
+        defines_file = NULL;
+    }
     if (output_file)
-	{
-		fclose(output_file);
-		output_file = NULL;
-	}
+    {
+        fclose(output_file);
+        output_file = NULL;
+    }
     if (code_file)
-	{
-		fclose(code_file);
-		code_file = NULL;
-	}
+    {
+        fclose(code_file);
+        code_file = NULL;
+    }
     if (verbose_file)
-	{
-		int c;
+    {
+        int c;
 
         if (fclose(log_file))
         {
@@ -193,14 +217,31 @@ void done(int k)
           BtYacc_putc(c, verbose_file);
         }
 
-		fclose(verbose_file);
-		verbose_file = NULL;
-	}
+        fclose(verbose_file);
+        verbose_file = NULL;
+    }
+	FREE(code_file_name);
+	FREE(defines_file_name);
+	FREE(output_file_name);
+	FREE(verbose_file_name);
 
     file_deletion(action_file, action_file_name);
     file_deletion(text_file, text_file_name);
     file_deletion(union_file, union_file_name);
     file_deletion(log_file, log_file_name);
+    action_file = NULL;
+    FREE(action_file_name);
+    text_file = NULL;
+    FREE(text_file_name);
+    union_file = NULL;
+    FREE(union_file_name);
+    log_file = NULL;
+    FREE(log_file_name);
+}
+
+void done(int k)
+{
+    final_cleanup();
     exit(k);
 }
 
@@ -360,7 +401,7 @@ static void getargs(int argc, char **argv)
                   error(lineno, 0, 0, "Preprocessor variable %s already defined", var_name);
                 }
               }
-              *ps = strdup(var_name);
+              *ps = STRDUP(var_name);
 
               if (*ps == 0)
                  no_space();
@@ -459,7 +500,7 @@ no_more_options:;
       if (input_file_name) {
         char *s2;
 
-        file_prefix = strdup(input_file_name);
+        file_prefix = STRDUP(input_file_name);
 
         if (!file_prefix) no_space();
 
@@ -497,7 +538,7 @@ no_more_options:;
     if (!name_prefix || !*name_prefix) {
         name_prefix = "yy";
     }
-    name_uc_prefix = strdup(name_prefix);
+    name_uc_prefix = STRDUP(name_prefix);
     strupper(name_uc_prefix);
 
     if (target_dir && *target_dir)
@@ -513,7 +554,7 @@ no_more_options:;
                 char *s2;
                 char *s;
 
-                target_dir = strdup(input_file_name);
+                target_dir = STRDUP(input_file_name);
                 if (!target_dir) no_space();
 
                 // strip off filename from the input file path:
@@ -705,7 +746,7 @@ void create_output_files(void)
     }
     else
     {
-        code_file_name = output_file_name;
+        code_file_name = STRDUP(output_file_name);
         CODE_FILE = OUTPUT_FILE;
     }
 
@@ -797,8 +838,13 @@ void open_output_files(void)
 
 struct section *active_section_list = NULL;
 
+
+
 int main(int argc, char **argv)
 {
+	os_init_heap();
+    atexit(final_cleanup);
+
 #ifdef BTYACC_USE_SIGNAL_HANDLING
     signal_setup();
 #endif

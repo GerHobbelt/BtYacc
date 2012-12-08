@@ -339,6 +339,7 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="mkpar.c" />
     <ClCompile Include="mstring.c" />
+    <ClCompile Include="msvc_win32_heap_checking.c" />
     <ClCompile Include="output.c" />
     <ClCompile Include="reader.c" />
     <ClCompile Include="readskel.c" />

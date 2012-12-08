@@ -478,7 +478,7 @@ static Yshort** transpose(Yshort** R, int n)
 
   FREE(temp_R);
 
-  return (new_R);
+  return new_R;
 }
 
 
@@ -564,8 +564,10 @@ static void build_relations(void)
   new_includes = transpose(includes, ngotos);
 
   for (i = 0; i < ngotos; ++i)
+  {
     if (includes[i])
       FREE(includes[i]);
+  }
 
   FREE(includes);
 

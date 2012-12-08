@@ -224,7 +224,7 @@ NextLine:
         error(lineno, 0, 0, "Preprocessor variable %s already defined", var_name);
       }
     }
-    *ps = strdup(var_name);
+    *ps = STRDUP(var_name);
     if (*ps == 0)
        no_space();
 
@@ -1198,20 +1198,20 @@ void read_declarations(void)
                 {
                     bp = get_literal(0);
                     /* strip quotes */
-                    prefix = strdup(bp->name + 1);
+                    prefix = STRDUP(bp->name + 1);
                     prefix[strlen(prefix)-1] = 0;
                 }
                 else
                 {
                     bp = get_name(0);
-                    prefix = strdup(bp->name);
+                    prefix = STRDUP(bp->name);
                 }
                 FREE(bp);
 
                 if (prefix && *prefix)
                 {
                     name_prefix = sanitize_to_varname(prefix);
-                    name_uc_prefix = strdup(prefix);
+                    name_uc_prefix = STRDUP(prefix);
                     strupper(name_uc_prefix);
                 }
                 else
@@ -1236,13 +1236,13 @@ void read_declarations(void)
                 {
                     bp = get_literal(0);
                     /* strip quotes */
-                    prefix = strdup(bp->name + 1);
+                    prefix = STRDUP(bp->name + 1);
                     prefix[strlen(prefix)-1] = 0;
                 }
                 else
                 {
                     bp = get_name(0);
-                    prefix = strdup(bp->name);
+                    prefix = STRDUP(bp->name);
                 }
                 FREE(bp);
 
@@ -1271,7 +1271,7 @@ void read_declarations(void)
                         error(lineno, line, t_cptr, "Preprocessor variable %s already defined", var_name);
                     }
                 }
-                *ps = strdup(var_name);
+                *ps = STRDUP(var_name);
 				if (!*ps) no_space();
                 *++ps = NULL;
             }
@@ -1446,8 +1446,8 @@ static char *parse_int(char *p, int *save)
 
 static void parse_arginfo(bucket *a, char *args, int argslen)
 {
-char    *p=args, *tmp;
-int     i, redec=0;
+char    *p = args, *tmp;
+int     i, redec = 0;
 
     if (a->args >= 0)
     {
@@ -1516,7 +1516,6 @@ int     i, redec=0;
 
         if (*p++) bad_formals();
     }
-    free(args);
 }
 
 static char *compile_arg(char **theptr, char *yyvaltag)
@@ -1743,6 +1742,7 @@ void advance_to_start(void)
     if (c != ':') syntax_error_ex(lineno, line, cptr, "expected a colon ':' starting the rule definition");
     start_rule(bp, s_lineno);
     parse_arginfo(bp, args, argslen);
+	FREE(args);
     ++cptr;
 }
 
@@ -1878,6 +1878,7 @@ void add_symbol(void)
         end_rule();
         start_rule(bp, s_lineno);
         parse_arginfo(bp, args, argslen);
+        FREE(args);
         ++cptr;
         return;
     }
@@ -1921,7 +1922,7 @@ void add_symbol(void)
         {
             ap = insert_arg_rule(ap, bp->argtags[i]);
         }
-        free(args);
+        FREE(args);
     }
 
     if (++nitems > maxitems)
@@ -2728,6 +2729,13 @@ void print_grammar(void)
         ++k;
         BtYacc_putc('\n', f);
     }
+}
+
+void free_reader_buffers(void)
+{
+	FREE(line);
+	FREE(cache);
+    FREE(name_pool);
 }
 
 void reader(void)

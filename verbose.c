@@ -280,7 +280,7 @@ void print_shifts(action const * p)
 }
 
 
-void print_reductions(action const * p, int defred)
+void print_reductions(action const * p, int default_reduction)
 {
     register int k, anyreds;
     register action const * q;
@@ -301,7 +301,7 @@ void print_reductions(action const * p, int defred)
     {
         for (; p; p = p->next)
         {
-            if (p->action_code == REDUCE && p->number != defred)
+            if (p->action_code == REDUCE && p->number != default_reduction)
             {
                 k = p->number - 2;
                 if (p->suppressed == 0)
@@ -310,8 +310,8 @@ void print_reductions(action const * p, int defred)
             }
         }
 
-        if (defred > 0)
-            BtYacc_printf(verbose_file, "\t.  reduce %d\n", defred - 2);
+        if (default_reduction > 0)
+            BtYacc_printf(verbose_file, "\t.  reduce %d\n", default_reduction - 2);
     }
 }
 

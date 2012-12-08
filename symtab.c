@@ -40,7 +40,7 @@ bucket* make_bucket(char const * name)
     if (bp == 0) no_space();
     bp->link = 0;
     bp->next = 0;
-    bp->name = strdup(name);
+    bp->name = STRDUP(name);
     if (bp->name == 0) no_space();
     bp->tag = 0;
     bp->value = UNDEFINED;

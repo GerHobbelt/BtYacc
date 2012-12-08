@@ -42,7 +42,7 @@ static char const *get_rflag_prefix(void)
         }
         else
         {
-            str = strdup(fmt);
+            str = STRDUP(fmt);
         }
     }
     return str;
@@ -115,7 +115,7 @@ static void print_one_comment(FILE *outfile, unsigned int outfile_idx, char cons
     }
     else
     {
-        char *cmt = strdup(comment);
+        char *cmt = STRDUP(comment);
         char *cmtline;
 
         if (!cmt) no_space();
@@ -912,7 +912,7 @@ void output_defines(void)
                 char *d;
 
                 s++;
-                s = strdup(s);
+                s = STRDUP(s);
                 if (!s) no_space();
 
                 d = s;
@@ -1239,12 +1239,14 @@ void output_debug(void)
         const char *sep = (i < nrules - 1 ? get_section("debug_yyname_strings_separator") : "");
 
         BtYacc_printf(output_file, "\"%s :", s);
+		FREE(s);
 
         for (j = rrhs[i]; ritem[j] > 0; ++j)
         {
             s = convert_to_C_string(symbol_name[ritem[j]]);
 
             BtYacc_printf(output_file, " %s", s);
+			FREE(s);
         }
         ++outline[OUTPUT_FILE];
         BtYacc_printf(output_file, "\"%s\n", count_newlines(OUTPUT_FILE, sep));
@@ -1469,6 +1471,19 @@ char const *get_section(char const * section_name)
 }
 
 
+void free_section_cache(void)
+{
+    struct section *sl;
+
+	if (!active_section_list)
+		return;
+
+    for (sl = &active_section_list[0]; sl->name; ++sl)
+    {
+		FREE(sl->cached_multiline_ptr);
+	}
+}
+
 char const *get_rule_description(int rule_nr)
 {
     register int j;
@@ -1478,14 +1493,20 @@ char const *get_rule_description(int rule_nr)
     if (!buf) no_space();
 
     msprintf(buf, "%s :", s);
+	FREE(s);
 
     for (j = rrhs[rule_nr]; ritem[j] > 0; ++j)
     {
         s = convert_to_C_string(symbol_name[ritem[j]]);
 
         msprintf(buf, " %s", s);
+		FREE(s);
     }
     return msdone(buf);
 }
 
+void free_action_order(void)
+{
+	FREE(order);
+}
 

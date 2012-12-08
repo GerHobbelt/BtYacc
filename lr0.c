@@ -566,7 +566,8 @@ static void set_derives(void)
 
 void free_derives(void)
 {
-    FREE(derives[start_symbol]);
+	if (derives)
+		FREE(derives[start_symbol]);
     FREE(derives);
 }
 

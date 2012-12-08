@@ -75,6 +75,9 @@
     <ClCompile Include="write.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="msvc_win32_heap_checking.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defs.h">

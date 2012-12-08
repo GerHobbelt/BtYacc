@@ -30,12 +30,17 @@
 /* [/i_a] */
 
 
+#if defined(_MSC_VER)
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <signal.h>
 
 
 /*  machine-dependent definitions                       */
@@ -182,9 +187,10 @@ typedef enum action_code_enumeration
 
 #define MALLOC(n)       malloc((unsigned)(n))
 #define CALLOC(k,n)     calloc((unsigned)(k), (unsigned)(n))
+#define STRDUP(s)       strdup(s)
 #define FREE(x)         do { free((char*)(x)); x = 0; } while (0)
-#define NEW(t)          (allocate(sizeof(t)))
-#define NEW2(n,t)       (allocate((unsigned)((n) * sizeof(t))))
+#define NEW(t)          CALLOC(1, sizeof(t))
+#define NEW2(n,t)       ((n) ? CALLOC((n), sizeof(t)) : NULL)
 #define REALLOC(p,n,t)  (realloc((char*)(p), (unsigned)((n) * sizeof(t))))
 #define RENEW(p,n,t)    (realloc((char*)(p), (unsigned)((n) * sizeof(t))))
 
@@ -410,6 +416,8 @@ extern int unsigned *ruleset;
 
 /* global functions */
 
+void os_init_heap(void);
+
 /* closure.c */
 void set_first_derives(void);
 void closure(Yshort *, int);
@@ -526,7 +534,9 @@ void free_reductions(void);
 void write_section(char const * section_name);
 struct section *lookup_section_name(char const * section_name);
 char const *get_section(char const * section_name);
+void free_section_cache(void);
 char const *get_rule_description(int rule_nr);
+void free_action_order(void);
 
 /* reader.c */
 int cachec(int);
@@ -567,6 +577,7 @@ void check_symbols(void);
 void pack_symbols(void);
 void pack_grammar(void);
 void print_grammar(void);
+void free_reader_buffers(void);
 void reader(void);
 
 /* readskel.c */
