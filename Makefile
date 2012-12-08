@@ -11,7 +11,8 @@ DEST	      = .
 
 HDRS	      = defs.h mstring.h
 
-CFLAGS	      = -g -Wall -O2 -Wstrict-prototypes -Wmissing-prototypes
+#CFLAGS	      = -g -Wall -O2 -Wstrict-prototypes -Wmissing-prototypes
+CFLAGS	      = -ggdb -Wall -O0 -Wstrict-prototypes -Wmissing-prototypes
  
 LDFLAGS	      = #-static
 

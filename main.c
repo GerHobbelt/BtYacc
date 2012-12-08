@@ -45,6 +45,7 @@ int unsigned DEFINES_FILE = 1;          /*  y.tab.h                             
 int unsigned OUTPUT_FILE = 2;           /*  y.tab.c                                         */
 int unsigned outline[3] = {0};
 const char *outfilename[3] = {0};
+FILE *outfile[3] = {0};
 
 
 char *action_file_name = NULL;
@@ -185,19 +186,22 @@ static void final_cleanup(void)
     FREE(symbol_assoc);
 	free_reader_buffers();
 
-    if (defines_file)
+    if (outfile[DEFINES_FILE])
     {
-        fclose(defines_file);
+        fclose(outfile[DEFINES_FILE]);
+        outfile[DEFINES_FILE] = NULL;
         defines_file = NULL;
     }
-    if (output_file)
+    if (outfile[OUTPUT_FILE])
     {
-        fclose(output_file);
+        fclose(outfile[OUTPUT_FILE]);
+        outfile[OUTPUT_FILE] = NULL;
         output_file = NULL;
     }
-    if (code_file)
+    if (outfile[CODE_FILE])
     {
-        fclose(code_file);
+        fclose(outfile[CODE_FILE]);
+        outfile[CODE_FILE] = NULL;
         code_file = NULL;
     }
     if (verbose_file)
@@ -805,33 +809,34 @@ void open_output_files(void)
     {
         create_output_files();
 
-        if (vflag)
+        if (verbose_file_name)
         {
             verbose_file = fopen(verbose_file_name, "w");
             if (verbose_file == 0)
                 open_error(verbose_file_name);
         }
 
-        if (dflag)
+        if (defines_file_name)
         {
-            defines_file = fopen(defines_file_name, "w");
+            outfile[DEFINES_FILE] = defines_file = fopen(defines_file_name, "w");
             if (defines_file == 0)
                 open_error(defines_file_name);
         }
 
-        output_file = fopen(output_file_name, "w");
+        outfile[OUTPUT_FILE] = output_file = fopen(output_file_name, "w");
         if (output_file == 0)
             open_error(output_file_name);
 
-        if (rflag)
+        if (outfile[CODE_FILE] == NULL)
         {
-            code_file = fopen(code_file_name, "w");
+            assert(strcmp(code_file_name, output_file_name) != 0);
+            outfile[CODE_FILE] = code_file = fopen(code_file_name, "w");
             if (code_file == 0)
                 open_error(code_file_name);
         }
         else
         {
-            code_file = output_file;
+            code_file = outfile[CODE_FILE];
         }
 
         write_section("banner");
