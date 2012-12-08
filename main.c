@@ -204,18 +204,21 @@ static void final_cleanup(void)
     {
         int c;
 
-        if (fclose(log_file))
-        {
-           perror("log_file: fclose");
-           abort();
-        }
+		if (log_file)
+		{
+			if (fclose(log_file))
+			{
+			   perror("log_file: fclose");
+			   abort();
+			}
+		}
 
-        log_file = fopen(log_file_name, "r");
-        if (log_file == NULL) open_error(log_file_name);
-        while ((c = getc(log_file)) != EOF)
-        {
-          BtYacc_putc(c, verbose_file);
-        }
+		log_file = fopen(log_file_name, "r");
+		if (log_file == NULL) open_error(log_file_name);
+		while ((c = getc(log_file)) != EOF)
+		{
+			BtYacc_putc(c, verbose_file);
+		}
 
         fclose(verbose_file);
         verbose_file = NULL;
