@@ -1567,7 +1567,7 @@ static char *compile_arg(char **theptr, char *yyvaltag)
         }
         if (isdigit(*p) || *p == '-')
         {
-          int val;
+          int val = 0;
           p = parse_int(p, &val);
           if (!p)
             dollar_error(rescan_lineno, 0, 0);
