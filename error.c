@@ -41,9 +41,18 @@ static void FileError(char const * fmt, ...) {
   }
 }
 
-void fatal(char const * msg)
+void fatal(char const * msg, ...)
 {
-    if (fprintf(stderr, "fatal - %s\n", msg) < 0)
+	va_list args;
+	char buf[2048];
+
+	va_start(args, msg);
+	buf[0] = 0;
+	vsnprintf(buf, sizeof(buf), msg, args);
+	buf[sizeof(buf) - 1] = 0;
+	va_end(args);
+
+    if (fprintf(stderr, "fatal - %s\n", buf) < 0)
     {
        perror("fatal: fprintf");
        abort();

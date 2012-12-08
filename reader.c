@@ -316,7 +316,7 @@ int nextc(int only_skip_whitespace)
                 if ((s = get_line()) == 0) return EOF;
                 break;
             }
-            
+
 			if (0 /* fall through */)
 			{
         case ',':
@@ -334,10 +334,10 @@ int nextc(int only_skip_whitespace)
     }
 }
 
-static struct keyword { 
-	const char *name; 
-	BtYacc_keyword_code token; 
-} keywords[] = 
+static struct keyword {
+	const char *name;
+	BtYacc_keyword_code token;
+} keywords[] =
 {
     { "binary", NONASSOC },
     { "debug", BISON_DEBUG },                         /* [i_a] bison emulation additions */
@@ -368,9 +368,9 @@ static struct keyword {
     { "nterm", BISON_NTERM },                         /* [i_a] bison emulation additions */
     { "output", BISON_OUTPUT },                       /* [i_a] bison emulation additions */
     { "parse-param", BISON_PARSE_PARAM },             /* [i_a] bison emulation additions */
-    { "prec", PREC },                                 /* %prec TOKEN: declare a token with precedence according to order of appearance; 
+    { "prec", PREC },                                 /* %prec TOKEN: declare a token with precedence according to order of appearance;
 													     when used after a rule, it is like %dprec, but referring to terminal TOKEN for association/precedence data */
-    { "prefer", PREFER },                             /* %prefer: like %dprec, similar to the %prefer mentioned in the Anna Bekkerman thesis: 
+    { "prefer", PREFER },                             /* %prefer: like %dprec, similar to the %prefer mentioned in the Anna Bekkerman thesis:
 													     assigns precedence to a rule; later rules get higher precedence. */
     { "printer", BISON_PRINTER },                     /* [i_a] bison emulation additions */
     { "pure-parser", BISON_PURE },                    /* [i_a] bison emulation additions */
@@ -427,7 +427,7 @@ BtYacc_keyword_code keyword(int fail_when_no_keyword)
     if (c == '0') return TOKEN;
     if (c == '2') return NONASSOC;
   }
-  if (fail_when_no_keyword) 
+  if (fail_when_no_keyword)
   {
 	syntax_error_ex(lineno, line, t_cptr, "expected a keyword or one of these: [ %%{  %%%%  %%\\  %%<  %%>  %%0  %%2 ]");
   }
@@ -583,12 +583,12 @@ loop:
         goto loop;
     case '%':
     case '\\':
-        if (*cptr == '}') 
+        if (*cptr == '}')
 		{
             if (need_newline) BtYacc_putc('\n', f);
             ++cptr;
             FREE(t_line);
-            return; 
+            return;
 		}
         /* fall through */
     default:
@@ -1136,9 +1136,9 @@ void read_declarations(void)
     for (;;)
     {
         c = nextc(0);
-        if (c == EOF) 
+        if (c == EOF)
 			unexpected_EOF();
-        if (c != '%') 
+        if (c != '%')
 			syntax_error_ex(lineno, line, cptr, "expected a %%-prefixed declaration command, e.g. %%token, %%left, %%right, %%ident, %%{ ... %%}, %%union");
         t_cptr = cptr;
         switch (k = keyword(1))
@@ -2288,7 +2288,7 @@ int mark_symbol(void)
 	{
         cptr += 2;
 	}
-    else 
+    else
 	{
 		k = keyword(0);
 		switch (k)
@@ -2365,6 +2365,9 @@ int mark_symbol(void)
 			bp = &defbp;
 		}
 		break;
+
+	default:
+		fatal("internal error in precedence handler: unexpected %%%s", (bp ? bp->name : "???"));
 	}
 
     if (rprec[nrules] != UNDEFINED && bp->prec != rprec[nrules])

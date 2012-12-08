@@ -173,7 +173,7 @@ static void set_goto_map(void)
 
           if (ISTOKEN(symbol)) break;
 
-          if (ngotos == MAXSHORT)
+          if (ngotos >= MAXSHORT)
             fatal("too many gotos");
 
           ++ngotos;
