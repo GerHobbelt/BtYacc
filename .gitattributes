@@ -7,6 +7,7 @@
 *.y             text eol=lf
 *.skeleton      text eol=lf
 *.md            text eol=lf
+*.m4            text eol=lf
 *README*        text eol=lf
 NEWS            text eol=lf
 ChangeLog       text eol=lf
