@@ -27,3 +27,8 @@ all: $(TEST_APPLICATIONS)
 
 #portability-config.h: portability-config.h.in Makefile.in configure
 #	@./configure
+
+BTYACC:
+	@cd ..; make
+
+

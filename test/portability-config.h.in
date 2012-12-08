@@ -6,6 +6,9 @@
 /* Define to 1 if you have the <conio.h> header file. */
 #undef HAVE_CONIO_H
 
+/* Define to 1 if you have the <ctype.h> header file. */
+#undef HAVE_CTYPE_H
+
 /* Define to 1 if you have the `getch' function. */
 #undef HAVE_GETCH
 
@@ -48,6 +51,9 @@
 
 /* Define to 1 if you have the `strpbrk' function. */
 #undef HAVE_STRPBRK
+
+/* Define to 1 if you have the `strupr' function. */
+#undef HAVE_STRUPR
 
 /* Define to 1 if you have the <syslog.h> header file. */
 #undef HAVE_SYSLOG_H

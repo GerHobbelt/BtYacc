@@ -2,6 +2,17 @@
 *.ac            text eol=lf
 *.am            text eol=lf
 *.in            text eol=lf
+*.c             text eol=lf
+*.h             text eol=lf
+*.y             text eol=lf
+*.skeleton      text eol=lf
+*.md            text eol=lf
+*README*        text eol=lf
+NEWS            text eol=lf
+ChangeLog       text eol=lf
+INSTALL         text eol=lf
+*.1             text eol=lf
+*.sgml          text eol=lf
 Makefile        text eol=lf
 configure       text eol=lf
 
@@ -20,4 +31,4 @@ configure       text eol=lf
 *.vsprops       text eol=crlf
 *.sln           text eol=crlf
 *.dsw           text eol=crlf
-*.dsp           text eol=crlf
+*.dos           text eol=crlf

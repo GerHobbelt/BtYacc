@@ -177,6 +177,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 TEST_GRAMMARS := $(wildcard test*.y)
 TEST_APPLICATIONS := $(patsubst %.y,%,$(TEST_GRAMMARS))
+BTYACC = ../btyacc
+BTYACC_OPTIONS = -tt -v
 FRAMEWORK_DEPS = \
 	test-framework-header.h \
 	test-framework-tail.h \
@@ -535,6 +537,9 @@ all: $(TEST_APPLICATIONS)
 
 #portability-config.h: portability-config.h.in Makefile.in configure
 #	@./configure
+
+BTYACC:
+	@cd ..; make
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

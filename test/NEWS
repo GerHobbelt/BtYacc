@@ -1,0 +1,10 @@
+v0.1 - December 2012
+
+  The first bit of work to make it happen. The idea is to run
+
+    ./configure
+    make
+
+  and then have a full set of compiled test executables produced 
+  from the test-*.y grammars.
+
