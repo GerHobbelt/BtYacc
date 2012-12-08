@@ -19,7 +19,7 @@ FRAMEWORK_DEPS = \
 all: $(TEST_APPLICATIONS)
 
 %.c: %.y 
-	$(BTYACC) $(BTYACC_OPTIONS) -o $@ $<
+	$(BTYACC) $(BTYACC_OPTIONS) $<
 
 %: %.c $(FRAMEWORK_DEPS)
 	$(CC) -O2 -o $@ $<
