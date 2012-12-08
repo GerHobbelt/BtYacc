@@ -842,8 +842,11 @@ struct section *active_section_list = NULL;
 
 int main(int argc, char **argv)
 {
+#if defined(_MSC_VER)
 	os_init_heap();
-    atexit(final_cleanup);
+#endif
+	
+	atexit(final_cleanup);
 
 #ifdef BTYACC_USE_SIGNAL_HANDLING
     signal_setup();
