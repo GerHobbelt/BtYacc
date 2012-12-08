@@ -1473,20 +1473,19 @@ extern YYSTYPE yylval;
 
 #ifndef YYSTYPE
 typedef int YYSTYPE;
+#endif
 
 #ifdef __cplusplus
 #ifndef YYSTYPE_ZERO
+/* this macro is used to ZERO one YYSTYPE instance: */
 #define YYSTYPE_ZERO(yylval)        yylval = 0
 #endif
 #endif
 
-/*
- * Since we know the yylval type, we can also provide a default yydebug log function now:
- */
 #ifndef YYDBPR
-#define YYDBPR(yystype)    BTYACC_DEBUG_LOG_PARTIAL("%d", (yystype))
+/* display the content of one YYSTYPE instance in the parser debug output: */
+#define YYDBPR(yystype)    BTYACC_DEBUG_LOG_PARTIAL("%d", (int)(yystype))
 #endif
-#endif /* YYSTYPE */
 
 
 %% union_decl_start
