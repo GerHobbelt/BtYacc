@@ -438,6 +438,8 @@ static void getargs(int argc, char **argv)
 
         case 't':
             tflag++;
+			if (tflag > 1 && !vflag)
+				vflag++;
             break;
 
         case 'v':
@@ -482,6 +484,8 @@ static void getargs(int argc, char **argv)
 
             case 't':
                 tflag++;
+				if (tflag > 1 && !vflag)
+					vflag++;
                 break;
 
             case 'v':
