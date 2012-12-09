@@ -89,9 +89,10 @@ int is_assigned_explicit_associativity(BtYacc_keyword_code assoc)
 
 static void remove_conflicts(void)
 {
-    register int i;
-    register int symbol;
-    register action *p, *pref;
+    int i;
+    int symbol;
+	int number = -1;
+    action *p, *pref;
 
     SRtotal = 0;
     RRtotal = 0;
@@ -106,10 +107,14 @@ static void remove_conflicts(void)
         pref = 0;
         for (p = parser[i]; p; p = p->next)
         {
+			action *new_pref = pref;
+			int print_resolution = 0;
+
             if (p->symbol != symbol)
             {
-                pref = p;
+                new_pref = p;
                 symbol = p->symbol;
+				number = p->number;
             }
             else if (i == final_state && symbol == 0)
             {
@@ -124,24 +129,34 @@ static void remove_conflicts(void)
                 {
                     if (pref->prec < p->prec)
                     {
+					    BtYacc_logf("state %5d: resolving conflict through precedence", i);
+						print_resolution = 1;
                         pref->suppressed = 2;
-                        pref = p;
+                        new_pref = p;
                     }
                     else if (pref->prec > p->prec)
                     {
+					    BtYacc_logf("state %5d: resolving conflict through precedence", i);
+						print_resolution = 1;
                         p->suppressed = 2;
                     }
                     else if (pref->assoc == LEFT)
                     {
+					    BtYacc_logf("state %5d: resolving conflict through LEFT association", i);
+						print_resolution = 1;
                         pref->suppressed = 2;
-                        pref = p;
+                        new_pref = p;
                     }
                     else if (pref->assoc == RIGHT)
                     {
+					    BtYacc_logf("state %5d: resolving conflict through RIGHT association", i);
+						print_resolution = 1;
                         p->suppressed = 2;
                     }
                     else
                     {
+					    BtYacc_logf("state %5d: resolving conflict using the default YACC mechanism as the user specified precedences are equal", i);
+						print_resolution = 1;
                         pref->suppressed = 2;
                         p->suppressed = 2;
                     }
@@ -150,29 +165,41 @@ static void remove_conflicts(void)
                 {
                     if (p->prec > 0 && pref->prec < p->prec)
                     {
+					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit precedence", i);
+						print_resolution = 1;
                         pref->suppressed = 2;
-                        pref = p;
+                        new_pref = p;
                     }
                     else if (pref->prec > 0 && pref->prec > p->prec)
                     {
+					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit precedence", i);
+						print_resolution = 1;
                         p->suppressed = 2;
                     }
                     else if (pref->assoc == LEFT && !is_assigned_explicit_associativity(p->assoc))
                     {
+					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit LEFT association preference", i);
+						print_resolution = 1;
                         pref->suppressed = 2;
-                        pref = p;
+                        new_pref = p;
                     }
                     else if (pref->assoc == RIGHT && !is_assigned_explicit_associativity(p->assoc))
                     {
+					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit RIGHT association preference", i);
+						print_resolution = 1;
                         p->suppressed = 2;
                     }
                     else if (p->assoc == LEFT && !is_assigned_explicit_associativity(pref->assoc))
                     {
+					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit LEFT association preference", i);
+						print_resolution = 1;
                         pref->suppressed = 2;
-                        pref = p;
+                        new_pref = p;
                     }
                     else if (p->assoc == RIGHT && !is_assigned_explicit_associativity(pref->assoc))
                     {
+					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit RIGHT association preference", i);
+						print_resolution = 1;
                         p->suppressed = 2;
                     }
                     else
@@ -191,6 +218,30 @@ static void remove_conflicts(void)
                 if (!pref->suppressed)
                     pref->suppressed = 1;
             }
+
+			if (print_resolution)
+			{
+				if (i == final_state && symbol == 0)
+				{
+					BtYacc_logf("\n           : shift/reduce conflict (%saccept, %sreduce %d) on $end\n\n",
+							(new_pref == pref ? "" : "DO NOT "), (new_pref != pref ? "" : "DO NOT "), p->number - 2);
+				}
+				else
+				{
+					if (pref->action_code == SHIFT)
+					{
+						BtYacc_logf("\n           : shift/reduce conflict (%sshift %d, %sreduce %d) on %s\n\n",
+								(new_pref == pref ? "" : "DO NOT "), number, (new_pref != pref ? "" : "DO NOT "), p->number - 2, symbol_name[symbol]);
+					}
+					else
+					{
+						BtYacc_logf("\n           : reduce/reduce conflict (%sreduce %d, %sreduce %d) on %s\n\n",
+								(new_pref == pref ? "" : "DO NOT "), number - 2, (new_pref != pref ? "" : "DO NOT "), p->number - 2, symbol_name[symbol]);
+					}
+				}
+			}
+
+			pref = new_pref;
         }
         SRtotal += SRcount;
         RRtotal += RRcount;

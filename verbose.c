@@ -259,24 +259,37 @@ void print_actions(int stateno)
 void print_shifts(action const * p)
 {
     register int count;
-    register action const * q;
+    register action const * q = p;
 
-    count = 0;
-    for (q = p; q; q = q->next)
+    for (; p; p = p->next)
     {
-        if (q->suppressed < 2 && q->action_code == SHIFT)
-            ++count;
+        if (p->action_code == SHIFT && p->suppressed == 0)
+            BtYacc_printf(verbose_file, "\t%s  shift %d\n",
+                        symbol_name[p->symbol], p->number);
     }
 
-    if (count > 0)
-    {
-        for (; p; p = p->next)
-        {
-            if (p->action_code == SHIFT && p->suppressed == 0)
-                BtYacc_printf(verbose_file, "\t%s  shift %d\n",
-                            symbol_name[p->symbol], p->number);
-        }
-    }
+	if (tflag > 1)
+	{
+		count = 0;
+
+		for (p = q; p; p = p->next)
+		{
+			if (p->action_code == SHIFT && p->suppressed > 0)
+			{
+				if (count == 0)
+				{
+					BtYacc_printf(verbose_file, "\tSUPRESSED shift actions:\n"
+												"\t------------------------\n");
+				}
+				++count;
+				BtYacc_printf(verbose_file, "\t%s  shift %d        %s\n",
+							symbol_name[p->symbol], p->number,
+							(p->suppressed > 1 ? 
+							 "SUPRESSED by explicit (user-supplied) precedence or associativity" :
+							 "SUPRESSED by YACC due to default CONFLICT resolve mechanism"));
+			}
+		}
+	}
 }
 
 
@@ -294,9 +307,12 @@ void print_reductions(action const * p, int default_reduction)
             break;
         }
     }
+	q = p;
 
     if (anyreds == 0)
-        BtYacc_puts("\t.  error\n", verbose_file);
+    {
+		BtYacc_puts("\t.  error\n", verbose_file);
+	}
     else
     {
         for (; p; p = p->next)
@@ -313,6 +329,61 @@ void print_reductions(action const * p, int default_reduction)
         if (default_reduction > 0)
             BtYacc_printf(verbose_file, "\t.  reduce %d\n", default_reduction - 2);
     }
+
+	if (tflag > 1)
+	{
+		int count = 0;
+		int suppr_defred = 0;
+
+        for (p = q; p; p = p->next)
+        {
+			if (p->action_code == REDUCE && p->suppressed > 0)
+            {
+				if (count == 0)
+				{
+					BtYacc_printf(verbose_file, "\tSUPRESSED reduce actions:\n"
+												"\t-------------------------\n");
+				}
+				++count;
+
+				k = p->number - 2;
+				if (p->number == default_reduction)
+				{
+					suppr_defred |= p->suppressed;
+				}
+				else
+				{
+	                BtYacc_printf(verbose_file, "\t%s  reduce %d        %s\n",
+		                    symbol_name[p->symbol], k,
+							(p->suppressed > 1 ? 
+							 "SUPRESSED by explicit (user-supplied) precedence or associativity" :
+							 "SUPRESSED by YACC due to default CONFLICT resolve mechanism"));
+				}
+            }
+        }
+
+        if (default_reduction > 0 && suppr_defred > 0)
+		{
+			if (count == 0)
+			{
+				BtYacc_printf(verbose_file, "\tSUPRESSED reduce actions:\n"
+											"\t-------------------------\n");
+			}
+			++count;
+			if (suppr_defred & 1)
+			{
+				BtYacc_printf(verbose_file, "\t.  reduce %d        %s\n", 
+						default_reduction - 2,
+						"SUPRESSED by YACC due to default CONFLICT resolve mechanism");
+			}
+			if (suppr_defred & 2)
+			{
+				BtYacc_printf(verbose_file, "\t.  reduce %d        %s\n", 
+						default_reduction - 2,
+						"SUPRESSED by explicit (user-supplied) precedence or associativity");
+			}
+		}
+	}
 }
 
 

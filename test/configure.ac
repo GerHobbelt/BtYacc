@@ -26,7 +26,7 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([alarm memset strncasecmp strpbrk stricmp strupr getch getche tcgetattr tcsetattr])
+AC_CHECK_FUNCS([alarm memset strncasecmp strcasecmp strpbrk strnicmp stricmp strupr getch getche tcgetattr tcsetattr vsnprintf snprintf])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

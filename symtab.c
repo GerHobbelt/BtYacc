@@ -16,18 +16,18 @@ bucket *first_symbol = NULL;
 bucket *last_symbol = NULL;
 
 
-int hash(char const * name)
+unsigned int hash(char const * name)
 {
-    register char const * s;
-    register int c, k;
+    register unsigned char const * s;
+    register unsigned int c, k;
 
     assert(name && *name);
-    s = name;
+    s = (unsigned char const *)name;
     k = *s;
     while ((c = *++s))
         k = (31 * k + c) & (TABLE_SIZE - 1);
 
-    return (k);
+    return k;
 }
 
 

@@ -13,7 +13,7 @@
 #define HAVE_GETCHE 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
+#undef HAVE_INTTYPES_H 
 
 /* Define to 1 if your system has a GNU libc compatible `malloc' function, and
    to 0 otherwise. */
@@ -26,7 +26,7 @@
 #define HAVE_MEMSET 1
 
 /* Define to 1 if you have the <netinet/in.h> header file. */
-#define HAVE_NETINET_IN_H 1
+#undef HAVE_NETINET_IN_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
@@ -38,7 +38,7 @@
 #define HAVE_STRICMP 1
 
 /* Define to 1 if you have the <strings.h> header file. */
-#define HAVE_STRINGS_H 1
+#undef HAVE_STRINGS_H 
 
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
@@ -50,13 +50,13 @@
 #define HAVE_STRPBRK 1
 
 /* Define to 1 if you have the <syslog.h> header file. */
-#define HAVE_SYSLOG_H 1
+#undef HAVE_SYSLOG_H
 
 /* Define to 1 if you have the <sys/param.h> header file. */
-#define HAVE_SYS_PARAM_H 1
+#undef HAVE_SYS_PARAM_H 
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
-#define HAVE_SYS_SOCKET_H 1
+#undef HAVE_SYS_SOCKET_H
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
@@ -71,10 +71,10 @@
 #define HAVE_TCSETATTR 1
 
 /* Define to 1 if you have the <termios.h> header file. */
-#define HAVE_TERMIOS_H 1
+#undef HAVE_TERMIOS_H
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#define HAVE_UNISTD_H 1
+#undef HAVE_UNISTD_H 
 
 /* Define to 1 if the system has the type `_Bool'. */
 #define HAVE__BOOL 1

@@ -72,6 +72,10 @@ typedef short int Yshort;
 #ifndef _YACC_EXTERN_
 #define _YACC_EXTERN_ "C"
 #endif
+#else
+#ifndef _YACC_EXTERN_
+#define _YACC_EXTERN_ /**/
+#endif
 #endif
 
 extern _YACC_EXTERN_ Yshort yylhs[];
@@ -370,6 +374,19 @@ static void btyacc_debug_log_partial(const char *msg, ...);
 #define BTYACC_DEBUG_LOG_EOL            btyacc_debug_log_eol
 static void btyacc_debug_log_eol(const char *msg, ...);
 #endif
+
+
+
+#if defined(YYERROR_DETAILED)
+#if !defined(yyerror_detailed)
+extern _YACC_EXTERN_ void yyerror_detailed(const char *msg, int lexed_token, YYSTYPE yylval, YYPOSN yyposn, unsigned int yystate);
+#endif
+#else
+#if !defined(yyerror)
+extern _YACC_EXTERN_ void yyerror(const char *msg);
+#endif
+#endif
+
 
 
 /*

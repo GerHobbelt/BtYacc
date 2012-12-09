@@ -847,10 +847,9 @@ void open_output_files(void)
 struct section *active_section_list = NULL;
 
 
-
 int main(int argc, char **argv)
 {
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && 0
 	os_init_heap();
 #endif
 	

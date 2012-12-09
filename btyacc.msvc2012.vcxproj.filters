@@ -22,6 +22,15 @@
     <Filter Include="Extra Files\Test Files">
       <UniqueIdentifier>{b8cf5d91-e395-4b75-885e-23efdfb69671}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Extra Files\Test Files\Framework code">
+      <UniqueIdentifier>{5c9612ed-c57d-49af-a8cc-30c74462f5a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extra Files\Test Files\Misc">
+      <UniqueIdentifier>{bdffe1f7-30fc-4534-b835-80f2b0b012ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extra Files\Test Files\Grammars">
+      <UniqueIdentifier>{cc82a99e-8bce-40fe-8b5a-b0e8bb527d5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="closure.c">
@@ -95,6 +104,21 @@
     <ClInclude Include="write.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="test\portability-config-MingW.h">
+      <Filter>Extra Files\Test Files\Framework code</Filter>
+    </ClInclude>
+    <ClInclude Include="test\portability-config-MSVC.h">
+      <Filter>Extra Files\Test Files\Framework code</Filter>
+    </ClInclude>
+    <ClInclude Include="test\test-framework-header.h">
+      <Filter>Extra Files\Test Files\Framework code</Filter>
+    </ClInclude>
+    <ClInclude Include="test\test-framework-porting-lib.h">
+      <Filter>Extra Files\Test Files\Framework code</Filter>
+    </ClInclude>
+    <ClInclude Include="test\test-framework-tail.h">
+      <Filter>Extra Files\Test Files\Framework code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="btyacc.ico">
@@ -167,37 +191,85 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="test\ansiC.y">
-      <Filter>Extra Files\Test Files</Filter>
+      <Filter>Extra Files\Test Files\Grammars</Filter>
     </None>
     <None Include="test\ansiC2.y">
-      <Filter>Extra Files\Test Files</Filter>
-    </None>
-    <None Include="test\empty.y">
-      <Filter>Extra Files\Test Files</Filter>
-    </None>
-    <None Include="test\error.y">
-      <Filter>Extra Files\Test Files</Filter>
-    </None>
-    <None Include="test\firebird.y">
-      <Filter>Extra Files\Test Files</Filter>
-    </None>
-    <None Include="test\ftp.y">
-      <Filter>Extra Files\Test Files</Filter>
-    </None>
-    <None Include="test\t1.y">
-      <Filter>Extra Files\Test Files</Filter>
-    </None>
-    <None Include="test\t2.y">
-      <Filter>Extra Files\Test Files</Filter>
-    </None>
-    <None Include="test\test.y">
-      <Filter>Extra Files\Test Files</Filter>
+      <Filter>Extra Files\Test Files\Grammars</Filter>
     </None>
     <None Include="test\bison-mysterious-reduce-reduce.y">
-      <Filter>Extra Files\Test Files</Filter>
+      <Filter>Extra Files\Test Files\Grammars</Filter>
+    </None>
+    <None Include="test\aclocal.m4">
+      <Filter>Extra Files\Test Files\Misc</Filter>
+    </None>
+    <None Include="test\bootstrap.sh">
+      <Filter>Extra Files\Test Files\Misc</Filter>
+    </None>
+    <None Include="test\ChangeLog">
+      <Filter>Extra Files\Test Files\Misc</Filter>
+    </None>
+    <None Include="test\configure.ac">
+      <Filter>Extra Files\Test Files\Misc</Filter>
+    </None>
+    <None Include="test\COPYING">
+      <Filter>Extra Files\Test Files\Misc</Filter>
+    </None>
+    <None Include="test\empty.y">
+      <Filter>Extra Files\Test Files\Grammars</Filter>
+    </None>
+    <None Include="test\error.y">
+      <Filter>Extra Files\Test Files\Grammars</Filter>
+    </None>
+    <None Include="test\firebird.y">
+      <Filter>Extra Files\Test Files\Grammars</Filter>
+    </None>
+    <None Include="test\ftp.y">
+      <Filter>Extra Files\Test Files\Grammars</Filter>
+    </None>
+    <None Include="test\htcobol.y">
+      <Filter>Extra Files\Test Files\Grammars</Filter>
+    </None>
+    <None Include="test\pp_parser.y">
+      <Filter>Extra Files\Test Files\Grammars</Filter>
+    </None>
+    <None Include="test\t1.y">
+      <Filter>Extra Files\Test Files\Grammars</Filter>
+    </None>
+    <None Include="test\t2.y">
+      <Filter>Extra Files\Test Files\Grammars</Filter>
+    </None>
+    <None Include="test\test-associativity.y">
+      <Filter>Extra Files\Test Files\Grammars</Filter>
+    </None>
+    <None Include="test\NEWS">
+      <Filter>Extra Files\Test Files\Misc</Filter>
+    </None>
+    <None Include="test\missing">
+      <Filter>Extra Files\Test Files\Misc</Filter>
+    </None>
+    <None Include="test\Makefile.am">
+      <Filter>Extra Files\Test Files\Misc</Filter>
+    </None>
+    <None Include="test\install-sh">
+      <Filter>Extra Files\Test Files\Misc</Filter>
+    </None>
+    <None Include="test\INSTALL">
+      <Filter>Extra Files\Test Files\Misc</Filter>
+    </None>
+    <None Include="test\README">
+      <Filter>Extra Files\Test Files\Misc</Filter>
+    </None>
+    <None Include="test\portability-config.h.in">
+      <Filter>Extra Files\Test Files\Framework code</Filter>
+    </None>
+    <None Include="test\test-precedence-2.y">
+      <Filter>Extra Files\Test Files\Grammars</Filter>
     </None>
     <None Include="test\test-precedence.y">
-      <Filter>Extra Files\Test Files</Filter>
+      <Filter>Extra Files\Test Files\Grammars</Filter>
+    </None>
+    <None Include="test\test.y">
+      <Filter>Extra Files\Test Files\Grammars</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

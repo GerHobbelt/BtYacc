@@ -357,6 +357,11 @@
     <ClInclude Include="log.h" />
     <ClInclude Include="mstring.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="test\portability-config-MingW.h" />
+    <ClInclude Include="test\portability-config-MSVC.h" />
+    <ClInclude Include="test\test-framework-header.h" />
+    <ClInclude Include="test\test-framework-porting-lib.h" />
+    <ClInclude Include="test\test-framework-tail.h" />
     <ClInclude Include="write.h" />
   </ItemGroup>
   <ItemGroup>
@@ -454,15 +459,31 @@
     </CustomBuild>
     <None Include="README.Debian" />
     <None Include="skel2c" />
+    <None Include="test\aclocal.m4" />
     <None Include="test\ansiC.y" />
     <None Include="test\ansiC2.y" />
     <None Include="test\bison-mysterious-reduce-reduce.y" />
+    <None Include="test\bootstrap.sh" />
+    <None Include="test\ChangeLog" />
+    <None Include="test\configure.ac" />
+    <None Include="test\COPYING" />
     <None Include="test\empty.y" />
     <None Include="test\error.y" />
     <None Include="test\firebird.y" />
     <None Include="test\ftp.y" />
+    <None Include="test\htcobol.y" />
+    <None Include="test\INSTALL" />
+    <None Include="test\install-sh" />
+    <None Include="test\Makefile.am" />
+    <None Include="test\missing" />
+    <None Include="test\NEWS" />
+    <None Include="test\portability-config.h.in" />
+    <None Include="test\pp_parser.y" />
+    <None Include="test\README" />
     <None Include="test\t1.y" />
     <None Include="test\t2.y" />
+    <None Include="test\test-associativity.y" />
+    <None Include="test\test-precedence-2.y" />
     <None Include="test\test-precedence.y" />
     <None Include="test\test.y" />
     <None Include="VERSION.TXT" />

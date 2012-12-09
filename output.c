@@ -1027,7 +1027,7 @@ done_this_char:
             buflen = 1 + strlen(literal_token_naming_tpl) + strlen(file_uc_prefix);
             dp = MALLOC(buflen);
             if (!dp) no_space();
-            snprintf(dp, buflen, literal_token_naming_tpl, file_uc_prefix);
+            sprintf(dp, literal_token_naming_tpl, file_uc_prefix);
 
             /*
             Now we have an expanded template, where the '%%s' in there is now a '%s' 
@@ -1036,7 +1036,7 @@ done_this_char:
             buflen = 1 + strlen(dp) + strlen(symstr);
             s = MALLOC(buflen);
             if (!s) no_space();
-            snprintf(s, buflen, dp, symstr);
+            sprintf(s, dp, symstr);
 
             FREE(symstr);
             FREE(dp);

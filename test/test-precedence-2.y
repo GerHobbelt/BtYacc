@@ -11,7 +11,7 @@
 %prec '=' '<' '>'
 %prec '(' ')'
 
-%token NUM
+%token NUMBER
 
 %%
 
@@ -37,7 +37,7 @@ expr: expr '+' expr								%left
 	  = { $$ = -$2; };
     | '+' expr					
 	  = { $$ = $2; };
-    | '!' expr				%prefer		
+    | '!' expr									%prefer		
 	  = { $$ = fabs($2) <= EPSILON; };
     | expr '%'					
 	  = { $$ = $2 / 100.0; };
@@ -46,40 +46,10 @@ expr: expr '+' expr								%left
     ;
 
 value: 
-	  digit
+	  NUMBER
 	  = { $$ = $1; };
-	| value digit
-	  = { $$ = $1 * 10 + $2; };
-	;
-
-digit:
-	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
-	  = { $$ = $1 - '0'; };
 	;
 
 %%
 
-void yyerror(const char *msg)
-{
-    fprintf(stderr, "%s\n", msg);
-}
-int yylex(void)
-{
-    int ch;
-
-    do
-    {
-        ch = getchar();
-    } while (ch == ' ' || ch == '\n' || ch == '\t');
-    if (ch == EOF || ch == '\x04' /* Control-D */ )
-        return 0;
-    printf("lex -> $%02X '%c'\n", ch, (isprint(ch) ? ch : '?'));
-    return ch;
-}
-int main(void)
-{
-    fprintf(stderr, "Enter a sequence\n");
-    yydebug = 1;
-    fprintf(stderr, "yyparse = %d\n", yyparse());
-    return 0;
-}
+#include "test-framework-tail.h"
