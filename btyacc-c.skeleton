@@ -218,45 +218,45 @@ YYSTYPE yyretlval;
 YYPOSN  yyretposn;
 
 #define YYABORT                                     \
-                        do                                      \
-                        {                                       \
-                            yymode = YY_EXIT_ABORT;               \
-                            goto past_the_reduce_actions;         \
-                        } while (0)
+    do                                              \
+    {                                               \
+        yymode = YY_EXIT_ABORT;                     \
+        goto past_the_reduce_actions;               \
+    } while (0)
 #define YYACCEPT                                    \
-                        do                                      \
-                        {                                       \
-                            if (yytrial)                          \
-                                yymode = YY_DO_ACCEPT_RULE;         \ 
-                            else                                  \
-                                yymode = YY_EXIT_ACCEPT;            \ 
-                            goto past_the_reduce_actions;         \
-                        } while(0)
+    do                                              \
+    {                                               \
+        if (yytrial)                                \
+            yymode = YY_DO_ACCEPT_RULE;             \ 
+        else                                        \
+            yymode = YY_EXIT_ACCEPT;                \ 
+        goto past_the_reduce_actions;               \
+    } while(0)
 #define YYERROR                                     \ 
-                        do                                      \
-                        {                                       \
-                            yymode = YY_RAN_INTO_ERROR;           \
-                            goto past_the_reduce_actions;         \
-                        } while (0)
+    do                                              \
+    {                                               \
+        yymode = YY_RAN_INTO_ERROR;                 \
+        goto past_the_reduce_actions;               \
+    } while (0)
 #define YYVALID                                     \
-                        do                                      \
-                        {                                       \
-                            if (yytrial)                          \
-                            {                                     \
-                                yymode = YY_DO_ACCEPT_RULE;         \
-                                goto past_the_reduce_actions;       \
-                            }                                     \
-                        } while(0)
+    do                                              \
+    {                                               \
+        if (yytrial)                                \
+        {                                           \
+            yymode = YY_DO_ACCEPT_RULE;             \
+            goto past_the_reduce_actions;           \
+        }                                           \
+    } while(0)
 #define YYVALID_NESTED                              \
-                        do                                      \
-                        {                                       \
-                            if (yytrial                           \
-                                    && yytrial->save == 0)            \
-                            {                                     \
-                                yymode = YY_DO_ACCEPT_RULE;         \
-                                goto past_the_reduce_actions;       \
-                            }                                     \
-                        } while(0)
+    do                                              \
+    {                                               \
+        if (yytrial                                 \
+            && yytrial->save == 0)                  \
+        {                                           \
+            yymode = YY_DO_ACCEPT_RULE;             \
+            goto past_the_reduce_actions;           \
+        }                                           \
+    } while(0)
 
 struct YYParseState_s
 {
@@ -458,7 +458,7 @@ void yyerror(const char *msg);
  */
 int yyparse(void)
 {
-    int yychar, yynewerrflag;
+    int yyn, yychar, yynewerrflag;
     int unsigned yystate;
     YYParseState *yyerrctx = 0;
 
@@ -502,9 +502,6 @@ int yyparse(void)
 
 
     /* Main parsing loop */
-    {
-    int yyn;
-
 yyloop:
     for(;;)
     {
@@ -608,7 +605,7 @@ yyloop:
                 {
                     BTYACC_DEBUG_LOG_EOL("btyacc[%s]: backtracking 1 token: %d (%s)\n",
                                     (yytrial ? "trial" : "---"),
-                                    ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
+                                    yychar, ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
                 }
 #endif
 
@@ -1237,7 +1234,6 @@ case YY_EXIT_ACCEPT:
         yyFreeState(&save);
     }
     return 0;
-    }
     }
     }
 }

@@ -1,5 +1,5 @@
 /*
-** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\btyaccpa.skeleton
+** This file generated automatically from btyaccpa.skeleton
 */
 
 #include "defs.h"
@@ -105,10 +105,10 @@ static char const * const tables[] =
     "",
     "extern _YACC_EXTERN_ Yshort yydgoto[];",
     "",
-    "/* ",
+    "/*",
     " * idx: current state; entry: non-zero if shifting|reducing possible",
     " *      in this state - in that case, yycheck[entry + lookahead] indicates",
-    " *      whether to perform the action for this lookahead. ",
+    " *      whether to perform the action for this lookahead.",
     " */",
     "extern _YACC_EXTERN_ Yshort yysindex[];",
     "extern _YACC_EXTERN_ Yshort yyrindex[];",
@@ -116,7 +116,7 @@ static char const * const tables[] =
     "/*",
     " * yycindex idx: current state; entry: non-zero if shift/reduce",
     " *               conflicts for this state - in that case, yycheck[entry + lookahead]",
-    " *               indicates whether there's a conflict for this lookahead ",
+    " *               indicates whether there's a conflict for this lookahead",
     " */",
     "extern _YACC_EXTERN_ Yshort yycindex[];",
     "extern _YACC_EXTERN_ Yshort yycheck[];",
@@ -127,7 +127,7 @@ static char const * const tables[] =
     "",
     "#if YYDEBUG",
     "/*",
-    " * idx: token code; entry: spelling of token ",
+    " * idx: token code; entry: spelling of token",
     " */",
     "extern _YACC_EXTERN_ char const *yyname[];",
     "",
@@ -175,20 +175,20 @@ static char const * const header[] =
     " * i.e. the $$ value for that rule.",
     " */",
     "#ifdef YYREDUCEPOSNFUNC",
-    "#define YYCALLREDUCEPOSN(e)\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\",
-    "\tif (reduce_posn)\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\",
-    "\t{\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\",
-    "\t    YYREDUCEPOSNFUNC(yyps->pos, &(yyps->psp)[1 - yym], &(yyps->vsp)[1 - yym],\t\t\\",
-    "\t                     yym, yyps->psp - yyps->ps, yychar, yyposn, e);                 \\",
-    "\t    reduce_posn = 0;\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\\",
-    "\t}",
+    "#define YYCALLREDUCEPOSN(e)                                                                                     \\",
+    "    if (reduce_posn)                                                                                            \\",
+    "    {                                                                                                           \\",
+    "        YYREDUCEPOSNFUNC(yyps->pos, &(yyps->psp)[1 - yyruletokencount], &(yyps->vsp)[1 - yyruletokencount],     \\",
+    "                         yyruletokencount, yyps->psp - yyps->ps, yychar, yyposn, e);                            \\",
+    "        reduce_posn = 0;                                                                                        \\",
+    "    }",
     "",
     "#ifndef YYREDUCEPOSNFUNCARG",
     "#define YYREDUCEPOSNFUNCARG (yyps->val)",
     "#endif",
     "",
     "",
-    "#define YYPOSNARG(n) (yyps->psp[1 - yym + (n) - 1])",
+    "#define YYPOSNARG(n) (yyps->psp[1 - yyruletokencount + (n) - 1])",
     "#define YYPOSNOUT    (yyps->pos)",
     "#endif",
     "",
@@ -244,18 +244,19 @@ static char const * const header[] =
     "#define YYACCEPT goto yyaccept",
     "#define YYERROR  goto yyerrlab",
     "#define YYVALID                                     \\",
-    "    do\t\t\t\t\t\t\t\t\t\t\t\t\\",
-    "\t{\t\t\t\t\t\t\t\t\t\t\t\t\\",
-    "        if (yytrial)\t\t\t\t\t\t\t\t\\",
-    "            goto yyvalid;\t\t\t\t\t\t\t\\",
+    "    do                                              \\",
+    "    {                                               \\",
+    "        if (yytrial)                                \\",
+    "            goto yyvalid;                           \\",
     "    } while(0)",
     "#define YYVALID_NESTED                              \\",
-    "    do {\t\t\t\t\t\t\t\t\t\t\t\\",
-    "        if (yytrial\t\t\t\t\t\t\t\t\t\\",
-    "            && yytrial->save == 0)\t\t\t\t\t\\",
-    "\t\t{\t\t\t\t\t\t\t\t\t\t\t\\",
-    "            goto yyvalid;\t\t\t\t\t\t\t\\",
-    "\t\t}\t\t\t\t\t\t\t\t\t\t\t\\",
+    "    do                                              \\",
+    "    {                                               \\",
+    "        if (yytrial                                 \\",
+    "            && yytrial->save == 0)                  \\",
+    "        {                                           \\",
+    "            goto yyvalid;                           \\",
+    "        }                                           \\",
     "    } while(0)",
     "",
     "struct YYParseState_s",
@@ -421,7 +422,7 @@ static char const * const header[] =
 
 static char const * const body[] =
 {
-    "#line 395 \"btyaccpa.skeleton\"",
+    "#line 396 \"btyaccpa.skeleton\"",
     "",
     "",
     "",
@@ -463,7 +464,7 @@ static char const * const body[] =
     " */",
     "int yyparse(void)",
     "{",
-    "    int yym, yyn, yychar, yynewerrflag;",
+    "    int yyn, yychar, yynewerrflag;",
     "    int unsigned yystate;",
     "    YYParseState *yyerrctx = 0;",
     "",
@@ -515,7 +516,7 @@ static char const * const body[] =
     "            if (!yys)",
     "                yys = \"illegal-symbol\";",
     "            BTYACC_DEBUG_LOG_PARTIAL(\"btyacc[%3u,%2d%s]: read token %d (%s)\",",
-    "\t\t\t                yystate, yydepth, (yytrial ? \",trial\" : \"\"), yychar, yys);",
+    "                            yystate, yydepth, (yytrial ? \",trial\" : \"\"), yychar, yys);",
     "#ifdef YYDBPR",
     "            BTYACC_DEBUG_LOG_PARTIAL(\" <\");",
     "            YYDBPR(yylval);",
@@ -779,7 +780,7 @@ static char const * const body[] =
     "            if (yydebug)",
     "            {",
     "                BTYACC_DEBUG_LOG_EOL(\"btyacc[%3u,%2d%s]:%s parse FAILED, entering ERROR mode\\n\",",
-    "\t                            yystate, yydepth, (yytrial ? \",trial\" : \"\"), (yytrial ? \" trial\" : \"\"));",
+    "                                yystate, yydepth, (yytrial ? \",trial\" : \"\"), (yytrial ? \" trial\" : \"\"));",
     "            }",
     "#endif",
     "            /* Restore state as it was in the most forward-advanced error */",
@@ -889,7 +890,8 @@ static char const * const body[] =
     "",
     "    /* Reduce the rule */",
     "yyreduce:",
-    "    yym = yylen[yyn];",
+    "    {",
+    "    int yyruletokencount = yylen[yyn];",
     "#if YYDEBUG",
     "    if (yydebug)",
     "    {",
@@ -897,13 +899,13 @@ static char const * const body[] =
     "                        yystate, yydepth, (yytrial ? \",trial\" : \"\"), yyn, yyrule[yyn],",
     "                        yychar, ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : \"???\"));",
     "#ifdef YYDBPR",
-    "        if (yym > 0)",
+    "        if (yyruletokencount > 0)",
     "        {",
     "            int i;",
     "            BTYACC_DEBUG_LOG_PARTIAL(\" <\");",
-    "            for (i = yym; i > 0; --i)",
+    "            for (i = yyruletokencount; i > 0; --i)",
     "            {",
-    "                if (i != yym)",
+    "                if (i != yyruletokencount)",
     "                    BTYACC_DEBUG_LOG_PARTIAL(\", \");",
     "                YYDBPR(yyps->vsp[1 - i]);",
     "            }",
@@ -913,7 +915,7 @@ static char const * const body[] =
     "        BTYACC_DEBUG_LOG_EOL(\"\\n\");",
     "    }",
     "#endif",
-    "    if (yyps->ssp + 1 - yym >= yyps->ss + yyps->stacksize)",
+    "    if (yyps->ssp + 1 - yyruletokencount >= yyps->ss + yyps->stacksize)",
     "    {",
     "        if (yyMoreStack(yyps))",
     "            goto heap_alloc_error;",
@@ -929,9 +931,9 @@ static char const * const body[] =
     "#endif",
     "#else",
     "    /* RA: bison compatibility: default action is '$$ = $1;' */",
-    "    if (yym > 0)",
+    "    if (yyruletokencount > 0)",
     "    {",
-    "        yyps->val = yyps->vsp[1 - yym];",
+    "        yyps->val = yyps->vsp[1 - yyruletokencount];",
     "    }",
     "#endif",
     "",
@@ -959,7 +961,7 @@ static char const * const body[] =
 
 static char const * const trailer[] =
 {
-    "#line 928 \"btyaccpa.skeleton\"",
+    "#line 930 \"btyaccpa.skeleton\"",
     "",
     "    default:",
     "        break;",
@@ -985,12 +987,14 @@ static char const * const trailer[] =
     "    }",
     "#endif",
     "",
-    "    yyps->ssp -= yym;",
+    "    yyps->ssp -= yyruletokencount;",
     "    yystate = *(yyps->ssp);",
-    "    yyps->vsp -= yym;",
-    "    yyps->psp -= yym;",
+    "    yyps->vsp -= yyruletokencount;",
+    "    yyps->psp -= yyruletokencount;",
+    "    }",
     "",
-    "    yym = yylhs[yyn];",
+    "    {",
+    "    int yym = yylhs[yyn];",
     "    if (yystate == 0 && yym == 0)",
     "    {",
     "#if YYDEBUG",
@@ -1167,6 +1171,7 @@ static char const * const trailer[] =
     "        yyFreeState(&save);",
     "    }",
     "    return 0;",
+    "    }",
     "}",
     "",
     "",
@@ -1184,10 +1189,10 @@ static char const * const trailer[] =
     "    {",
     "        /* in trial mode; save scanner results for future parse attempts */",
     "        if (yylvp == yylvlim)",
-    "\t\t{",
+    "        {",
     "            if (yyExpand())",
     "                return -2;",
-    "\t\t}",
+    "        }",
     "        *yylexp = yylex();",
     "        *yylvp++ = yylval;",
     "        ++yylve;",
@@ -1463,7 +1468,7 @@ static char const * const trailer[] =
 
 static char const * const line_position[] =
 {
-    "#line 1427 \"btyaccpa.skeleton\"",
+    "#line 1432 \"btyaccpa.skeleton\"",
     "#line %d \"%s\"",
     "",
     0
@@ -1471,21 +1476,21 @@ static char const * const line_position[] =
 
 static char const * const comment_start[] =
 {
-    "#line 1430 \"btyaccpa.skeleton\"",
+    "#line 1435 \"btyaccpa.skeleton\"",
     "/*",
     0
 };
 
 static char const * const comment_next_line[] =
 {
-    "#line 1432 \"btyaccpa.skeleton\"",
+    "#line 1437 \"btyaccpa.skeleton\"",
     "**",
     0
 };
 
 static char const * const comment_end[] =
 {
-    "#line 1434 \"btyaccpa.skeleton\"",
+    "#line 1439 \"btyaccpa.skeleton\"",
     "*/",
     "",
     0
@@ -1493,7 +1498,7 @@ static char const * const comment_end[] =
 
 static char const * const action_case_start[] =
 {
-    "#line 1437 \"btyaccpa.skeleton\"",
+    "#line 1442 \"btyaccpa.skeleton\"",
     "    case %d:",
     "",
     0
@@ -1501,7 +1506,7 @@ static char const * const action_case_start[] =
 
 static char const * const action_code[] =
 {
-    "#line 1440 \"btyaccpa.skeleton\"",
+    "#line 1445 \"btyaccpa.skeleton\"",
     "        %s;",
     "",
     "",
@@ -1510,7 +1515,7 @@ static char const * const action_code[] =
 
 static char const * const action_case_end[] =
 {
-    "#line 1444 \"btyaccpa.skeleton\"",
+    "#line 1449 \"btyaccpa.skeleton\"",
     "        break;",
     "",
     "",
@@ -1519,7 +1524,7 @@ static char const * const action_case_end[] =
 
 static char const * const action_if_not_yytrial_start[] =
 {
-    "#line 1448 \"btyaccpa.skeleton\"",
+    "#line 1453 \"btyaccpa.skeleton\"",
     "        if (!yytrial)",
     "        {",
     "",
@@ -1528,7 +1533,7 @@ static char const * const action_if_not_yytrial_start[] =
 
 static char const * const action_if_not_yytrial_end[] =
 {
-    "#line 1452 \"btyaccpa.skeleton\"",
+    "#line 1457 \"btyaccpa.skeleton\"",
     "",
     "        } /* end: if (!yytrial) */",
     "",
@@ -1537,84 +1542,84 @@ static char const * const action_if_not_yytrial_end[] =
 
 static char const * const action_block_start[] =
 {
-    "#line 1456 \"btyaccpa.skeleton\"",
+    "#line 1461 \"btyaccpa.skeleton\"",
     "{",
     0
 };
 
 static char const * const action_block_end[] =
 {
-    "#line 1458 \"btyaccpa.skeleton\"",
+    "#line 1463 \"btyaccpa.skeleton\"",
     "}",
     0
 };
 
 static char const * const yyval_tag_reference[] =
 {
-    "#line 1460 \"btyaccpa.skeleton\"",
+    "#line 1465 \"btyaccpa.skeleton\"",
     "yyval.%s",
     0
 };
 
 static char const * const yyval_reference[] =
 {
-    "#line 1462 \"btyaccpa.skeleton\"",
+    "#line 1467 \"btyaccpa.skeleton\"",
     "yyval",
     0
 };
 
 static char const * const yyvsp_tag_reference[] =
 {
-    "#line 1464 \"btyaccpa.skeleton\"",
+    "#line 1469 \"btyaccpa.skeleton\"",
     "yyvsp[%d].%s",
     0
 };
 
 static char const * const yyvsp_reference[] =
 {
-    "#line 1466 \"btyaccpa.skeleton\"",
+    "#line 1471 \"btyaccpa.skeleton\"",
     "yyvsp[%d]",
     0
 };
 
 static char const * const rflag_prefix[] =
 {
-    "#line 1468 \"btyaccpa.skeleton\"",
+    "#line 1473 \"btyaccpa.skeleton\"",
     "static",
     0
 };
 
 static char const * const not_rflag_prefix[] =
 {
-    "#line 1470 \"btyaccpa.skeleton\"",
+    "#line 1475 \"btyaccpa.skeleton\"",
     "",
     0
 };
 
 static char const * const int_table_start[] =
 {
-    "#line 1472 \"btyaccpa.skeleton\"",
+    "#line 1477 \"btyaccpa.skeleton\"",
     "%sYshort %29s[%5d] = {%5d%s",
     0
 };
 
 static char const * const int_table_entry[] =
 {
-    "#line 1474 \"btyaccpa.skeleton\"",
+    "#line 1479 \"btyaccpa.skeleton\"",
     "%5d%s",
     0
 };
 
 static char const * const int_table_entry_separator[] =
 {
-    "#line 1476 \"btyaccpa.skeleton\"",
+    "#line 1481 \"btyaccpa.skeleton\"",
     ",",
     0
 };
 
 static char const * const int_table_end[] =
 {
-    "#line 1478 \"btyaccpa.skeleton\"",
+    "#line 1483 \"btyaccpa.skeleton\"",
     "",
     "};",
     "",
@@ -1623,7 +1628,7 @@ static char const * const int_table_end[] =
 
 static char const * const table_size[] =
 {
-    "#line 1482 \"btyaccpa.skeleton\"",
+    "#line 1487 \"btyaccpa.skeleton\"",
     "",
     "",
     "#define YYTABLESIZE %d",
@@ -1635,7 +1640,7 @@ static char const * const table_size[] =
 
 static char const * const defines_file_protection_start[] =
 {
-    "#line 1489 \"btyaccpa.skeleton\"",
+    "#line 1494 \"btyaccpa.skeleton\"",
     "",
     "#ifndef _BTYACC_DEFINES_H_",
     "#define _BTYACC_DEFINES_H_",
@@ -1647,7 +1652,7 @@ static char const * const defines_file_protection_start[] =
 
 static char const * const defines_file_protection_end[] =
 {
-    "#line 1496 \"btyaccpa.skeleton\"",
+    "#line 1501 \"btyaccpa.skeleton\"",
     "",
     "",
     "#endif /* _BTYACC_DEFINES_H_ */",
@@ -1658,14 +1663,14 @@ static char const * const defines_file_protection_end[] =
 
 static char const * const token_charset[] =
 {
-    "#line 1502 \"btyaccpa.skeleton\"",
+    "#line 1507 \"btyaccpa.skeleton\"",
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$",
     0
 };
 
 static char const * const literal_token_name_template[] =
 {
-    "#line 1504 \"btyaccpa.skeleton\"",
+    "#line 1509 \"btyaccpa.skeleton\"",
     "YYSYMBOL_%%s",
     0
 };
@@ -1673,7 +1678,7 @@ static char const * const literal_token_name_template[] =
 
 static char const * const define_token[] =
 {
-    "#line 1509 \"btyaccpa.skeleton\"",
+    "#line 1514 \"btyaccpa.skeleton\"",
     "#define %-60s %5d",
     "",
     0
@@ -1681,7 +1686,7 @@ static char const * const define_token[] =
 
 static char const * const yystype_extern_decl[] =
 {
-    "#line 1512 \"btyaccpa.skeleton\"",
+    "#line 1517 \"btyaccpa.skeleton\"",
     "",
     "extern YYSTYPE yylval;",
     "",
@@ -1690,7 +1695,7 @@ static char const * const yystype_extern_decl[] =
 
 static char const * const define_default_yystype[] =
 {
-    "#line 1516 \"btyaccpa.skeleton\"",
+    "#line 1521 \"btyaccpa.skeleton\"",
     "",
     "#ifndef YYSTYPE",
     "typedef int YYSTYPE;",
@@ -1715,7 +1720,7 @@ static char const * const define_default_yystype[] =
 
 static char const * const union_decl_start[] =
 {
-    "#line 1536 \"btyaccpa.skeleton\"",
+    "#line 1541 \"btyaccpa.skeleton\"",
     "",
     "typedef union",
     0
@@ -1723,7 +1728,7 @@ static char const * const union_decl_start[] =
 
 static char const * const union_decl_end[] =
 {
-    "#line 1539 \"btyaccpa.skeleton\"",
+    "#line 1544 \"btyaccpa.skeleton\"",
     " yystype_t;",
     "#define YYSTYPE yystype_t",
     "",
@@ -1733,7 +1738,7 @@ static char const * const union_decl_end[] =
 
 static char const * const define_yymaxtoken[] =
 {
-    "#line 1544 \"btyaccpa.skeleton\"",
+    "#line 1549 \"btyaccpa.skeleton\"",
     "",
     "#define YYMAXTOKEN %5d",
     "",
@@ -1743,7 +1748,7 @@ static char const * const define_yymaxtoken[] =
 
 static char const * const define_yyfinal[] =
 {
-    "#line 1549 \"btyaccpa.skeleton\"",
+    "#line 1554 \"btyaccpa.skeleton\"",
     "",
     "#define YYFINAL %5d",
     "",
@@ -1753,7 +1758,7 @@ static char const * const define_yyfinal[] =
 
 static char const * const define_yydebug[] =
 {
-    "#line 1554 \"btyaccpa.skeleton\"",
+    "#line 1559 \"btyaccpa.skeleton\"",
     "",
     "#ifndef YYDEBUG",
     "#define YYDEBUG %d",
@@ -1765,14 +1770,14 @@ static char const * const define_yydebug[] =
 
 static char const * const debug_yy_null[] =
 {
-    "#line 1561 \"btyaccpa.skeleton\"",
+    "#line 1566 \"btyaccpa.skeleton\"",
     "0",
     0
 };
 
 static char const * const debug_yyname_strings_start[] =
 {
-    "#line 1563 \"btyaccpa.skeleton\"",
+    "#line 1568 \"btyaccpa.skeleton\"",
     "",
     "#if YYDEBUG",
     "%schar const *yyname[] = {",
@@ -1782,14 +1787,14 @@ static char const * const debug_yyname_strings_start[] =
 
 static char const * const debug_yyname_strings_separator[] =
 {
-    "#line 1568 \"btyaccpa.skeleton\"",
+    "#line 1573 \"btyaccpa.skeleton\"",
     ",",
     0
 };
 
 static char const * const debug_yyname_strings_end[] =
 {
-    "#line 1570 \"btyaccpa.skeleton\"",
+    "#line 1575 \"btyaccpa.skeleton\"",
     "};",
     "#endif",
     "",
@@ -1799,7 +1804,7 @@ static char const * const debug_yyname_strings_end[] =
 
 static char const * const debug_yyrule_strings_start[] =
 {
-    "#line 1575 \"btyaccpa.skeleton\"",
+    "#line 1580 \"btyaccpa.skeleton\"",
     "",
     "#if YYDEBUG",
     "%schar const *yyrule[] = {",
@@ -1809,14 +1814,14 @@ static char const * const debug_yyrule_strings_start[] =
 
 static char const * const debug_yyrule_strings_separator[] =
 {
-    "#line 1580 \"btyaccpa.skeleton\"",
+    "#line 1585 \"btyaccpa.skeleton\"",
     ",",
     0
 };
 
 static char const * const debug_yyrule_strings_end[] =
 {
-    "#line 1582 \"btyaccpa.skeleton\"",
+    "#line 1587 \"btyaccpa.skeleton\"",
     "};",
     "#endif",
     "",
@@ -1826,85 +1831,85 @@ static char const * const debug_yyrule_strings_end[] =
 
 static char const * const DEFINES_FILENAME[] =
 {
-    "#line 1587 \"btyaccpa.skeleton\"",
+    "#line 1592 \"btyaccpa.skeleton\"",
     "%s%s.tab.h",
     0
 };
 
 static char const * const OUTPUT_FILENAME[] =
 {
-    "#line 1589 \"btyaccpa.skeleton\"",
+    "#line 1594 \"btyaccpa.skeleton\"",
     "%s%s.tab.c",
     0
 };
 
 static char const * const CODE_FILENAME[] =
 {
-    "#line 1591 \"btyaccpa.skeleton\"",
+    "#line 1596 \"btyaccpa.skeleton\"",
     "%s%s.code.c",
     0
 };
 
 static char const * const VERBOSE_FILENAME[] =
 {
-    "#line 1593 \"btyaccpa.skeleton\"",
+    "#line 1598 \"btyaccpa.skeleton\"",
     "%s%s.output",
     0
 };
 
 struct section section_list_btyaccpa[] = {
-    { "language", &language[0] },
-    { "banner", &banner[0] },
-    { "tables", &tables[0] },
-    { "header", &header[0] },
-    { "body", &body[0] },
-    { "trailer", &trailer[0] },
-    { "line_position", &line_position[0] },
-    { "comment_start", &comment_start[0] },
-    { "comment_next_line", &comment_next_line[0] },
-    { "comment_end", &comment_end[0] },
-    { "action_case_start", &action_case_start[0] },
-    { "action_code", &action_code[0] },
-    { "action_case_end", &action_case_end[0] },
-    { "action_if_!yytrial_start", &action_if_not_yytrial_start[0] },
-    { "action_if_!yytrial_end", &action_if_not_yytrial_end[0] },
-    { "action_block_start", &action_block_start[0] },
-    { "action_block_end", &action_block_end[0] },
-    { "yyval.tag_reference", &yyval_tag_reference[0] },
-    { "yyval_reference", &yyval_reference[0] },
-    { "yyvsp.tag_reference", &yyvsp_tag_reference[0] },
-    { "yyvsp_reference", &yyvsp_reference[0] },
-    { "rflag_prefix", &rflag_prefix[0] },
-    { "!rflag_prefix", &not_rflag_prefix[0] },
-    { "int_table_start", &int_table_start[0] },
-    { "int_table_entry", &int_table_entry[0] },
-    { "int_table_entry_separator", &int_table_entry_separator[0] },
-    { "int_table_end", &int_table_end[0] },
-    { "table_size", &table_size[0] },
-    { "defines_file_protection_start", &defines_file_protection_start[0] },
-    { "defines_file_protection_end", &defines_file_protection_end[0] },
-    { "token_charset", &token_charset[0] },
-    { "literal_token_name_template", &literal_token_name_template[0] },
-    { "define_token", &define_token[0] },
-    { "yystype_extern_decl", &yystype_extern_decl[0] },
-    { "define_default_yystype", &define_default_yystype[0] },
-    { "union_decl_start", &union_decl_start[0] },
-    { "union_decl_end", &union_decl_end[0] },
-    { "define_yymaxtoken", &define_yymaxtoken[0] },
-    { "define_yyfinal", &define_yyfinal[0] },
-    { "define_yydebug", &define_yydebug[0] },
-    { "debug_yy_null", &debug_yy_null[0] },
-    { "debug_yyname_strings_start", &debug_yyname_strings_start[0] },
-    { "debug_yyname_strings_separator", &debug_yyname_strings_separator[0] },
-    { "debug_yyname_strings_end", &debug_yyname_strings_end[0] },
-    { "debug_yyrule_strings_start", &debug_yyrule_strings_start[0] },
-    { "debug_yyrule_strings_separator", &debug_yyrule_strings_separator[0] },
-    { "debug_yyrule_strings_end", &debug_yyrule_strings_end[0] },
-    { "DEFINES_FILENAME", &DEFINES_FILENAME[0] },
-    { "OUTPUT_FILENAME", &OUTPUT_FILENAME[0] },
-    { "CODE_FILENAME", &CODE_FILENAME[0] },
-    { "VERBOSE_FILENAME", &VERBOSE_FILENAME[0] },
-    { 0, 0 } };
+	{ "language", &language[0] },
+	{ "banner", &banner[0] },
+	{ "tables", &tables[0] },
+	{ "header", &header[0] },
+	{ "body", &body[0] },
+	{ "trailer", &trailer[0] },
+	{ "line_position", &line_position[0] },
+	{ "comment_start", &comment_start[0] },
+	{ "comment_next_line", &comment_next_line[0] },
+	{ "comment_end", &comment_end[0] },
+	{ "action_case_start", &action_case_start[0] },
+	{ "action_code", &action_code[0] },
+	{ "action_case_end", &action_case_end[0] },
+	{ "action_if_!yytrial_start", &action_if_not_yytrial_start[0] },
+	{ "action_if_!yytrial_end", &action_if_not_yytrial_end[0] },
+	{ "action_block_start", &action_block_start[0] },
+	{ "action_block_end", &action_block_end[0] },
+	{ "yyval.tag_reference", &yyval_tag_reference[0] },
+	{ "yyval_reference", &yyval_reference[0] },
+	{ "yyvsp.tag_reference", &yyvsp_tag_reference[0] },
+	{ "yyvsp_reference", &yyvsp_reference[0] },
+	{ "rflag_prefix", &rflag_prefix[0] },
+	{ "!rflag_prefix", &not_rflag_prefix[0] },
+	{ "int_table_start", &int_table_start[0] },
+	{ "int_table_entry", &int_table_entry[0] },
+	{ "int_table_entry_separator", &int_table_entry_separator[0] },
+	{ "int_table_end", &int_table_end[0] },
+	{ "table_size", &table_size[0] },
+	{ "defines_file_protection_start", &defines_file_protection_start[0] },
+	{ "defines_file_protection_end", &defines_file_protection_end[0] },
+	{ "token_charset", &token_charset[0] },
+	{ "literal_token_name_template", &literal_token_name_template[0] },
+	{ "define_token", &define_token[0] },
+	{ "yystype_extern_decl", &yystype_extern_decl[0] },
+	{ "define_default_yystype", &define_default_yystype[0] },
+	{ "union_decl_start", &union_decl_start[0] },
+	{ "union_decl_end", &union_decl_end[0] },
+	{ "define_yymaxtoken", &define_yymaxtoken[0] },
+	{ "define_yyfinal", &define_yyfinal[0] },
+	{ "define_yydebug", &define_yydebug[0] },
+	{ "debug_yy_null", &debug_yy_null[0] },
+	{ "debug_yyname_strings_start", &debug_yyname_strings_start[0] },
+	{ "debug_yyname_strings_separator", &debug_yyname_strings_separator[0] },
+	{ "debug_yyname_strings_end", &debug_yyname_strings_end[0] },
+	{ "debug_yyrule_strings_start", &debug_yyrule_strings_start[0] },
+	{ "debug_yyrule_strings_separator", &debug_yyrule_strings_separator[0] },
+	{ "debug_yyrule_strings_end", &debug_yyrule_strings_end[0] },
+	{ "DEFINES_FILENAME", &DEFINES_FILENAME[0] },
+	{ "OUTPUT_FILENAME", &OUTPUT_FILENAME[0] },
+	{ "CODE_FILENAME", &CODE_FILENAME[0] },
+	{ "VERBOSE_FILENAME", &VERBOSE_FILENAME[0] },
+	{ 0, 0 } };
 
 unsigned int section_list_btyaccpa_count = 51;
 

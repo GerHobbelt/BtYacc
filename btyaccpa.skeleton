@@ -151,12 +151,12 @@ extern _YACC_EXTERN_ char const *yyrule[];
  * i.e. the $$ value for that rule.
  */
 #ifdef YYREDUCEPOSNFUNC
-#define YYCALLREDUCEPOSN(e)                                                             \
-    if (reduce_posn)                                                                    \
-    {                                                                                   \
-        YYREDUCEPOSNFUNC(yyps->pos, &(yyps->psp)[1 - yym], &(yyps->vsp)[1 - yym],       \
-                         yym, yyps->psp - yyps->ps, yychar, yyposn, e);                 \
-        reduce_posn = 0;                                                                \
+#define YYCALLREDUCEPOSN(e)                                                                                     \
+    if (reduce_posn)                                                                                            \
+    {                                                                                                           \
+        YYREDUCEPOSNFUNC(yyps->pos, &(yyps->psp)[1 - yyruletokencount], &(yyps->vsp)[1 - yyruletokencount],     \
+                         yyruletokencount, yyps->psp - yyps->ps, yychar, yyposn, e);                            \
+        reduce_posn = 0;                                                                                        \
     }
 
 #ifndef YYREDUCEPOSNFUNCARG
@@ -164,7 +164,7 @@ extern _YACC_EXTERN_ char const *yyrule[];
 #endif
 
 
-#define YYPOSNARG(n) (yyps->psp[1 - yym + (n) - 1])
+#define YYPOSNARG(n) (yyps->psp[1 - yyruletokencount + (n) - 1])
 #define YYPOSNOUT    (yyps->pos)
 #endif
 
@@ -226,7 +226,8 @@ YYPOSN  yyretposn;
             goto yyvalid;                           \
     } while(0)
 #define YYVALID_NESTED                              \
-    do {                                            \
+    do                                              \
+    {                                               \
         if (yytrial                                 \
             && yytrial->save == 0)                  \
         {                                           \
@@ -434,7 +435,7 @@ void yyerror(const char *msg);
  */
 int yyparse(void)
 {
-    int yym, yyn, yychar, yynewerrflag;
+    int yyn, yychar, yynewerrflag;
     int unsigned yystate;
     YYParseState *yyerrctx = 0;
 
@@ -860,7 +861,8 @@ yyinrecovery:
 
     /* Reduce the rule */
 yyreduce:
-    yym = yylen[yyn];
+    {
+    int yyruletokencount = yylen[yyn];
 #if YYDEBUG
     if (yydebug)
     {
@@ -868,13 +870,13 @@ yyreduce:
                         yystate, yydepth, (yytrial ? ",trial" : ""), yyn, yyrule[yyn],
                         yychar, ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
 #ifdef YYDBPR
-        if (yym > 0)
+        if (yyruletokencount > 0)
         {
             int i;
             BTYACC_DEBUG_LOG_PARTIAL(" <");
-            for (i = yym; i > 0; --i)
+            for (i = yyruletokencount; i > 0; --i)
             {
-                if (i != yym)
+                if (i != yyruletokencount)
                     BTYACC_DEBUG_LOG_PARTIAL(", ");
                 YYDBPR(yyps->vsp[1 - i]);
             }
@@ -884,7 +886,7 @@ yyreduce:
         BTYACC_DEBUG_LOG_EOL("\n");
     }
 #endif
-    if (yyps->ssp + 1 - yym >= yyps->ss + yyps->stacksize)
+    if (yyps->ssp + 1 - yyruletokencount >= yyps->ss + yyps->stacksize)
     {
         if (yyMoreStack(yyps))
             goto heap_alloc_error;
@@ -900,9 +902,9 @@ yyreduce:
 #endif
 #else
     /* RA: bison compatibility: default action is '$$ = $1;' */
-    if (yym > 0)
+    if (yyruletokencount > 0)
     {
-        yyps->val = yyps->vsp[1 - yym];
+        yyps->val = yyps->vsp[1 - yyruletokencount];
     }
 #endif
 
@@ -951,12 +953,14 @@ yyreduce:
     }
 #endif
 
-    yyps->ssp -= yym;
+    yyps->ssp -= yyruletokencount;
     yystate = *(yyps->ssp);
-    yyps->vsp -= yym;
-    yyps->psp -= yym;
+    yyps->vsp -= yyruletokencount;
+    yyps->psp -= yyruletokencount;
+    }
 
-    yym = yylhs[yyn];
+    {
+    int yym = yylhs[yyn];
     if (yystate == 0 && yym == 0)
     {
 #if YYDEBUG
@@ -1133,6 +1137,7 @@ yyaccept:
         yyFreeState(&save);
     }
     return 0;
+    }
 }
 
 
