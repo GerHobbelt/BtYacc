@@ -100,7 +100,7 @@ void report_mem_analysis(void)
 void os_init_heap(void)
 {
 #if defined(_MSC_VER) && (defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(WIN64)) && defined(_DEBUG)
-	int i;
+    int i;
 
     /*
      * Hook in our client-defined reporting function.

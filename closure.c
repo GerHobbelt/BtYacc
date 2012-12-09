@@ -35,16 +35,16 @@ static void print_closure(int n)
   for (isp = itemset; isp < itemsetend; ++isp)
   {
     BtYacc_logf(" %5d", *isp);
-	++i;
-	if (i == 10)
-	{
-		i = 0;
-		BtYacc_logs("\n");
-	}
+    ++i;
+    if (i == 10)
+    {
+        i = 0;
+        BtYacc_logs("\n");
+    }
   }
   if (i)
   {
-	BtYacc_logs("\n");
+    BtYacc_logs("\n");
   }
   BtYacc_logs("\n");
 }

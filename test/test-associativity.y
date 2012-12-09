@@ -12,10 +12,10 @@
 
 %%
 
-expr: expr '+' expr				%left /* tell rule it's left-associative: this should resolve the S/R conflict */
-	  = { $$ = $1 + $3; };
-	| NUMBER			
-	  = { $$ = $1; };
+expr: expr '+' expr             %left /* tell rule it's left-associative: this should resolve the S/R conflict */
+      = { $$ = $1 + $3; };
+    | NUMBER
+      = { $$ = $1; };
     ;
 
 %%

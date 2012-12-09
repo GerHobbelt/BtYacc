@@ -43,14 +43,14 @@ static void FileError(char const * fmt, ...) {
 
 void fatal(char const * msg, ...)
 {
-	va_list args;
-	char buf[2048];
+    va_list args;
+    char buf[2048];
 
-	va_start(args, msg);
-	buf[0] = 0;
-	vsnprintf(buf, sizeof(buf), msg, args);
-	buf[sizeof(buf) - 1] = 0;
-	va_end(args);
+    va_start(args, msg);
+    buf[0] = 0;
+    vsnprintf(buf, sizeof(buf), msg, args);
+    buf[sizeof(buf) - 1] = 0;
+    va_end(args);
 
     if (fprintf(stderr, "fatal - %s\n", buf) < 0)
     {

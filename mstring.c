@@ -101,40 +101,40 @@ char *msdone(struct mstring *s)
 int strnscmp(const char *a, const char *b)
 {
     for (;;)
-	{
+    {
         while (isspace(*a)) ++a;
 
         while (isspace(*b)) ++b;
 
         while (*a && *a == *b) ++a, ++b;
 
-        if (isspace(*a)) 
-		{
+        if (isspace(*a))
+        {
             if (isalnum(a[-1]) && isalnum(*b))
-                break; 
-		}
-        else if (isspace(*b)) 
-		{
+                break;
+        }
+        else if (isspace(*b))
+        {
             if (isalnum(b[-1]) && isalnum(*a))
-                break; 
-		}
+                break;
+        }
         else
-            break; 
-	}
+            break;
+    }
     return *a - *b;
 }
 
 unsigned int strnshash(const char *str)
 {
-	unsigned int    h = 0;
-	register unsigned char const *s = (unsigned char const *)str;
+    unsigned int    h = 0;
+    register unsigned char const *s = (unsigned char const *)str;
 
-    while (*s) 
-	{
+    while (*s)
+    {
         if (!isspace(*s))
             h = (h << 5) - h + *s;
-        ++s; 
-	}
+        ++s;
+    }
 
     return h;
 }

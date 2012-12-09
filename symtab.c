@@ -85,13 +85,13 @@ void create_symbol_table(void)
     symbol_table = (bucket **) NEW2(TABLE_SIZE, symbol_table[0]);
     if (symbol_table == 0) no_space();
 
-	/* The symbol_table[] array has been completely zeroed by NEW2() */
+    /* The symbol_table[] array has been completely zeroed by NEW2() */
 
     bp = make_bucket("error");
     bp->index = 1;
     bp->symbol_class = TERM;
-	assert(bp->assoc == TOKEN);
-	bp->assoc = NTERM;
+    assert(bp->assoc == TOKEN);
+    bp->assoc = NTERM;
 
     first_symbol = bp;
     last_symbol = bp;

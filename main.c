@@ -132,11 +132,11 @@ convert the input string to all-uppercase
 */
 void strupper(char *str)
 {
-	while (*str)
-	{
-		*str = toupper(*str);
-		++str;
-	}
+    while (*str)
+    {
+        *str = toupper(*str);
+        ++str;
+    }
 }
 
 static void file_deletion(FILE* f, char const * name)
@@ -167,24 +167,24 @@ static void file_deletion(FILE* f, char const * name)
  */
 static void final_cleanup(void)
 {
-	FREE(defred);
-	free_action_order();
-	FREE(rules_used);
-	FREE(SRconflicts);
-	FREE(RRconflicts);
-	free_nullable();
-	free_derives();
-	free_section_cache();
+    FREE(defred);
+    free_action_order();
+    FREE(rules_used);
+    FREE(SRconflicts);
+    FREE(RRconflicts);
+    free_nullable();
+    free_derives();
+    free_section_cache();
     FREE(ritem);
-	FREE(rlhs);
-	FREE(rrhs);
-	FREE(rprec);
-	FREE(rassoc);
+    FREE(rlhs);
+    FREE(rrhs);
+    FREE(rprec);
+    FREE(rassoc);
     FREE(symbol_name);
     FREE(symbol_value);
     FREE(symbol_prec);
     FREE(symbol_assoc);
-	free_reader_buffers();
+    free_reader_buffers();
 
     if (outfile[DEFINES_FILE])
     {
@@ -208,29 +208,29 @@ static void final_cleanup(void)
     {
         int c;
 
-		if (log_file)
-		{
-			if (fclose(log_file))
-			{
-			   perror("log_file: fclose");
-			   abort();
-			}
-		}
+        if (log_file)
+        {
+            if (fclose(log_file))
+            {
+               perror("log_file: fclose");
+               abort();
+            }
+        }
 
-		log_file = fopen(log_file_name, "r");
-		if (log_file == NULL) open_error(log_file_name);
-		while ((c = getc(log_file)) != EOF)
-		{
-			BtYacc_putc(c, verbose_file);
-		}
+        log_file = fopen(log_file_name, "r");
+        if (log_file == NULL) open_error(log_file_name);
+        while ((c = getc(log_file)) != EOF)
+        {
+            BtYacc_putc(c, verbose_file);
+        }
 
         fclose(verbose_file);
         verbose_file = NULL;
     }
-	FREE(code_file_name);
-	FREE(defines_file_name);
-	FREE(output_file_name);
-	FREE(verbose_file_name);
+    FREE(code_file_name);
+    FREE(defines_file_name);
+    FREE(output_file_name);
+    FREE(verbose_file_name);
 
     file_deletion(action_file, action_file_name);
     file_deletion(text_file, text_file_name);
@@ -438,8 +438,8 @@ static void getargs(int argc, char **argv)
 
         case 't':
             tflag++;
-			if (tflag > 1 && !vflag)
-				vflag++;
+            if (tflag > 1 && !vflag)
+                vflag++;
             break;
 
         case 'v':
@@ -484,8 +484,8 @@ static void getargs(int argc, char **argv)
 
             case 't':
                 tflag++;
-				if (tflag > 1 && !vflag)
-					vflag++;
+                if (tflag > 1 && !vflag)
+                    vflag++;
                 break;
 
             case 'v':
@@ -854,10 +854,10 @@ struct section *active_section_list = NULL;
 int main(int argc, char **argv)
 {
 #if defined(_MSC_VER) && 0
-	os_init_heap();
+    os_init_heap();
 #endif
-	
-	atexit(final_cleanup);
+
+    atexit(final_cleanup);
 
 #ifdef BTYACC_USE_SIGNAL_HANDLING
     signal_setup();

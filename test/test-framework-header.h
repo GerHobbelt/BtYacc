@@ -20,16 +20,16 @@ BtYacc test grammars: Framework Header Section
 #include <memory.h>
 #endif
 #if defined(HAVE_STDINT_H)
-#include <stdint.h> 
+#include <stdint.h>
 #endif
 #if defined(HAVE_CTYPE_H)
 #include <ctype.h>
 #endif
 #if defined(HAVE_STRINGS_H)
-#include <strings.h> 
+#include <strings.h>
 #endif
 #if defined(HAVE_STRING_H)
-#include <string.h> 
+#include <string.h>
 #endif
 #if defined(HAVE_UNISTD_H)
 #include <unistd.h>
@@ -41,25 +41,25 @@ BtYacc test grammars: Framework Header Section
 #include <inttypes.h>
 #endif
 #if defined(HAVE_NETINET_IN_H)
-#include <netinet/in.h> 
+#include <netinet/in.h>
 #endif
 #if defined(HAVE_SYSLOG_H)
-#include <syslog.h> 
+#include <syslog.h>
 #endif
 #if defined(HAVE_SYS_PARAM_H)
-#include <sys/param.h> 
+#include <sys/param.h>
 #endif
 #if defined(HAVE_SYS_SOCKET_H)
-#include <sys/socket.h> 
+#include <sys/socket.h>
 #endif
 #if defined(HAVE_SYS_STAT_H)
-#include <sys/stat.h> 
+#include <sys/stat.h>
 #endif
 #if defined(HAVE_SYS_TYPES_H)
-#include <sys/types.h> 
+#include <sys/types.h>
 #endif
 #if defined(HAVE_TERMIOS_H)
-#include <termios.h> 
+#include <termios.h>
 #endif
 #if defined(HAVE_MATH_H)
 #include <math.h>
@@ -75,15 +75,15 @@ BtYacc test grammars: Framework Header Section
 
 
 #ifndef YYERROR /* using ifdef(YYERROR) to notice whether we were loaded as header or half way through the generated code */
-#define YYERROR_DETAILED	1
+#define YYERROR_DETAILED    1
 #else
-#define TEST_FRAMEWORK_ALT_INTRO_CODE	1
+#define TEST_FRAMEWORK_ALT_INTRO_CODE   1
 #endif
 
 
 #ifndef YYSTYPE
 typedef double yystype_t;
-#define YYSTYPE	yystype_t
+#define YYSTYPE yystype_t
 
 #undef YYDBPR
 #define YYDBPR(yystype)    BTYACC_DEBUG_LOG_PARTIAL("%f", (double)(yystype))
@@ -115,11 +115,11 @@ static int yylex(void);
 library to buffer character input using a dynamically sized buffer:
 */
 
-struct mstring 
+struct mstring
 {
     char *base;
-	char *ptr;
-	char *end;
+    char *ptr;
+    char *end;
 };
 
 static void msprintf(struct mstring *buf, const char *str, ...);
@@ -136,16 +136,16 @@ hash a string
 static unsigned int strhash(char const * name);
 
 /**
-the structure of a symbol table entry  
+the structure of a symbol table entry
 */
 struct symbol
 {
     char *name;
-    unsigned int index;			/* unique identifier for quick lookup in the hash table based on a number instead of the string */
-    struct symbol *link;		/* chain of buckets for a single hash */
-    struct symbol *next;		/* chain of all buckets */
+    unsigned int index;         /* unique identifier for quick lookup in the hash table based on a number instead of the string */
+    struct symbol *link;        /* chain of buckets for a single hash */
+    struct symbol *next;        /* chain of all buckets */
 
-	YYSTYPE value;
+    YYSTYPE value;
 };
 
 /**

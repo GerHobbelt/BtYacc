@@ -6,7 +6,7 @@
 #include <conio.h>
 #endif
 #if defined(HAVE_TERMIOS_H)
-#include <termios.h> 
+#include <termios.h>
 #endif
 
 
@@ -14,11 +14,11 @@
 
 int getkey(void)
 {
-    char ch; 
+    char ch;
 
-    ch = getche(); 
-    return ch; 
-} 
+    ch = getche();
+    return ch;
+}
 
 #elif defined(HAVE_TCGETATTR) && defined(HAVE_TCSETATTR)
 

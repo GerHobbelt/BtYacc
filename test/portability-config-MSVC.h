@@ -13,7 +13,7 @@
 #define HAVE_GETCHE 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#undef HAVE_INTTYPES_H 
+#undef HAVE_INTTYPES_H
 
 /* Define to 1 if your system has a GNU libc compatible `malloc' function, and
    to 0 otherwise. */
@@ -38,7 +38,7 @@
 #define HAVE_STRICMP 1
 
 /* Define to 1 if you have the <strings.h> header file. */
-#undef HAVE_STRINGS_H 
+#undef HAVE_STRINGS_H
 
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
@@ -53,7 +53,7 @@
 #undef HAVE_SYSLOG_H
 
 /* Define to 1 if you have the <sys/param.h> header file. */
-#undef HAVE_SYS_PARAM_H 
+#undef HAVE_SYS_PARAM_H
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
 #undef HAVE_SYS_SOCKET_H
@@ -74,7 +74,7 @@
 #undef HAVE_TERMIOS_H
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#undef HAVE_UNISTD_H 
+#undef HAVE_UNISTD_H
 
 /* Define to 1 if the system has the type `_Bool'. */
 #define HAVE__BOOL 1

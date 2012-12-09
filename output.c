@@ -940,7 +940,7 @@ void output_defines(void)
             literal_token_naming_tpl = get_section("literal_token_name_template");
 
             // first construct the replacement string for the literal token:
-            buflen = strlen(s) * (1 + sizeof("close_square_bracket")) /* longest replacement string */;                 
+            buflen = strlen(s) * (1 + sizeof("close_square_bracket")) /* longest replacement string */;
             dp = symstr = MALLOC(buflen + 1);
             if (!symstr) no_space();
             c = *s;
@@ -1030,7 +1030,7 @@ done_this_char:
             sprintf(dp, literal_token_naming_tpl, file_uc_prefix);
 
             /*
-            Now we have an expanded template, where the '%%s' in there is now a '%s' 
+            Now we have an expanded template, where the '%%s' in there is now a '%s'
             ready to receive the constructed token string:
             */
             buflen = 1 + strlen(dp) + strlen(symstr);
@@ -1199,7 +1199,7 @@ void output_debug(void)
     symnam = (char **) NEW2(max + 1, symnam[0]);
     if (symnam == 0) no_space();
 
-	/* Note that it is not necessary to zero the element symnam[max]. */
+    /* Note that it is not necessary to zero the element symnam[max]. */
     /* The symnam[] array has been zeroed completely by NEW2() */
 
     for (i = ntokens - 1; i >= 2; --i)
@@ -1264,14 +1264,14 @@ void output_debug(void)
         const char *sep = (i < nrules - 1 ? get_section("debug_yyname_strings_separator") : "");
 
         BtYacc_printf(output_file, "\"%s :", s);
-		FREE(s);
+        FREE(s);
 
         for (j = rrhs[i]; ritem[j] > 0; ++j)
         {
             s = convert_to_C_string(symbol_name[ritem[j]]);
 
             BtYacc_printf(output_file, " %s", s);
-			FREE(s);
+            FREE(s);
         }
         ++outline[OUTPUT_FILE];
         BtYacc_printf(output_file, "\"%s\n", count_newlines(OUTPUT_FILE, sep));
@@ -1495,13 +1495,13 @@ void free_section_cache(void)
 {
     struct section *sl;
 
-	if (!active_section_list)
-		return;
+    if (!active_section_list)
+        return;
 
     for (sl = &active_section_list[0]; sl->name; ++sl)
     {
-		FREE(sl->cached_multiline_ptr);
-	}
+        FREE(sl->cached_multiline_ptr);
+    }
 }
 
 char const *get_rule_description(int rule_nr)
@@ -1513,20 +1513,20 @@ char const *get_rule_description(int rule_nr)
     if (!buf) no_space();
 
     msprintf(buf, "%s :", s);
-	FREE(s);
+    FREE(s);
 
     for (j = rrhs[rule_nr]; ritem[j] > 0; ++j)
     {
         s = convert_to_C_string(symbol_name[ritem[j]]);
 
         msprintf(buf, " %s", s);
-		FREE(s);
+        FREE(s);
     }
     return msdone(buf);
 }
 
 void free_action_order(void)
 {
-	FREE(order);
+    FREE(order);
 }
 

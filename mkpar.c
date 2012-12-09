@@ -42,7 +42,7 @@ static void unused_rules(void)
     rules_used = (Yshort *) NEW2(nrules, rules_used[0]);
     if (rules_used == 0) no_space();
 
-	/* the rules_used[] array has been zeroed completely by NEW2() */
+    /* the rules_used[] array has been zeroed completely by NEW2() */
 
     for (i = 0; i < nstates; ++i)
     {
@@ -70,53 +70,53 @@ static void unused_rules(void)
 }
 
 /*
-Return TRUE when the action has been explicitly assigned 
+Return TRUE when the action has been explicitly assigned
 a particular associativity.
 */
 int is_assigned_explicit_associativity(BtYacc_keyword_code assoc)
 {
-	switch (assoc)
-	{
-	case LEFT:
-	case RIGHT:
-	case NONASSOC:
-		return 1;
-		
-	default:
-		return 0;
-	}
+    switch (assoc)
+    {
+    case LEFT:
+    case RIGHT:
+    case NONASSOC:
+        return 1;
+
+    default:
+        return 0;
+    }
 }
 
 static void push_rejection_reason(action *p1, action *p2, action *old_pref, action *new_pref, int state, suppression_reason_t reason)
 {
-	suppression_info *info;
+    suppression_info *info;
 
-	if (!p1->rej_count)
-	{
-		p1->rej_info = NEW(p1->rej_info[0]);
-		if (!p1->rej_info) no_space();
-		p1->rej_count = 1;
-	}
-	else
-	{
-		p1->rej_info = RENEW(p1->rej_info, p1->rej_count + 1, p1->rej_info[0]);
-		if (!p1->rej_info) no_space();
-		p1->rej_count += 1;
-	}
-	info = p1->rej_info + p1->rej_count - 1;
+    if (!p1->rej_count)
+    {
+        p1->rej_info = NEW(p1->rej_info[0]);
+        if (!p1->rej_info) no_space();
+        p1->rej_count = 1;
+    }
+    else
+    {
+        p1->rej_info = RENEW(p1->rej_info, p1->rej_count + 1, p1->rej_info[0]);
+        if (!p1->rej_info) no_space();
+        p1->rej_count += 1;
+    }
+    info = p1->rej_info + p1->rej_count - 1;
 
-	info->conflicting_entry = p2;
-	info->state = state;
-	info->reason = reason;
-	info->me_is_old_pref = (p1 == old_pref);
-	info->me_is_new_pref = (p1 == new_pref);
+    info->conflicting_entry = p2;
+    info->state = state;
+    info->reason = reason;
+    info->me_is_old_pref = (p1 == old_pref);
+    info->me_is_new_pref = (p1 == new_pref);
 }
 
 static void remove_conflicts(void)
 {
     int i;
     int symbol;
-	int number = -1;
+    int number = -1;
     action *p, *pref;
 
     SRtotal = 0;
@@ -132,73 +132,73 @@ static void remove_conflicts(void)
         pref = 0;
         for (p = parser[i]; p; p = p->next)
         {
-			action *new_pref = pref;
+            action *new_pref = pref;
 
             if (p->symbol != symbol)
             {
                 new_pref = p;
                 symbol = p->symbol;
-				number = p->number;
+                number = p->number;
             }
             else if (i == final_state && symbol == 0)
             {
-				push_rejection_reason(pref, p, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
-				push_rejection_reason(p, pref, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
+                push_rejection_reason(pref, p, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
+                push_rejection_reason(p, pref, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
                 ++SRcount;
                 p->suppressed |= 1;
                 pref->suppressed |= 1;
             }
             else if (pref->action_code == SHIFT)
             {
-				assert(pref->symbol == p->symbol);
+                assert(pref->symbol == p->symbol);
                 if (pref->prec > 0 && p->prec > 0)
                 {
                     if (pref->prec < p->prec)
                     {
-						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_PRECEDENCE);
+                        push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_PRECEDENCE);
                         pref->suppressed |= 2;
                         new_pref = p;
                     }
                     else if (pref->prec > p->prec)
                     {
-						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_PRECEDENCE);
+                        push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_PRECEDENCE);
                         p->suppressed |= 2;
                     }
                     else if (pref->assoc == LEFT && (p->assoc == LEFT || !is_assigned_explicit_associativity(p->assoc)))
                     {
-						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
+                        push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
                         pref->suppressed |= 2;
                         new_pref = p;
                     }
                     else if (pref->assoc == RIGHT && (p->assoc == RIGHT || !is_assigned_explicit_associativity(p->assoc)))
                     {
-						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
+                        push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
                         p->suppressed |= 2;
                     }
                     else if (p->assoc == LEFT && (pref->assoc == LEFT || !is_assigned_explicit_associativity(pref->assoc)))
                     {
-						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
+                        push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
                         pref->suppressed |= 2;
                         new_pref = p;
                     }
                     else if (p->assoc == RIGHT && (pref->assoc == RIGHT || !is_assigned_explicit_associativity(pref->assoc)))
                     {
-						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
+                        push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
                         p->suppressed |= 2;
                     }
                     else
                     {
-						push_rejection_reason(pref, p, pref, pref, i, SUPPR_BY_YACC_DEFAULT1);
-						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_YACC_DEFAULT2);
-						/*
-						WARNING: suppression here was set to '2' before, but I believe that 
-						         failure to resolve conflict via precedence (due to equal
-								 precedence values) should NOT silently discard BOTH actions.
+                        push_rejection_reason(pref, p, pref, pref, i, SUPPR_BY_YACC_DEFAULT1);
+                        push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_YACC_DEFAULT2);
+                        /*
+                        WARNING: suppression here was set to '2' before, but I believe that
+                                 failure to resolve conflict via precedence (due to equal
+                                 precedence values) should NOT silently discard BOTH actions.
 
-								 Instead, this is another job for the backtracker if you ask me...
-						*/
-						++SRcount;
-						pref->suppressed |= 1;
+                                 Instead, this is another job for the backtracker if you ask me...
+                        */
+                        ++SRcount;
+                        pref->suppressed |= 1;
                         p->suppressed |= 1;
                     }
                 }
@@ -206,57 +206,57 @@ static void remove_conflicts(void)
                 {
                     if (p->prec > 0 && pref->prec < p->prec)
                     {
-						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_PRECEDENCE);
+                        push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_PRECEDENCE);
                         pref->suppressed |= 2;
                         new_pref = p;
                     }
                     else if (pref->prec > 0 && pref->prec > p->prec)
                     {
-						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_PRECEDENCE);
+                        push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_PRECEDENCE);
                         p->suppressed |= 2;
                     }
                     else if (pref->assoc == LEFT && (p->assoc == LEFT || !is_assigned_explicit_associativity(p->assoc)))
                     {
-						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
+                        push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
                         pref->suppressed |= 2;
                         new_pref = p;
                     }
                     else if (pref->assoc == RIGHT && (p->assoc == RIGHT || !is_assigned_explicit_associativity(p->assoc)))
                     {
-						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
+                        push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
                         p->suppressed |= 2;
                     }
                     else if (p->assoc == LEFT && (pref->assoc == LEFT || !is_assigned_explicit_associativity(pref->assoc)))
                     {
-						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
+                        push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
                         pref->suppressed |= 2;
                         new_pref = p;
                     }
                     else if (p->assoc == RIGHT && (pref->assoc == RIGHT || !is_assigned_explicit_associativity(pref->assoc)))
                     {
-						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
+                        push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
                         p->suppressed |= 2;
                     }
                     else
                     {
-						push_rejection_reason(pref, p, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
-						push_rejection_reason(p, pref, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
-						++SRcount;
-						p->suppressed |= 1;
-						pref->suppressed |= 1;
-					}
+                        push_rejection_reason(pref, p, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
+                        push_rejection_reason(p, pref, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
+                        ++SRcount;
+                        p->suppressed |= 1;
+                        pref->suppressed |= 1;
+                    }
                 }
             }
             else
             {
-				push_rejection_reason(pref, p, pref, pref, i, SUPPR_NONE_RR_CONFLICT);
-				push_rejection_reason(p, pref, pref, pref, i, SUPPR_NONE_RR_CONFLICT);
+                push_rejection_reason(pref, p, pref, pref, i, SUPPR_NONE_RR_CONFLICT);
+                push_rejection_reason(p, pref, pref, pref, i, SUPPR_NONE_RR_CONFLICT);
                 ++RRcount;
                 p->suppressed |= 1;
                 pref->suppressed |= 1;
             }
 
-			pref = new_pref;
+            pref = new_pref;
         }
         SRtotal += SRcount;
         RRtotal += RRcount;

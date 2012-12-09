@@ -317,16 +317,16 @@ int nextc(int only_skip_whitespace)
                 break;
             }
 
-			if (0 /* fall through */)
-			{
+            if (0 /* fall through */)
+            {
         case ',':
         case ';':
-				if (!only_skip_whitespace)
-				{
-					++s;
-					break;
-				}
-			}
+                if (!only_skip_whitespace)
+                {
+                    ++s;
+                    break;
+                }
+            }
         default:
             cptr = s;
             return *s;
@@ -335,8 +335,8 @@ int nextc(int only_skip_whitespace)
 }
 
 static struct keyword {
-	const char *name;
-	BtYacc_keyword_code token;
+    const char *name;
+    BtYacc_keyword_code token;
 } keywords[] =
 {
     { "binary", NONASSOC },
@@ -365,13 +365,13 @@ static struct keyword {
     { "no-lines", BISON_NO_LINES },                   /* [i_a] bison emulation additions */
     { "no_lines", BISON_NO_LINES },                   /* [i_a] bison emulation additions */
     { "nonassoc", NONASSOC },
-    { "nterm", NTERM },			                      /* [i_a] bison emulation additions */
+    { "nterm", NTERM },                               /* [i_a] bison emulation additions */
     { "output", BISON_OUTPUT },                       /* [i_a] bison emulation additions */
     { "parse-param", BISON_PARSE_PARAM },             /* [i_a] bison emulation additions */
     { "prec", PREC },                                 /* %prec TOKEN: declare a token with precedence according to order of appearance;
-													     when used after a rule, it is like %dprec, but referring to terminal TOKEN for association/precedence data */
+                                                         when used after a rule, it is like %dprec, but referring to terminal TOKEN for association/precedence data */
     { "prefer", PREFER },                             /* %prefer: like %dprec, similar to the %prefer mentioned in the Anna Bekkerman thesis:
-													     assigns precedence to a rule; later rules get higher precedence. */
+                                                         assigns precedence to a rule; later rules get higher precedence. */
     { "printer", BISON_PRINTER },                     /* [i_a] bison emulation additions */
     { "pure-parser", BISON_PURE },                    /* [i_a] bison emulation additions */
     { "pure_parser", BISON_PURE },                    /* [i_a] bison emulation additions */
@@ -390,21 +390,21 @@ static struct keyword {
 
 const char *get_keyword_as_string(BtYacc_keyword_code a)
 {
-	int i;
+    int i;
 
-	for (i = 0; i < sizeof(keywords)/sizeof(keywords[0]); i++)
-	{
-		if (keywords[i].token == a)
-			return keywords[i].name;
-	}
-	return NULL;
+    for (i = 0; i < sizeof(keywords)/sizeof(keywords[0]); i++)
+    {
+        if (keywords[i].token == a)
+            return keywords[i].name;
+    }
+    return NULL;
 }
 
 static int search_strcmp(void const * key, void const * element)
 {
-	const struct keyword *kwd = (const struct keyword *)element;
+    const struct keyword *kwd = (const struct keyword *)element;
 
-	return strcmp((const char *)key, kwd->name);
+    return strcmp((const char *)key, kwd->name);
 }
 
 BtYacc_keyword_code keyword(int fail_when_no_keyword)
@@ -441,7 +441,7 @@ BtYacc_keyword_code keyword(int fail_when_no_keyword)
   }
   if (fail_when_no_keyword)
   {
-	syntax_error_ex(lineno, line, t_cptr, "expected a keyword or one of these: [ %%{  %%%%  %%\\  %%<  %%>  %%0  %%2 ]");
+    syntax_error_ex(lineno, line, t_cptr, "expected a keyword or one of these: [ %%{  %%%%  %%\\  %%<  %%>  %%0  %%2 ]");
   }
   return NOT_A_KEYWORD;
 }
@@ -576,7 +576,7 @@ void copy_text(void)
        BtYacc_printf(f, line_format, lineno - 1, (inc_file ? inc_file_name : input_file_name));
 
 loop:
-    switch (c = *cptr++) 
+    switch (c = *cptr++)
     {
     case '\n':
         BtYacc_putc('\n', f);
@@ -597,17 +597,17 @@ loop:
     case '%':
     case '\\':
         if (*cptr == '}')
-		{
+        {
             if (need_newline) BtYacc_putc('\n', f);
             ++cptr;
             FREE(t_line);
             return;
-		}
+        }
         /* fall through */
     default:
         BtYacc_putc(c, f);
         need_newline = 1;
-        goto loop; 
+        goto loop;
       }
 }
 
@@ -1140,7 +1140,7 @@ void declare_start(void)
 void read_declarations(void)
 {
     register int c;
-	BtYacc_keyword_code k;
+    BtYacc_keyword_code k;
     char *t_cptr;
 
     cache_size = 256;
@@ -1151,9 +1151,9 @@ void read_declarations(void)
     {
         c = nextc(0);
         if (c == EOF)
-			unexpected_EOF();
+            unexpected_EOF();
         if (c != '%')
-			syntax_error_ex(lineno, line, cptr, "expected a %%-prefixed declaration command, e.g. %%token, %%left, %%right, %%ident, %%{ ... %%}, %%union");
+            syntax_error_ex(lineno, line, cptr, "expected a %%-prefixed declaration command, e.g. %%token, %%left, %%right, %%ident, %%{ ... %%}, %%union");
         t_cptr = cptr;
         switch (k = keyword(1))
         {
@@ -1172,7 +1172,7 @@ void read_declarations(void)
         case LEFT:
         case RIGHT:
         case NONASSOC:
-		case PREC:
+        case PREC:
             declare_tokens(k);
             break;
         case TYPE:
@@ -1286,12 +1286,12 @@ void read_declarations(void)
                     }
                 }
                 *ps = STRDUP(var_name);
-				if (!*ps) no_space();
+                if (!*ps) no_space();
                 *++ps = NULL;
             }
             break;
 #endif
-		default:
+        default:
             unsupported_feature(lineno, line, t_cptr);
             break;
         }
@@ -1756,7 +1756,7 @@ void advance_to_start(void)
     if (c != ':') syntax_error_ex(lineno, line, cptr, "expected a colon ':' starting the rule definition");
     start_rule(bp, s_lineno);
     parse_arginfo(bp, args, argslen);
-	FREE(args);
+    FREE(args);
     ++cptr;
 }
 
@@ -1765,8 +1765,8 @@ void start_rule(bucket *bp, int unsigned s_lineno)
     if (bp->symbol_class == TERM)
         terminal_lhs(s_lineno);
     bp->symbol_class = NONTERM;
-	assert(bp->assoc == TOKEN || bp->assoc == NTERM);
-	bp->assoc = NTERM;
+    assert(bp->assoc == TOKEN || bp->assoc == NTERM);
+    bp->assoc = NTERM;
     if (!bp->index)
         bp->index = nrules;
     if (nrules >= maxrules)
@@ -2289,10 +2289,10 @@ Expected tokens are:
 int mark_symbol(void)
 {
     int c;
-	bucket defbp = {0};
+    bucket defbp = {0};
     bucket *bp = &defbp;
-	BtYacc_keyword_code k = PREC;
-	char *t_cptr = cptr;
+    BtYacc_keyword_code k = PREC;
+    char *t_cptr = cptr;
 
     c = cptr[1];
     if (c == '%' || c == '\\')
@@ -2302,90 +2302,90 @@ int mark_symbol(void)
     }
 
     if (c == '=')
-	{
+    {
         cptr += 2;
-	}
+    }
     else
-	{
-		k = keyword(0);
-		switch (k)
-		{
-		case PREC:
-		case DPREC_PRIO:
-		case LEFT:
-		case RIGHT:
-		case NONASSOC:
-		case PREFER:
-			break;
+    {
+        k = keyword(0);
+        switch (k)
+        {
+        case PREC:
+        case DPREC_PRIO:
+        case LEFT:
+        case RIGHT:
+        case NONASSOC:
+        case PREFER:
+            break;
 
-		default:
-	        syntax_error_ex(lineno, line, t_cptr, "expected a PRECedence");
-		}
-	}
+        default:
+            syntax_error_ex(lineno, line, t_cptr, "expected a PRECedence");
+        }
+    }
 
-	defbp.assoc = k;
-	defbp.prec = UNDEFINED;
+    defbp.assoc = k;
+    defbp.prec = UNDEFINED;
 
-	switch (k)
-	{
-	case PREFER:
-		// 'prefer' does assign a default, high, precedence: the last one wins.
-		defbp.prec = ++precedence_max;
-	case LEFT:
-	case RIGHT:
-	case NONASSOC:
-	case PREC:
-	case DPREC_PRIO:		/* this one is followed by a numeric value: */
-		c = nextc(1);
-		if (isalpha(c) || c == '_' || c == '.' || c == '$')
-			bp = get_name(1);
-		else if (c == '\'' || c == '"')
-			bp = get_literal(1);
-		else if (isdigit(c))
-		{
-			bp->prec = get_number();
-			if (bp->prec <= 0)
-				syntax_error_ex(lineno, line, t_cptr, "expected a positive, non-zero rule's precedence value following the %% keyword: %s", t_cptr);
-		}
-		else if (k == PREC)
-		{
-			syntax_error_ex(lineno, line, t_cptr, "expected a terminal, non-terminal token or simple token literal string identifying this rule's precedence");
-			/*NOTREACHED*/
-			return 0;
-		}
+    switch (k)
+    {
+    case PREFER:
+        // 'prefer' does assign a default, high, precedence: the last one wins.
+        defbp.prec = ++precedence_max;
+    case LEFT:
+    case RIGHT:
+    case NONASSOC:
+    case PREC:
+    case DPREC_PRIO:        /* this one is followed by a numeric value: */
+        c = nextc(1);
+        if (isalpha(c) || c == '_' || c == '.' || c == '$')
+            bp = get_name(1);
+        else if (c == '\'' || c == '"')
+            bp = get_literal(1);
+        else if (isdigit(c))
+        {
+            bp->prec = get_number();
+            if (bp->prec <= 0)
+                syntax_error_ex(lineno, line, t_cptr, "expected a positive, non-zero rule's precedence value following the %% keyword: %s", t_cptr);
+        }
+        else if (k == PREC)
+        {
+            syntax_error_ex(lineno, line, t_cptr, "expected a terminal, non-terminal token or simple token literal string identifying this rule's precedence");
+            /*NOTREACHED*/
+            return 0;
+        }
 
-		if (bp)
-		{
-			switch (k)
-			{
-			// these override the associativity of the given precedence token:
-			case LEFT:
-			case RIGHT:
-			case NONASSOC:
-				if (bp != &defbp)
-					defbp = *bp;
-				bp = &defbp;
-				defbp.assoc = k;
-				break;
+        if (bp)
+        {
+            switch (k)
+            {
+            // these override the associativity of the given precedence token:
+            case LEFT:
+            case RIGHT:
+            case NONASSOC:
+                if (bp != &defbp)
+                    defbp = *bp;
+                bp = &defbp;
+                defbp.assoc = k;
+                break;
 
-			case PREFER:
-				break;
+            case PREFER:
+                break;
 
-			default:
-				if (bp->prec <= 0)
-					syntax_error_ex(lineno, line, t_cptr, "expected a token with an associated positive, non-zero precedence to follow %%%s", bp->name);
-				break;
-			}
-		}
-		else
-		{
-			bp = &defbp;
-		}
-		break;
+            default:
+                if (bp->prec <= 0)
+                    syntax_error_ex(lineno, line, t_cptr, "expected a token with an associated positive, non-zero precedence to follow %%%s", bp->name);
+                break;
+            }
+        }
+        else
+        {
+            bp = &defbp;
+        }
+        break;
 
-	default:
-		fatal("internal error in precedence handler: unexpected %%%s", (bp ? bp->name : "???"));
-	}
+    default:
+        fatal("internal error in precedence handler: unexpected %%%s", (bp ? bp->name : "???"));
+    }
 
     if (rprec[nrules] != UNDEFINED && bp->prec != rprec[nrules])
         prec_redeclared();
@@ -2460,11 +2460,11 @@ void pack_names(void)
     name_pool = MALLOC(name_pool_size);
     if (name_pool == 0) no_space();
 
-	t = name_pool;
+    t = name_pool;
     strcpy(t, "$accept");
-	t += strlen(t) + 1;
+    t += strlen(t) + 1;
     strcpy(t, "$end");
-	t += strlen(t) + 1;
+    t += strlen(t) + 1;
     for (bp = first_symbol; bp; bp = bp->next)
     {
         p = t;
@@ -2630,7 +2630,7 @@ void pack_grammar(void)
 {
     register int i, j;
     BtYacc_keyword_code assoc;
-	Yshort prec;
+    Yshort prec;
 
     ritem = NEW2(nitems, ritem[0]);
     if (ritem == 0) no_space();
@@ -2677,23 +2677,23 @@ void pack_grammar(void)
         while (pitem[j])
         {
             ritem[j] = pitem[j]->index;
-			if (pitem[j]->symbol_class == TERM)
-			{
-				/*
-				Only determine rule precedence and associativity by taking those
-				values from the right-most terminal when the rule itself hasn't
-				already been 'overridden' via %prefer/%prec/%dprec and / or
-				%left/%right/%nonassoc
-				*/
-				if (rprec[i] == UNDEFINED)
-				{
-					prec = pitem[j]->prec;
-				}
-				if (!is_assigned_explicit_associativity(rassoc[i]))
-				{
-					assoc = pitem[j]->assoc;
-				}
-			}
+            if (pitem[j]->symbol_class == TERM)
+            {
+                /*
+                Only determine rule precedence and associativity by taking those
+                values from the right-most terminal when the rule itself hasn't
+                already been 'overridden' via %prefer/%prec/%dprec and / or
+                %left/%right/%nonassoc
+                */
+                if (rprec[i] == UNDEFINED)
+                {
+                    prec = pitem[j]->prec;
+                }
+                if (!is_assigned_explicit_associativity(rassoc[i]))
+                {
+                    assoc = pitem[j]->assoc;
+                }
+            }
             ++j;
         }
         ritem[j] = -i;
@@ -2749,8 +2749,8 @@ void print_grammar(void)
 
 void free_reader_buffers(void)
 {
-	FREE(line);
-	FREE(cache);
+    FREE(line);
+    FREE(cache);
     FREE(name_pool);
 }
 

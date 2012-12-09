@@ -104,7 +104,7 @@ typedef int Yshort;
 
 typedef enum keyword_code_enumeration
 {
-	NOT_A_KEYWORD					= -1,
+    NOT_A_KEYWORD                   = -1,
 
     TOKEN                           =  0,
     LEFT                            =  1,
@@ -117,7 +117,7 @@ typedef enum keyword_code_enumeration
     UNION                           =  8,
     IDENT                           =  9,
     SCANNERLESS_ZERO_ASCII          = 10,
-	PREFER                          = 11,
+    PREFER                          = 11,
 
     /* [i_a] bison emulation additions */
     BISON_DEBUG                     = 110,
@@ -140,7 +140,7 @@ typedef enum keyword_code_enumeration
     BISON_YACC                      = 127,
     BISON_DESTRUCTOR                = 128,
     BISON_PRINTER                   = 129,
-    NTERM		                    = 130,
+    NTERM                           = 130,
     DPREC_PRIO                      = 131,
     BISON_MERGE                     = 132,
     PREC                            = 133
@@ -163,7 +163,7 @@ typedef enum symbol_class_enumeration
 
 typedef enum action_code_enumeration
 {
-	UNDEFINED_ACTION = 0,
+    UNDEFINED_ACTION = 0,
 
     SHIFT = 1,
     REDUCE = 2
@@ -172,15 +172,15 @@ typedef enum action_code_enumeration
 
 /*  character macros  */
 
-#define IS_IDENT(c)				(isalnum(c) || (c) == '_' || (c) == '.' || (c) == '$')
-#define IS_OCTAL(c)				((c) >= '0' && (c) <= '7')
+#define IS_IDENT(c)             (isalnum(c) || (c) == '_' || (c) == '.' || (c) == '$')
+#define IS_OCTAL(c)             ((c) >= '0' && (c) <= '7')
 #define NUMERIC_VALUE(c)        ((c) - '0')
 
 
 /*  symbol macros  */
 
-#define ISTOKEN(s)				((s) < start_symbol)
-#define ISVAR(s)				((s) >= start_symbol)
+#define ISTOKEN(s)              ((s) < start_symbol)
+#define ISVAR(s)                ((s) >= start_symbol)
 
 
 /*  storage allocation macros  */
@@ -209,9 +209,9 @@ struct bucket
     Yshort args;
     Yshort value;
     Yshort index;
-    Yshort prec;				/* precedence: UNDEFINED or number > 0 */
+    Yshort prec;                /* precedence: UNDEFINED or number > 0 */
     BtYacc_symbol_class symbol_class;
-    BtYacc_keyword_code assoc;	/* associativity: LEFT/RIGHT/NONASSOC/other */
+    BtYacc_keyword_code assoc;  /* associativity: LEFT/RIGHT/NONASSOC/other */
 };
 
 
@@ -255,23 +255,23 @@ struct reductions
 
 typedef enum suppression_reason
 {
-	SUPPR_BY_PRECEDENCE = 1,
-	SUPPR_BY_LEFT_ASSOC = 2,
-	SUPPR_BY_RIGHT_ASSOC = 3,
-	SUPPR_NONE_SR_CONFLICT = 4,
-	SUPPR_NONE_RR_CONFLICT = 5,
-	SUPPR_BY_YACC_DEFAULT1 = 10,
-	SUPPR_BY_YACC_DEFAULT2 = 11
+    SUPPR_BY_PRECEDENCE = 1,
+    SUPPR_BY_LEFT_ASSOC = 2,
+    SUPPR_BY_RIGHT_ASSOC = 3,
+    SUPPR_NONE_SR_CONFLICT = 4,
+    SUPPR_NONE_RR_CONFLICT = 5,
+    SUPPR_BY_YACC_DEFAULT1 = 10,
+    SUPPR_BY_YACC_DEFAULT2 = 11
 } suppression_reason_t;
 
 typedef struct suppression_info suppression_info;
 struct suppression_info
 {
     struct action *conflicting_entry;
-	Yshort state;
-	char me_is_old_pref;
-	char me_is_new_pref;
-	suppression_reason_t reason;
+    Yshort state;
+    char me_is_old_pref;
+    char me_is_new_pref;
+    suppression_reason_t reason;
 };
 
 /*  the structure used to represent parser actions  */
@@ -282,12 +282,12 @@ struct action
     struct action *next;
     Yshort symbol;
     Yshort number;
-    Yshort prec;				/* precedence: UNDEFINED or number > 0 */
+    Yshort prec;                /* precedence: UNDEFINED or number > 0 */
     BtYacc_action_code action_code;
-    BtYacc_keyword_code assoc;	/* associativity: LEFT/RIGHT/NONASSOC/other */
+    BtYacc_keyword_code assoc;  /* associativity: LEFT/RIGHT/NONASSOC/other */
     char   suppressed;
-	char   rej_count;
-	suppression_info *rej_info;
+    char   rej_count;
+    suppression_info *rej_info;
 };
 
 struct section {
