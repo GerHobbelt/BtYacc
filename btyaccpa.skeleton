@@ -973,9 +973,9 @@ yyreduce:
         yystate = YYFINAL;
         *++(yyps->ssp) = YYFINAL;
         *++(yyps->vsp) = yyps->val;
-        yyretlval = yyps->val;  /* return value of root non-terminal to yylval */
+        yyretlval = yyps->val;  /* return value of root non-terminal to yyretlval */
         *++(yyps->psp) = yyps->pos;
-        yyretposn = yyps->pos;  /* return value of root position to yyposn */
+        yyretposn = yyps->pos;  /* return value of root position to yyretposn */
         if (yychar < 0)
         {
             yychar = yyLex1();
