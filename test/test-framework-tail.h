@@ -65,6 +65,17 @@ void yyerror(const char *msg)
 
 #endif
 
+
+
+
+typedef int getkey_f(void);
+
+static getkey_f *keypress = 0;
+
+
+
+
+
 #define TILDE                   '~'
 #define BACKQUOTE               '`'
 #define EXCLAMATION_MARK        '!'
@@ -361,11 +372,18 @@ void yyerror(const char *msg)
 #endif
 
 
+static short int previous_ch[8] = {0};
+static short int previous_ch_pos = 0;
+
+static void reset_yylex(void)
+{
+    memset(previous_ch, 0, sizeof(previous_ch));
+    previous_ch_pos = 0;
+}
+
 static int yylex(void)
 {
     short int ch;
-    static short int previous_ch[8] = {0};
-    static short int previous_ch_pos = 0;
 #define POP_CH(ch)                                      \
             do                                          \
             {                                           \
@@ -378,7 +396,7 @@ static int yylex(void)
                 }                                       \
                 else                                    \
                 {                                       \
-                    ch = getchar();                     \
+                    ch = keypress();                    \
                 }                                       \
             } while(0)
 #define LA_CH(ch, n)                                    \
@@ -393,7 +411,7 @@ static int yylex(void)
                 else                                    \
                 {                                       \
                     ch = previous_ch[ch_q_pos]          \
-                       = getchar();                     \
+                       = keypress();                    \
                 }                                       \
             } while(0)
 #define PUSH_CH(ch)                                     \
@@ -435,6 +453,8 @@ static int yylex(void)
     for (;;)
     {
         POP_CH(ch);
+        fprintf(stderr, "\nyylex: ch = %c ($%02x), previous_ch_pos = %d, state = %d, val = %f, val_power = %f, val_sign = %d\n",
+            ch, ch, previous_ch_pos, state, (double)val, (double)val_power, val_sign);
         switch (ch)
         {
         case 0:
@@ -446,6 +466,7 @@ static int yylex(void)
                 break;
             }
             PUSH_CH(EOF);
+            fprintf(stderr, "\nyylex: delivered symbol code EOF\n");
             return 0;
 
         case ' ':
@@ -498,7 +519,10 @@ static int yylex(void)
 
         case '_':
             if (state == LEX_NEW_TOKEN && YYSYMBOL_UNDERSCORE)
+            {
+                fprintf(stderr, "\nyylex: delivered symbol code YYSYMBOL_UNDERSCORE\n");
                 return YYSYMBOL_UNDERSCORE;
+            }
             if ((state == LEX_NEW_TOKEN || state == LEX_WORD) && ID)
                 state = LEX_VARIABLE_ID;
             if (state == LEX_VARIABLE_ID)
@@ -526,6 +550,7 @@ static int yylex(void)
                 val_power = 10;
                 continue;
 
+#if 0
         case '-':
             if (state == LEX_NEW_TOKEN && NUMBER)
             {
@@ -553,6 +578,7 @@ static int yylex(void)
             }
                     }
                 }
+#endif
             }
             /* fall through */
         default:
@@ -764,6 +790,28 @@ static int yylex(void)
                     if (sympos < 0)
                     {
                         POP_CH(ch);
+                        {
+                            char opstr[8] = {0};
+                            int sp;
+
+                            for (sp = 0; deflist[sp]; sp += -deflist[sp] + 2)
+                            {
+                                if (deflist[sp + 1] == -sympos)
+                                {
+                                    int len = deflist[sp];
+                                    int j;
+
+                                    for (sp += 2, j = 0; j < len; j++)
+                                    {
+                                        opstr[j] = deflist[sp + j];
+                                    }
+                                    opstr[j] = 0;
+                                    break;
+                                }
+                            }
+                            fprintf(stderr, "\nyylex: delivered symbol code %d for operator [ %s ]\n", 
+                                            -sympos, opstr);
+                        }
                         return -sympos;
                     }
 
@@ -797,6 +845,7 @@ static int yylex(void)
             }
             break;
         }
+        break;
     }
 
     /*
@@ -810,6 +859,7 @@ static int yylex(void)
             val /= val_power;
         val *= val_sign;
         yylval = val;
+        fprintf(stderr, "\nyylex: delivered NUMBER, value: %f\n", (double)val);
         return NUMBER;
 
     case LEX_WORD:
@@ -823,6 +873,7 @@ static int yylex(void)
             strbuf = NULL;
             sym = lookup_symbol(str);
             yylval = sym->index;        // this allows the grammar action code to retrieve this word via a simple number.
+            fprintf(stderr, "\nyylex: delivered %s, value: [%s]\n", (state == LEX_VARIABLE_ID ? "ID" : "WORD"), sym->name);
             free(str);
         }
         return (state == LEX_VARIABLE_ID ? ID : WORD);
@@ -831,16 +882,40 @@ static int yylex(void)
         // we shouldn't really be here...
         POP_CH(ch);
         yylval = ch;
+        fprintf(stderr, "\nyylex: delivered YYERRCODE, value: %c ($%02x)\n", ch, ch);
         return YYERRCODE;
     }
 }
 
-int main(void)
+int getkey_per_line(void)
+{
+    int ch = fgetc(stdin);
+    if (ch == '\x04')
+        return EOF;
+    return ch;
+}
+
+int main(int argc, char **argv)
 {
     int ch;
 
+    keypress = getkey;
+
     create_symbol_table();
     yydebug = 1;
+    /*
+     * -l:  Enter input by line instead of immediately (per char).
+     */
+    if (argc > 1 && argv[1] && strcmp("-l", argv[1]) == 0)
+    {
+        keypress = getkey_per_line;
+        fprintf(stderr, "NOTICE: input will processed on a per-line basis, i.e.\n        you must hit [ENTER] before the input will be seen.\n\n");
+    }
+    else
+    {
+        fprintf(stderr, "NOTICE: input will processed on a per-character basis, i.e.\n        the code will see each keypress immediately and act accordingly.\n\n");
+    }
+
     do
     {
 #if !defined(SHOW_USAGE)
@@ -850,11 +925,16 @@ int main(void)
 #endif
 
         yylval = 0;
-        fprintf(stderr, "yyparse = %d, yylval = ", yyparse());
-        YYDBPR(yylval);
-        fprintf(stderr, "\n\n*** Hit [Y] for another round:\n");
-        ch = getchar();
-    } while (ch == 'y' || ch == 'Y');
+        reset_yylex();
+
+        fprintf(stderr, "yyparse = %d, yyretlval = ", yyparse());
+        YYDBPR(yyretlval);
+
+        fprintf(stderr, "\n\n*** Hit [Control+D] if you don't want to go for another round:\n");
+        ch = keypress();
+        //fprintf(stderr, "typed char: %c (%02x)\n", ch, ch);
+        fprintf(stderr, "\n---\n");
+    } while (ch != EOF);
 
     fprintf(stderr, "Exiting test application...\n");
     free_symbol_table();

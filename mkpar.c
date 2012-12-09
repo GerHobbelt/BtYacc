@@ -116,7 +116,6 @@ static void remove_conflicts(void)
 {
     int i;
     int symbol;
-    int number = -1;
     action *p, *pref;
 
     SRtotal = 0;
@@ -138,7 +137,6 @@ static void remove_conflicts(void)
             {
                 new_pref = p;
                 symbol = p->symbol;
-                number = p->number;
             }
             else if (i == final_state && symbol == 0)
             {

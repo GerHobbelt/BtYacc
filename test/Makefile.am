@@ -11,6 +11,7 @@ BTYACC_OPTIONS = -v -l
 FRAMEWORK_DEPS = \
 	test-framework-header.h \
 	test-framework-tail.h \
+	test-framework-porting-lib.h \
 	portability-config.h
 
 

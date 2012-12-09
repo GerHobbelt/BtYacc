@@ -10,13 +10,16 @@
 #endif
 
 
-#if defined(HAVE_GETCH)
+#if defined(HAVE_GETCHE)
 
 int getkey(void)
 {
     char ch;
 
     ch = getche();
+
+    if (ch == '\x04') /* Control-D */
+        return EOF;
     return ch;
 }
 
@@ -29,7 +32,7 @@ int getkey(void)
 
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
+    newt.c_lflag &= ~(ICANON /* | ECHO */ );
     // as per http://www.daniweb.com/software-development/c/threads/148447/getch-implementation-in-unix: required for HP-UX:
     newt.c_cc[VMIN] = 1;
     newt.c_cc[VTIME] = 0;
@@ -39,6 +42,8 @@ int getkey(void)
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 
+    if (ch == '\x04') /* Control-D */
+        return EOF;
     return ch;
 }
 
