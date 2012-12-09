@@ -1,8 +1,9 @@
 /* Infix notation calculator - calc - cf. bison 1.20 manual */
 %{
-#define YYSTYPE double
-#include <math.h>
+#include "test-framework-header.h"
 %}
+%debug
+
 /* BISON Declarations */
 %token NUMBER
 %left '-' '+'
@@ -19,7 +20,7 @@ line: '\n'
 ;
 exp: NUMBER { $$ = $1; }
 | exp '+' exp { $$ = $1 + $3; }
-| exp ' ' exp { $$ = $1 - $3; }
+| exp '-' exp { $$ = $1 - $3; }
 | exp '*' exp { $$ = $1 * $3; }
 | exp '/' exp { $$ = $1 / $3; }
 | '-' exp %prec NEG { $$ = -$2; }
@@ -27,3 +28,4 @@ exp: NUMBER { $$ = $1; }
 | '(' exp ')' { $$ = $2; }
 ;
 %%
+#include "test-framework-tail.h"

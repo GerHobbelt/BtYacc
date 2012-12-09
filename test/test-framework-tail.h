@@ -10,7 +10,7 @@ void yyerror_detailed(const char *msg, int lexed_token, YYSTYPE yylval, YYPOSN y
     int ri, si, ci;
     int i;
 
-#if defined(YYDEBUG)
+#if YYDEBUG
     fprintf(stderr, "%s (when parsing token '%s' at input position %d)\n", msg, ((lexed_token >= 0 && lexed_token < YYMAXTOKEN) ? yyname[lexed_token] : "illegal-token"), yyposn);
 #else
     fprintf(stderr, "%s (when parsing token '%d' at input position %d)\n", msg, lexed_token, yyposn);
@@ -30,7 +30,7 @@ void yyerror_detailed(const char *msg, int lexed_token, YYSTYPE yylval, YYPOSN y
         {
             if (ri != 0 && (ri + i <= YYTABLESIZE) && yycheck[ri + i] == i)
             {
-#if defined(YYDEBUG)
+#if YYDEBUG
                 fprintf(stderr, "%s (%d) -> %s\n", yyname[i], i, "reduction");
 #else
                 fprintf(stderr, "(%d) -> %s\n", i, "reduction");
@@ -38,7 +38,7 @@ void yyerror_detailed(const char *msg, int lexed_token, YYSTYPE yylval, YYPOSN y
             }
             if (si != 0 && (si + i <= YYTABLESIZE) && yycheck[si + i] == i)
             {
-#if defined(YYDEBUG)
+#if YYDEBUG
                 fprintf(stderr, "%s (%d) -> %s\n", yyname[i], i, "shift");
 #else
                 fprintf(stderr, "(%d) -> %s\n", i, "shift");
@@ -46,7 +46,7 @@ void yyerror_detailed(const char *msg, int lexed_token, YYSTYPE yylval, YYPOSN y
             }
             if (ci != 0 && (ci + i <= YYTABLESIZE) && yycheck[ci + i] == i)
             {
-#if defined(YYDEBUG)
+#if YYDEBUG
                 fprintf(stderr, "%s (%d) -> %s\n", yyname[i], i, "CONFLICT");
 #else
                 fprintf(stderr, "(%d) -> %s\n", i, "CONFLICT");
@@ -358,6 +358,10 @@ static getkey_f *keypress = 0;
 #define YYSYMBOL_BACKQUOTE_BACKQUOTE_BACKQUOTE                      0
 #endif
 
+#ifndef YYSYMBOL_BACKSLASH_n
+#define YYSYMBOL_BACKSLASH_n                0
+#endif
+
 
 #ifndef NUMBER
 #define NUMBER                  0
@@ -453,8 +457,11 @@ static int yylex(void)
     for (;;)
     {
         POP_CH(ch);
-        fprintf(stderr, "\nyylex: ch = %c ($%02x), previous_ch_pos = %d, state = %d, val = %f, val_power = %f, val_sign = %d\n",
-            ch, ch, previous_ch_pos, state, (double)val, (double)val_power, val_sign);
+        if (yydebug > 0)
+        {
+            fprintf(stderr, "\nyylex: ch = %c ($%02x), previous_ch_pos = %d, state = %d, val = %f, val_power = %f, val_sign = %d\n",
+                ch, ch, previous_ch_pos, state, (double)val, (double)val_power, val_sign);
+        }
         switch (ch)
         {
         case 0:
@@ -466,7 +473,10 @@ static int yylex(void)
                 break;
             }
             PUSH_CH(EOF);
-            fprintf(stderr, "\nyylex: delivered symbol code EOF\n");
+            if (yydebug > 0)
+            {
+                fprintf(stderr, "\nyylex: delivered symbol code EOF\n");
+            }
             return 0;
 
         case ' ':
@@ -477,6 +487,14 @@ static int yylex(void)
             {
                 PUSHBACK_CH(ch);
                 break;
+            }
+            if (ch == '\n' && YYSYMBOL_BACKSLASH_n)
+            {
+                if (yydebug > 0)
+                {
+                    fprintf(stderr, "\nyylex: delivered symbol code '\\n' (LineFeed)\n");
+                }
+                return YYSYMBOL_BACKSLASH_n;
             }
             continue;
 
@@ -520,7 +538,10 @@ static int yylex(void)
         case '_':
             if (state == LEX_NEW_TOKEN && YYSYMBOL_UNDERSCORE)
             {
-                fprintf(stderr, "\nyylex: delivered symbol code YYSYMBOL_UNDERSCORE\n");
+                if (yydebug > 0)
+                {
+                    fprintf(stderr, "\nyylex: delivered symbol code YYSYMBOL_UNDERSCORE\n");
+                }
                 return YYSYMBOL_UNDERSCORE;
             }
             if ((state == LEX_NEW_TOKEN || state == LEX_WORD) && ID)
@@ -790,6 +811,7 @@ static int yylex(void)
                     if (sympos < 0)
                     {
                         POP_CH(ch);
+                        if (yydebug > 0)
                         {
                             char opstr[8] = {0};
                             int sp;
@@ -859,7 +881,10 @@ static int yylex(void)
             val /= val_power;
         val *= val_sign;
         yylval = val;
-        fprintf(stderr, "\nyylex: delivered NUMBER, value: %f\n", (double)val);
+        if (yydebug > 0)
+        {
+            fprintf(stderr, "\nyylex: delivered NUMBER, value: %f\n", (double)val);
+        }
         return NUMBER;
 
     case LEX_WORD:
@@ -873,7 +898,10 @@ static int yylex(void)
             strbuf = NULL;
             sym = lookup_symbol(str);
             yylval = sym->index;        // this allows the grammar action code to retrieve this word via a simple number.
-            fprintf(stderr, "\nyylex: delivered %s, value: [%s]\n", (state == LEX_VARIABLE_ID ? "ID" : "WORD"), sym->name);
+            if (yydebug > 0)
+            {
+                fprintf(stderr, "\nyylex: delivered %s, value: [%s]\n", (state == LEX_VARIABLE_ID ? "ID" : "WORD"), sym->name);
+            }
             free(str);
         }
         return (state == LEX_VARIABLE_ID ? ID : WORD);
@@ -882,7 +910,10 @@ static int yylex(void)
         // we shouldn't really be here...
         POP_CH(ch);
         yylval = ch;
-        fprintf(stderr, "\nyylex: delivered YYERRCODE, value: %c ($%02x)\n", ch, ch);
+        if (yydebug > 0)
+        {
+            fprintf(stderr, "\nyylex: delivered YYERRCODE, value: %c ($%02x)\n", ch, ch);
+        }
         return YYERRCODE;
     }
 }
@@ -902,7 +933,9 @@ int main(int argc, char **argv)
     keypress = getkey;
 
     create_symbol_table();
+#if YYDEBUG
     yydebug = 1;
+#endif
     /*
      * -l:  Enter input by line instead of immediately (per char).
      */

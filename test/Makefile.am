@@ -23,7 +23,7 @@ all: ../btyacc $(TEST_OUTPUT_SOURCEFILES) $(TEST_APPLICATIONS)
 	../btyacc $(BTYACC_OPTIONS) $<
 
 %: %.tab.c $(FRAMEWORK_DEPS)
-	$(CC) -ggdb -O0 -Wall -Wno-unused-function -o $@ $<
+	$(CC) -ggdb -O0 -Wall -Wno-unused-function -o $@ $< -Wl,-lm
 
 
 #portability-config.h: portability-config.h.in Makefile.in configure
