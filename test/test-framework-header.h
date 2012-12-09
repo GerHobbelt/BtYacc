@@ -61,19 +61,35 @@ BtYacc test grammars: Framework Header Section
 #if defined(HAVE_TERMIOS_H)
 #include <termios.h> 
 #endif
+#if defined(HAVE_MATH_H)
+#include <math.h>
+#endif
+#if defined(HAVE_LIMITS_H)
+#include <limits.h>
+#endif
+#if defined(HAVE_FLOAT_H)
+#include <float.h>
+#endif
 
 
 
 
+#ifndef YYERROR /* using ifdef(YYERROR) to notice whether we were loaded as header or half way through the generated code */
 #define YYERROR_DETAILED	1
+#else
+#define TEST_FRAMEWORK_ALT_INTRO_CODE	1
+#endif
 
 
-
-
+#ifndef YYSTYPE
 typedef double yystype_t;
 #define YYSTYPE	yystype_t
 
+#undef YYDBPR
 #define YYDBPR(yystype)    BTYACC_DEBUG_LOG_PARTIAL("%f", (double)(yystype))
+#endif
+
+
 
 
 
@@ -149,5 +165,11 @@ static struct symbol *lookup_symbol_by_index(unsigned int index);
 
 static void create_symbol_table(void);
 static void free_symbol_table(void);
+
+
+/**
+Print a 'out of memory' error message and abort/exit.
+*/
+static void no_space(void);
 
 

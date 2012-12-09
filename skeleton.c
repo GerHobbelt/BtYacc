@@ -1,5 +1,5 @@
 /*
-** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\btyaccpa.skeleton
+** This file generated automatically from btyaccpa.skeleton
 */
 
 #include "defs.h"
@@ -335,18 +335,6 @@ static char const * const header[] =
     "#define yyPCopy(to, from, size)         memcpy(to, from, (size) * sizeof((to)[0]))",
     "#endif",
     "",
-    "",
-    0
-};
-
-static char const * const body[] =
-{
-    "#line 315 \"btyaccpa.skeleton\"",
-    "",
-    "#ifndef YYERRCODE",
-    "#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.",
-    "#endif",
-    "",
     "/*",
     " * Define's which could have been overridden by the user:",
     " *",
@@ -408,15 +396,30 @@ static char const * const body[] =
     "",
     "#if defined(YYERROR_DETAILED)",
     "#if !defined(yyerror_detailed)",
-    "extern _YACC_EXTERN_ void yyerror_detailed(const char *msg, int lexed_token, YYSTYPE yylval, YYPOSN yyposn, unsigned int yystate);",
+    "void yyerror_detailed(const char *msg, int lexed_token, YYSTYPE yylval, YYPOSN yyposn, unsigned int yystate);",
     "#endif",
     "#else",
     "#if !defined(yyerror)",
-    "extern _YACC_EXTERN_ void yyerror(const char *msg);",
+    "void yyerror(const char *msg);",
     "#endif",
     "#endif",
     "",
     "",
+    "",
+    "",
+    0
+};
+
+static char const * const body[] =
+{
+    "#line 386 \"btyaccpa.skeleton\"",
+    "",
+    "",
+    "",
+    "",
+    "#ifndef YYERRCODE",
+    "#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.",
+    "#endif",
     "",
     "/*",
     " *    Parser function. Roughly looks like this:",
@@ -947,7 +950,7 @@ static char const * const body[] =
 
 static char const * const trailer[] =
 {
-    "#line 916 \"btyaccpa.skeleton\"",
+    "#line 919 \"btyaccpa.skeleton\"",
     "",
     "  default:",
     "    break;",
@@ -1449,7 +1452,7 @@ static char const * const trailer[] =
 
 static char const * const line_position[] =
 {
-    "#line 1413 \"btyaccpa.skeleton\"",
+    "#line 1416 \"btyaccpa.skeleton\"",
     "#line %d \"%s\"",
     "",
     0
@@ -1457,21 +1460,21 @@ static char const * const line_position[] =
 
 static char const * const comment_start[] =
 {
-    "#line 1416 \"btyaccpa.skeleton\"",
+    "#line 1419 \"btyaccpa.skeleton\"",
     "/*",
     0
 };
 
 static char const * const comment_next_line[] =
 {
-    "#line 1418 \"btyaccpa.skeleton\"",
+    "#line 1421 \"btyaccpa.skeleton\"",
     "**",
     0
 };
 
 static char const * const comment_end[] =
 {
-    "#line 1420 \"btyaccpa.skeleton\"",
+    "#line 1423 \"btyaccpa.skeleton\"",
     "*/",
     "",
     0
@@ -1479,7 +1482,7 @@ static char const * const comment_end[] =
 
 static char const * const action_case_start[] =
 {
-    "#line 1423 \"btyaccpa.skeleton\"",
+    "#line 1426 \"btyaccpa.skeleton\"",
     "  case %d:",
     "",
     0
@@ -1487,7 +1490,7 @@ static char const * const action_case_start[] =
 
 static char const * const action_code[] =
 {
-    "#line 1426 \"btyaccpa.skeleton\"",
+    "#line 1429 \"btyaccpa.skeleton\"",
     "    %s;",
     "",
     "",
@@ -1496,7 +1499,7 @@ static char const * const action_code[] =
 
 static char const * const action_case_end[] =
 {
-    "#line 1430 \"btyaccpa.skeleton\"",
+    "#line 1433 \"btyaccpa.skeleton\"",
     "    break;",
     "",
     "",
@@ -1505,7 +1508,7 @@ static char const * const action_case_end[] =
 
 static char const * const action_if_not_yytrial_start[] =
 {
-    "#line 1434 \"btyaccpa.skeleton\"",
+    "#line 1437 \"btyaccpa.skeleton\"",
     "    if (!yytrial)",
     "    {",
     "",
@@ -1514,7 +1517,7 @@ static char const * const action_if_not_yytrial_start[] =
 
 static char const * const action_if_not_yytrial_end[] =
 {
-    "#line 1438 \"btyaccpa.skeleton\"",
+    "#line 1441 \"btyaccpa.skeleton\"",
     "",
     "    } /* end: if (!yytrial) */",
     "",
@@ -1523,84 +1526,84 @@ static char const * const action_if_not_yytrial_end[] =
 
 static char const * const action_block_start[] =
 {
-    "#line 1442 \"btyaccpa.skeleton\"",
+    "#line 1445 \"btyaccpa.skeleton\"",
     "{",
     0
 };
 
 static char const * const action_block_end[] =
 {
-    "#line 1444 \"btyaccpa.skeleton\"",
+    "#line 1447 \"btyaccpa.skeleton\"",
     "}",
     0
 };
 
 static char const * const yyval_tag_reference[] =
 {
-    "#line 1446 \"btyaccpa.skeleton\"",
+    "#line 1449 \"btyaccpa.skeleton\"",
     "yyval.%s",
     0
 };
 
 static char const * const yyval_reference[] =
 {
-    "#line 1448 \"btyaccpa.skeleton\"",
+    "#line 1451 \"btyaccpa.skeleton\"",
     "yyval",
     0
 };
 
 static char const * const yyvsp_tag_reference[] =
 {
-    "#line 1450 \"btyaccpa.skeleton\"",
+    "#line 1453 \"btyaccpa.skeleton\"",
     "yyvsp[%d].%s",
     0
 };
 
 static char const * const yyvsp_reference[] =
 {
-    "#line 1452 \"btyaccpa.skeleton\"",
+    "#line 1455 \"btyaccpa.skeleton\"",
     "yyvsp[%d]",
     0
 };
 
 static char const * const rflag_prefix[] =
 {
-    "#line 1454 \"btyaccpa.skeleton\"",
+    "#line 1457 \"btyaccpa.skeleton\"",
     "static",
     0
 };
 
 static char const * const not_rflag_prefix[] =
 {
-    "#line 1456 \"btyaccpa.skeleton\"",
+    "#line 1459 \"btyaccpa.skeleton\"",
     "",
     0
 };
 
 static char const * const int_table_start[] =
 {
-    "#line 1458 \"btyaccpa.skeleton\"",
+    "#line 1461 \"btyaccpa.skeleton\"",
     "%sYshort %29s[%5d] = {%5d%s",
     0
 };
 
 static char const * const int_table_entry[] =
 {
-    "#line 1460 \"btyaccpa.skeleton\"",
+    "#line 1463 \"btyaccpa.skeleton\"",
     "%5d%s",
     0
 };
 
 static char const * const int_table_entry_separator[] =
 {
-    "#line 1462 \"btyaccpa.skeleton\"",
+    "#line 1465 \"btyaccpa.skeleton\"",
     ",",
     0
 };
 
 static char const * const int_table_end[] =
 {
-    "#line 1464 \"btyaccpa.skeleton\"",
+    "#line 1467 \"btyaccpa.skeleton\"",
     "",
     "};",
     "",
@@ -1609,7 +1612,7 @@ static char const * const int_table_end[] =
 
 static char const * const table_size[] =
 {
-    "#line 1468 \"btyaccpa.skeleton\"",
+    "#line 1471 \"btyaccpa.skeleton\"",
     "",
     "",
     "#define YYTABLESIZE %d",
@@ -1621,7 +1624,7 @@ static char const * const table_size[] =
 
 static char const * const defines_file_protection_start[] =
 {
-    "#line 1475 \"btyaccpa.skeleton\"",
+    "#line 1478 \"btyaccpa.skeleton\"",
     "",
     "#ifndef _BTYACC_DEFINES_H_",
     "#define _BTYACC_DEFINES_H_",
@@ -1633,7 +1636,7 @@ static char const * const defines_file_protection_start[] =
 
 static char const * const defines_file_protection_end[] =
 {
-    "#line 1482 \"btyaccpa.skeleton\"",
+    "#line 1485 \"btyaccpa.skeleton\"",
     "",
     "",
     "#endif /* _BTYACC_DEFINES_H_ */",
@@ -1644,14 +1647,14 @@ static char const * const defines_file_protection_end[] =
 
 static char const * const token_charset[] =
 {
-    "#line 1488 \"btyaccpa.skeleton\"",
+    "#line 1491 \"btyaccpa.skeleton\"",
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$",
     0
 };
 
 static char const * const literal_token_name_template[] =
 {
-    "#line 1490 \"btyaccpa.skeleton\"",
+    "#line 1493 \"btyaccpa.skeleton\"",
     "YYSYMBOL_%%s",
     0
 };
@@ -1659,7 +1662,7 @@ static char const * const literal_token_name_template[] =
 
 static char const * const define_token[] =
 {
-    "#line 1495 \"btyaccpa.skeleton\"",
+    "#line 1498 \"btyaccpa.skeleton\"",
     "#define %-60s %5d",
     "",
     0
@@ -1667,7 +1670,7 @@ static char const * const define_token[] =
 
 static char const * const yystype_extern_decl[] =
 {
-    "#line 1498 \"btyaccpa.skeleton\"",
+    "#line 1501 \"btyaccpa.skeleton\"",
     "",
     "extern YYSTYPE yylval;",
     "",
@@ -1676,10 +1679,11 @@ static char const * const yystype_extern_decl[] =
 
 static char const * const define_default_yystype[] =
 {
-    "#line 1502 \"btyaccpa.skeleton\"",
+    "#line 1505 \"btyaccpa.skeleton\"",
     "",
     "#ifndef YYSTYPE",
     "typedef int YYSTYPE;",
+    "#define YYSTYPE YYSTYPE",
     "#endif",
     "",
     "#ifdef __cplusplus",
@@ -1700,7 +1704,7 @@ static char const * const define_default_yystype[] =
 
 static char const * const union_decl_start[] =
 {
-    "#line 1521 \"btyaccpa.skeleton\"",
+    "#line 1525 \"btyaccpa.skeleton\"",
     "",
     "typedef union",
     0
@@ -1708,7 +1712,7 @@ static char const * const union_decl_start[] =
 
 static char const * const union_decl_end[] =
 {
-    "#line 1524 \"btyaccpa.skeleton\"",
+    "#line 1528 \"btyaccpa.skeleton\"",
     " yystype_t;",
     "#define YYSTYPE yystype_t",
     "",
@@ -1718,7 +1722,7 @@ static char const * const union_decl_end[] =
 
 static char const * const define_yymaxtoken[] =
 {
-    "#line 1529 \"btyaccpa.skeleton\"",
+    "#line 1533 \"btyaccpa.skeleton\"",
     "",
     "#define YYMAXTOKEN %5d",
     "",
@@ -1728,7 +1732,7 @@ static char const * const define_yymaxtoken[] =
 
 static char const * const define_yyfinal[] =
 {
-    "#line 1534 \"btyaccpa.skeleton\"",
+    "#line 1538 \"btyaccpa.skeleton\"",
     "",
     "#define YYFINAL %5d",
     "",
@@ -1738,7 +1742,7 @@ static char const * const define_yyfinal[] =
 
 static char const * const define_yydebug[] =
 {
-    "#line 1539 \"btyaccpa.skeleton\"",
+    "#line 1543 \"btyaccpa.skeleton\"",
     "",
     "#ifndef YYDEBUG",
     "#define YYDEBUG %d",
@@ -1750,14 +1754,14 @@ static char const * const define_yydebug[] =
 
 static char const * const debug_yy_null[] =
 {
-    "#line 1546 \"btyaccpa.skeleton\"",
+    "#line 1550 \"btyaccpa.skeleton\"",
     "0",
     0
 };
 
 static char const * const debug_yyname_strings_start[] =
 {
-    "#line 1548 \"btyaccpa.skeleton\"",
+    "#line 1552 \"btyaccpa.skeleton\"",
     "",
     "#if YYDEBUG",
     "%schar const *yyname[] = {",
@@ -1767,14 +1771,14 @@ static char const * const debug_yyname_strings_start[] =
 
 static char const * const debug_yyname_strings_separator[] =
 {
-    "#line 1553 \"btyaccpa.skeleton\"",
+    "#line 1557 \"btyaccpa.skeleton\"",
     ",",
     0
 };
 
 static char const * const debug_yyname_strings_end[] =
 {
-    "#line 1555 \"btyaccpa.skeleton\"",
+    "#line 1559 \"btyaccpa.skeleton\"",
     "};",
     "#endif",
     "",
@@ -1784,7 +1788,7 @@ static char const * const debug_yyname_strings_end[] =
 
 static char const * const debug_yyrule_strings_start[] =
 {
-    "#line 1560 \"btyaccpa.skeleton\"",
+    "#line 1564 \"btyaccpa.skeleton\"",
     "",
     "#if YYDEBUG",
     "%schar const *yyrule[] = {",
@@ -1794,14 +1798,14 @@ static char const * const debug_yyrule_strings_start[] =
 
 static char const * const debug_yyrule_strings_separator[] =
 {
-    "#line 1565 \"btyaccpa.skeleton\"",
+    "#line 1569 \"btyaccpa.skeleton\"",
     ",",
     0
 };
 
 static char const * const debug_yyrule_strings_end[] =
 {
-    "#line 1567 \"btyaccpa.skeleton\"",
+    "#line 1571 \"btyaccpa.skeleton\"",
     "};",
     "#endif",
     "",
@@ -1811,28 +1815,28 @@ static char const * const debug_yyrule_strings_end[] =
 
 static char const * const DEFINES_FILENAME[] =
 {
-    "#line 1572 \"btyaccpa.skeleton\"",
+    "#line 1576 \"btyaccpa.skeleton\"",
     "%s%s.tab.h",
     0
 };
 
 static char const * const OUTPUT_FILENAME[] =
 {
-    "#line 1574 \"btyaccpa.skeleton\"",
+    "#line 1578 \"btyaccpa.skeleton\"",
     "%s%s.tab.c",
     0
 };
 
 static char const * const CODE_FILENAME[] =
 {
-    "#line 1576 \"btyaccpa.skeleton\"",
+    "#line 1580 \"btyaccpa.skeleton\"",
     "%s%s.code.c",
     0
 };
 
 static char const * const VERBOSE_FILENAME[] =
 {
-    "#line 1578 \"btyaccpa.skeleton\"",
+    "#line 1582 \"btyaccpa.skeleton\"",
     "%s%s.output",
     0
 };

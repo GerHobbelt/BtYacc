@@ -16,7 +16,7 @@ AC_PROG_CC
 # Checks for libraries.
 
 # Checks for header files.
-AC_CHECK_HEADERS([netinet/in.h stdlib.h string.h sys/param.h sys/socket.h syslog.h termios.h unistd.h conio.h ctype.h])
+AC_CHECK_HEADERS([netinet/in.h stdlib.h string.h sys/param.h sys/socket.h syslog.h termios.h unistd.h conio.h ctype.h math.h limits.h float.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL

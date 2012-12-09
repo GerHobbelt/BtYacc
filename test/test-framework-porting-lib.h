@@ -49,3 +49,13 @@ int getkey(void)
 #endif
 
 
+
+#ifndef EPSILON
+#ifdef FLT_EPSILON
+#define EPSILON         FLT_EPSILON
+#else
+#define EPSILON         1.0e-7
+#endif
+#endif
+
+

@@ -31,7 +31,7 @@ void yyerror_detailed(const char *msg, int lexed_token, YYSTYPE yylval, YYPOSN y
 			if (ri != 0 && (ri + i <= YYTABLESIZE) && yycheck[ri + i] == i)
 			{
 #if defined(YYDEBUG)
-				fprintf(stderr, "%s (%d) -> %s\n", i, yyname[i], "reduction");
+				fprintf(stderr, "%s (%d) -> %s\n", yyname[i], i, "reduction");
 #else
 				fprintf(stderr, "(%d) -> %s\n", i, "reduction");
 #endif
@@ -39,7 +39,7 @@ void yyerror_detailed(const char *msg, int lexed_token, YYSTYPE yylval, YYPOSN y
 			if (si != 0 && (si + i <= YYTABLESIZE) && yycheck[si + i] == i)
 			{
 #if defined(YYDEBUG)
-				fprintf(stderr, "%s (%d) -> %s\n", i, yyname[i], "shift");
+				fprintf(stderr, "%s (%d) -> %s\n", yyname[i], i, "shift");
 #else
 				fprintf(stderr, "(%d) -> %s\n", i, "shift");
 #endif
@@ -47,7 +47,7 @@ void yyerror_detailed(const char *msg, int lexed_token, YYSTYPE yylval, YYPOSN y
 			if (ci != 0 && (ci + i <= YYTABLESIZE) && yycheck[ci + i] == i)
 			{
 #if defined(YYDEBUG)
-				fprintf(stderr, "%s (%d) -> %s\n", i, yyname[i], "CONFLICT");
+				fprintf(stderr, "%s (%d) -> %s\n", yyname[i], i, "CONFLICT");
 #else
 				fprintf(stderr, "(%d) -> %s\n", i, "CONFLICT");
 #endif
@@ -840,13 +840,19 @@ int main(void)
     int ch;
 
 	create_symbol_table();
-    fprintf(stderr, "Enter a sequence\n");
     yydebug = 1;
     do
     {
+#if !defined(SHOW_USAGE)
+        fprintf(stderr, "Enter a sequence\n");
+#else
+        SHOW_USAGE();
+#endif
+
         yylval = 0;
-        fprintf(stderr, "yyparse = %d, yylval = %f\n", yyparse(), yylval);
-        fprintf(stderr, "Hit Y for another round:\n");
+        fprintf(stderr, "yyparse = %d, yylval = ", yyparse());
+        YYDBPR(yylval);
+        fprintf(stderr, "\n\n*** Hit [Y] for another round:\n");
         ch = getchar();
     } while (ch == 'y' || ch == 'Y');
 
@@ -1000,7 +1006,7 @@ static struct symbol *first_symbol = NULL;
 static struct symbol *last_symbol = NULL;
 
 
-#define SYMTAB_HASH(s)		(hash(s) & (TABLE_SIZE - 1))
+#define SYMTAB_HASH(s)		(strhash(s) & (TABLE_SIZE - 1))
 
 
 static struct symbol *lookup_symbol(char const * name)
@@ -1066,8 +1072,6 @@ static struct symbol *lookup_symbol_by_index(unsigned int index)
 
 static void create_symbol_table(void)
 {
-    register struct symbol *bp;
-
     symbol_table = (struct symbol **)calloc(TABLE_SIZE, sizeof(symbol_table[0]));
     if (symbol_table == 0) no_space();
 
