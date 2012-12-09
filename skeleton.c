@@ -1,5 +1,5 @@
 /*
-** This file generated automatically from btyaccpa.skeleton
+** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\btyaccpa.skeleton
 */
 
 #include "defs.h"
@@ -578,7 +578,7 @@ static char const * const body[] =
     "        {",
     "          BTYACC_DEBUG_LOG_EOL(\"btyacc[%s]: backtracking 1 token: %d (%s)\\n\", ",
     "                  (yytrial ? \"trial\" : \"---\"),",
-    "                  ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : \"???\"));",
+    "                  yychar, ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : \"???\"));",
     "        }",
     "#endif",
     "",
@@ -1072,9 +1072,9 @@ static char const * const trailer[] =
     "  if (yydebug)",
     "  {",
     "    BTYACC_DEBUG_LOG_EOL(\"btyacc[%3d,%2d%s]: CONFLICT trial successful, \"",
-    "            \"backtracking to state %d, %d tokens\\n\",",
-    "            yystate, yydepth, (yytrial ? \",trial\" : \"\"),",
-    "            yypath->state, (int)(yylvp - yylvals - yypath->lexeme));",
+    "                         \"backtracking to state %d, %d tokens\\n\",",
+    "                         yystate, yydepth, (yytrial ? \",trial\" : \"\"),",
+    "                         yypath->state, (int)(yylvp - yylvals - yypath->lexeme));",
     "  }",
     "#endif",
     "  if (yyerrctx)",

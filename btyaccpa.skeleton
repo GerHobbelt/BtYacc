@@ -549,7 +549,7 @@ yyloop:
         {
           BTYACC_DEBUG_LOG_EOL("btyacc[%s]: backtracking 1 token: %d (%s)\n", 
                   (yytrial ? "trial" : "---"),
-                  ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
+                  yychar, ((yychar >= 0 && yychar <= YYMAXTOKEN) ? yyname[yychar] : "???"));
         }
 #endif
 
@@ -1038,9 +1038,9 @@ yyvalid:
   if (yydebug)
   {
     BTYACC_DEBUG_LOG_EOL("btyacc[%3d,%2d%s]: CONFLICT trial successful, "
-            "backtracking to state %d, %d tokens\n",
-            yystate, yydepth, (yytrial ? ",trial" : ""),
-            yypath->state, (int)(yylvp - yylvals - yypath->lexeme));
+                         "backtracking to state %d, %d tokens\n",
+                         yystate, yydepth, (yytrial ? ",trial" : ""),
+                         yypath->state, (int)(yylvp - yylvals - yypath->lexeme));
   }
 #endif
   if (yyerrctx)

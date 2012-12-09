@@ -1,5 +1,5 @@
 /*
-** This file generated automatically from push.skeleton
+** This file generated automatically from D:\h\prj\1original\visyond\visygit\util\btyacc\push.skeleton
 */
 
 #include "defs.h"
@@ -89,6 +89,10 @@ static char const * const tables[] =
     "#ifndef _YACC_EXTERN_",
     "#define _YACC_EXTERN_ \"C\"",
     "#endif",
+    "#else",
+    "#ifndef _YACC_EXTERN_",
+    "#define _YACC_EXTERN_ /**/",
+    "#endif",
     "#endif",
     "",
     "extern _YACC_EXTERN_ Yshort yylhs[];",
@@ -127,7 +131,7 @@ static char const * const tables[] =
 
 static char const * const header[] =
 {
-    "#line 106 \"push.skeleton\"",
+    "#line 110 \"push.skeleton\"",
     "",
     "#ifndef YYERRCODE",
     "#error Make sure you '#include' the generated btyacc .h headerfile in the .Y file itself, as it defines YYERRCODE and several other constants.",
@@ -139,8 +143,9 @@ static char const * const header[] =
     "#endif",
     "",
     "#define YYEMPTY      (-1)",
+    "/* Clear any previous look-ahead token: */",
     "#define yyclearin    (yychar = YYEMPTY)",
-    "",
+    "/* Reset the parser error state to 'normal' */",
     "#define yyerrok      (yyps->errflag = 0)",
     "",
     "",
@@ -181,6 +186,7 @@ static char const * const header[] =
     "};",
     "typedef struct YYParseState_s YYParseState;",
     "",
+    "/* Current parser state */",
     "static YYParseState *yypstate = 0;",
     "",
     "/* yypath != NULL: do the full parse, starting at *yypath parser state. */",
@@ -229,13 +235,84 @@ static char const * const header[] =
     "#define yySCopy(to, from, size)         memcpy(to, from, (size) * sizeof((to)[0]))",
     "#endif",
     "",
+    "/*",
+    " * Define's which could have been overridden by the user:",
+    " *",
+    " *",
+    " * yydebug LOGGING OUTPUT (default to stderr)",
+    " *",
+    " * A yyparse() yydebug session starts with a single call to",
+    " *   BTYACC_SET_YYDEBUG_FROM_ENV",
+    " * followed by a single call to",
+    " *   BTYACC_DEBUG_LOG_START",
+    " * when yydebug has been turned ON in the BTYACC_SET_YYDEBUG_FROM_ENV call.",
+    " *",
+    " * When yydebug has been turned ON, the yyparse() run will then go and write",
+    " * one or more 'log lines' a.k.a. log report events:",
+    " *",
+    " * Any log line consists of zero or more calls to",
+    " *   BTYACC_DEBUG_LOG_PARTIAL",
+    " * followed by one call to",
+    " *   BTYACC_DEBUG_LOG_EOL",
+    " * which is like BTYACC_DEBUG_LOG_PARTIAL but includes the line terminator (LF)",
+    " * and concludes this yydebug log report event.",
+    " *",
+    " *",
+    " * DEVELOPER NOTE",
+    " * --------------",
+    " *",
+    " * When you provide your own custom implementation of these functions, this",
+    " * combination of functions may help you to cache the logged parts up to the",
+    " * invocation of BTYACC_DEBUG_LOG_EOL at which time you may send the entire",
+    " * concatenated log message to the destination, e.g. a syslog server (which",
+    " * would want to receive the entire line in a single string/message).",
+    " */",
+    "",
+    "#ifndef BTYACC_SET_YYDEBUG_FROM_ENV",
+    "#define BTYACC_SET_YYDEBUG_FROM_ENV__LOCAL_DEF",
+    "#define BTYACC_SET_YYDEBUG_FROM_ENV()   btyacc_set_yydebug_from_env()",
+    "static void btyacc_set_yydebug_from_env(void);",
+    "#endif",
+    "",
+    "#ifndef BTYACC_DEBUG_LOG_START",
+    "#define BTYACC_DEBUG_LOG_START__LOCAL_DEF",
+    "#define BTYACC_DEBUG_LOG_START(msg)     btyacc_debug_log_start(msg)",
+    "static void btyacc_debug_log_start(const char *msg);",
+    "#endif",
+    "",
+    "#ifndef BTYACC_DEBUG_LOG_PARTIAL",
+    "#define BTYACC_DEBUG_LOG_PARTIAL__LOCAL_DEF",
+    "#define BTYACC_DEBUG_LOG_PARTIAL        btyacc_debug_log_partial",
+    "static void btyacc_debug_log_partial(const char *msg, ...);",
+    "#endif",
+    "",
+    "#ifndef BTYACC_DEBUG_LOG_EOL",
+    "#define BTYACC_DEBUG_LOG_EOL__LOCAL_DEF",
+    "#define BTYACC_DEBUG_LOG_EOL            btyacc_debug_log_eol",
+    "static void btyacc_debug_log_eol(const char *msg, ...);",
+    "#endif",
+    "",
+    "",
+    "",
+    "#if defined(YYERROR_DETAILED)",
+    "#if !defined(yyerror_detailed)",
+    "void yyerror_detailed(const char *msg, int lexed_token, YYSTYPE yylval, YYPOSN yyposn, unsigned int yystate);",
+    "#endif",
+    "#else",
+    "#if !defined(yyerror)",
+    "void yyerror(const char *msg);",
+    "#endif",
+    "#endif",
+    "",
+    "",
+    "",
     "",
     0
 };
 
 static char const * const body[] =
 {
-    "#line 209 \"push.skeleton\"",
+    "#line 286 \"push.skeleton\"",
     "",
     "#ifndef YYNEWSTATE",
     "static struct yyparsestate *YYNEWSTATE(int size)",
@@ -276,13 +353,41 @@ static char const * const body[] =
     "            goto yyvalid;                                   \\",
     "    } while(0)",
     "",
+    "/*",
+    " *    Parser function. Roughly looks like this:",
+    " *",
+    " *    int yyparse(void)",
+    " *    {",
+    " *    yyloop:",
+    " *      if (reduce_possible) goto yyreduce;",
+    " *      read_token;",
+    " *      if (conflict)",
+    " *      {",
+    " *        handle_conflict;",
+    " *        goto yyshift; or goto yyreduce;",
+    " *      }",
+    " *      if (shift_possible)",
+    " *      {",
+    " *    yyshift:",
+    " *        do_shift;",
+    " *        goto yyloop;",
+    " *      }",
+    " *      if (reduce_possible) goto yyreduce;",
+    " *",
+    " *      (error handling);",
+    " *      goto yyloop;",
+    " *",
+    " *    yyreduce:",
+    " *      BIG_CHUNK_OF_RULE_ACTIONS;",
+    " *      goto yyloop;",
+    " *",
+    " *      (more error handling);",
+    " *    }",
+    " */",
     "int yyparse(int yychar, YYSTYPE yylval)",
     "{",
     "    int yym, yyn, yynewerrflag;",
     "    int unsigned yystate;",
-    "#if YYDEBUG",
-    "    char *yys;",
-    "#endif",
     "",
     "    if (yychar < 0)",
     "        yychar = 0;",
@@ -303,7 +408,7 @@ static char const * const body[] =
     "#if YYDEBUG",
     "    if (yydebug)",
     "    {",
-    "        yys = 0;",
+    "        const char *yys = 0;",
     "        if (yychar <= YYMAXTOKEN)",
     "            yys = yyname[yychar];",
     "        if (!yys)",
@@ -346,15 +451,16 @@ static char const * const body[] =
     "#if YYDEBUG",
     "        if (yydebug)",
     "        {",
-    "            yys = 0;",
+    "            char const *yys = 0;",
+    "",
     "            if (yychar <= YYMAXTOKEN)",
     "                yys = yyname[yychar];",
     "            if (!yys)",
     "                yys = \"illegal-symbol\";",
-    "            printf(\"yydebug: state %d, reading %d (%s) \", yystate,",
+    "            printf(\"yydebug: state %d, reading %d (%s)\", yystate,",
     "                    yychar, yys);",
     "#ifdef YYDBPR",
-    "            printf(\"<\");",
+    "            printf(\" <\");",
     "            YYDBPR(yylval);",
     "            printf(\">\");",
     "#endif",
@@ -531,7 +637,13 @@ static char const * const body[] =
     "        yynewerrflag = 1;",
     "    }",
     "    if (yynewerrflag)",
+    "    {",
+    "#ifdef YYERROR_DETAILED",
+    "        yyerror_detailed(\"syntax error\", yychar, yylval, yyposn, yystate);",
+    "#else",
     "        yyerror(\"syntax error\");",
+    "#endif",
+    "    }",
     "yyinrecovery:",
     "    if (yyerrflag < 3)",
     "    {",
@@ -617,7 +729,7 @@ static char const * const body[] =
 
 static char const * const trailer[] =
 {
-    "#line 586 \"push.skeleton\"",
+    "#line 698 \"push.skeleton\"",
     "",
     "    }",
     "",
@@ -651,13 +763,19 @@ static char const * const trailer[] =
     "    }",
     "    if ((yyn = yygindex[yym]) && (yyn += yystate) >= 0 &&",
     "        yyn <= YYTABLESIZE && yycheck[yyn] == yystate)",
+    "    {",
     "        yystate = yytable[yyn];",
+    "    }",
     "    else",
+    "    {",
     "        yystate = yydgoto[yym];",
+    "    }",
     "#if YYDEBUG",
     "    if (yydebug)",
+    "    {",
     "        printf(\"yydebug: after reduction, %s from state %d to state %d\\n\",",
     "               \"shifting\", *yyssp, yystate);",
+    "    }",
     "#endif",
     "    if (yyssp >= yyss + yystacksize - 1)",
     "        YYMORESTACK;",
@@ -667,7 +785,9 @@ static char const * const trailer[] =
     "",
     "yyvalid:",
     "    if (yypath)",
+    "    {",
     "        goto yyabort;",
+    "    }",
     "    while (yypstate->save)",
     "    {",
     "        struct yyparsestate *save = yypstate->save;",
@@ -677,20 +797,31 @@ static char const * const trailer[] =
     "    }",
     "#if YYDEBUG",
     "    if (yydebug)",
+    "    {",
     "        printf(\"yydebug: trial successful, %s state %d, %d tokens\\n\",",
     "               \"backtracking to\", yypath->state,",
     "               (int)(yylvp - yylvals - yypath->lexeme));",
+    "    }",
     "#endif",
     "    yychar = -1;",
     "    yyssp = yyss + (yypath->ssp - yypath->ss);",
     "    yyvsp = yyvs + (yypath->vsp - yypath->vs);",
-    "    memcpy(yyss, yypath->ss, (yyssp - yyss + 1) * sizeof(short));",
+    "    memcpy(yyss, yypath->ss, (yyssp - yyss + 1) * sizeof(yyss[0]));",
     "    YYSCOPY(yyvs, yypath->vs, yyvsp - yyvs + 1);",
     "    yylvp = yylvals + yypath->lexeme;",
     "    yylexp = yylexemes + yypath->lexeme;",
     "    yystate = yypath->state;",
     "    goto yyloop;",
     "",
+    "",
+    "heap_alloc_error:",
+    "#if YYDEBUG",
+    "    if (yydebug)",
+    "    {",
+    "        BTYACC_DEBUG_LOG_EOL(\"btyacc[%3d,--%s]: out of memory\\n\",",
+    "                yystate, (yytrial ? \",trial\" : \"\"));",
+    "    }",
+    "#endif",
     "yyabort:",
     "    while (yypstate)",
     "    {",
@@ -738,7 +869,8 @@ static char const * const trailer[] =
     "  {",
     "    /* in trial mode; save scanner results for future parse attempts */",
     "    if (yylvp == yylvlim)",
-    "      yyExpand();",
+    "      if (yyExpand())",
+    "        return -2;",
     "    *yylexp = yylex();",
     "    *yylvp++ = yylval;",
     "    ++yylve;",
@@ -753,32 +885,6 @@ static char const * const trailer[] =
     "}",
     "",
     "/* Enlarge lexical value queue */",
-    "static int yyexpand(void)",
-    "{",
-    "    int p = yylvp-yylvals;",
-    "    int s = yylvlim-yylvals;",
-    "",
-    "    s += 16;",
-    "#ifndef __cplusplus",
-    "    yylvals = (YYSTYPE *)realloc(yylvals, s*sizeof(YYSTYPE));",
-    "    yylexemes = (short *)realloc(yylexemes, s*sizeof(short));",
-    "#else /* C++ */",
-    "    {",
-    "        short *tl = yylexemes;",
-    "        YYSTYPE *tv = yylvals;",
-    "        yylvals = new YYSTYPE[s];",
-    "        yylexemes = new short[s];",
-    "        memcpy(yylexemes, tl, (s-16)*sizeof(short));",
-    "        YYSCOPY(yylvals, tv, s-16);",
-    "        delete[] tl;",
-    "        delete[] tv;",
-    "    }",
-    "#endif /* C++ */",
-    "    yylvp = yylve = yylvals + p;",
-    "    yylvlim = yylvals + s;",
-    "    yylexp = yylexemes + p;",
-    "    return 0;",
-    "}",
     "static int yyExpand(void)",
     "{",
     "  int p = yylvp - yylvals;",
@@ -793,6 +899,14 @@ static char const * const trailer[] =
     "#else",
     "    yylvals = (YYSTYPE*)malloc(s * sizeof(yylvals[0]));",
     "    yylexemes = (Yshort*)malloc(s * sizeof(yylexemes[0]));",
+    "    if (!yylvals || !yylexemes)",
+    "    {",
+    "        free(yylvals);",
+    "        free(yylexemes);",
+    "        yylvals = tv;",
+    "        yylexemes = tl;",
+    "        return -1;",
+    "    }",
     "#endif",
     "    memcpy(yylexemes, tl, (s - YYSTACKGROWTH) * sizeof(yylexemes[0]));",
     "    yySCopy(yylvals, tv, s - YYSTACKGROWTH);",
@@ -825,7 +939,7 @@ static char const * const trailer[] =
     "",
     "#endif",
     "",
-    "static void yyMoreStack(YYParseState *yyps)",
+    "static int yyMoreStack(YYParseState *yyps)",
     "{",
     "  int p = yyps->ssp - yyps->ss;",
     "  Yshort  *tss = yyps->ss;",
@@ -836,6 +950,14 @@ static char const * const trailer[] =
     "#else",
     "  yyps->ss = (Yshort*)malloc(sizeof(yyps->ss[0]) * (yyps->stacksize + YYSTACKGROWTH));",
     "  yyps->vs = (YYSTYPE*)malloc(sizeof(yyps->vs[0]) * (yyps->stacksize + YYSTACKGROWTH));",
+    "  if (!yyps->ss || !yyps->vs)",
+    "  {",
+    "    free(yyps->ss);",
+    "    free(yyps->vs);",
+    "    yyps->ss = tss;",
+    "    yyps->vs = tvs;",
+    "    return -1;",
+    "  }",
     "#endif",
     "  memcpy(yyps->ss, tss, yyps->stacksize * sizeof(yyps->ss[0]));",
     "  yySCopy(yyps->vs, tvs, yyps->stacksize);",
@@ -858,6 +980,7 @@ static char const * const trailer[] =
     "    BTYACC_DEBUG_LOG_EOL(\"btyacc: stack size increased to %d\\n\", yyps->stacksize);",
     "  }",
     "#endif",
+    "  return 0;",
     "}",
     "",
     "",
@@ -884,8 +1007,16 @@ static char const * const trailer[] =
     "  }",
     "#else",
     "  p = (YYParseState*)malloc(sizeof(p[0]));",
+    "  if (!p) return NULL;",
     "  p->ss = (Yshort*) malloc(size * sizeof(p->ss[0]));",
     "  p->vs = (YYSTYPE*)malloc(size * sizeof(p->vs[0]));",
+    "  if (!p->ss || !p->vs)",
+    "  {",
+    "    free(p->ss);",
+    "    free(p->vs);",
+    "    free(p);",
+    "    return NULL;",
+    "  }",
     "  /*",
     "   * Keep in mind that the caller of this function will fill the items",
     "   * up to index [old_size] (not including that one)!",
@@ -902,13 +1033,19 @@ static char const * const trailer[] =
     "  YYParseState *p = *v;",
     "",
     "#ifdef __cplusplus",
-    "  delete[] p->ss;",
-    "  delete[] p->vs;",
-    "  delete p;",
+    "  if (p)",
+    "  {",
+    "    delete[] p->ss;",
+    "    delete[] p->vs;",
+    "    delete p;",
+    "  }",
     "#else",
-    "  free(p->ss);",
-    "  free(p->vs);",
-    "  free(p);",
+    "  if (p)",
+    "  {",
+    "    free(p->ss);",
+    "    free(p->vs);",
+    "    free(p);",
+    "  }",
     "#endif",
     "",
     "  *v = 0;",
@@ -927,6 +1064,7 @@ static char const * const trailer[] =
     " * ----------------------------------------------------------------------",
     " */",
     "",
+    "#ifdef BTYACC_SET_YYDEBUG_FROM_ENV__LOCAL_DEF",
     "static void btyacc_set_yydebug_from_env(void)",
     "{",
     "  const char *yys = getenv(\"YYDEBUG\");",
@@ -939,12 +1077,16 @@ static char const * const trailer[] =
     "      yydebug = yyn - '0';",
     "  }",
     "}",
+    "#endif",
     "",
+    "#ifdef BTYACC_DEBUG_LOG_START__LOCAL_DEF",
     "static void btyacc_debug_log_start(const char *msg)",
     "{",
     "    fprintf(stderr, \"%s\", msg);",
     "}",
+    "#endif",
     "",
+    "#ifdef BTYACC_DEBUG_LOG_PARTIAL__LOCAL_DEF",
     "static void btyacc_debug_log_partial(const char *msg, ...)",
     "{",
     "    va_list args;",
@@ -953,7 +1095,9 @@ static char const * const trailer[] =
     "    vfprintf(stderr, msg, args);",
     "    va_end(args);",
     "}",
+    "#endif",
     "",
+    "#ifdef BTYACC_DEBUG_LOG_EOL__LOCAL_DEF",
     "static void btyacc_debug_log_eol(const char *msg, ...)",
     "{",
     "    va_list args;",
@@ -962,13 +1106,14 @@ static char const * const trailer[] =
     "    vfprintf(stderr, msg, args);",
     "    va_end(args);",
     "}",
+    "#endif",
     "",
     0
 };
 
 static char const * const line_position[] =
 {
-    "#line 932 \"push.skeleton\"",
+    "#line 1077 \"push.skeleton\"",
     "#line %d \"%s\"",
     "",
     0
@@ -976,21 +1121,29 @@ static char const * const line_position[] =
 
 static char const * const comment_start[] =
 {
-    "#line 935 \"push.skeleton\"",
+    "#line 1080 \"push.skeleton\"",
     "/*",
+    0
+};
+
+static char const * const comment_next_line[] =
+{
+    "#line 1082 \"push.skeleton\"",
+    "**",
     0
 };
 
 static char const * const comment_end[] =
 {
-    "#line 937 \"push.skeleton\"",
+    "#line 1084 \"push.skeleton\"",
     "*/",
+    "",
     0
 };
 
 static char const * const action_case_start[] =
 {
-    "#line 939 \"push.skeleton\"",
+    "#line 1087 \"push.skeleton\"",
     "  case %d:",
     "",
     0
@@ -998,7 +1151,7 @@ static char const * const action_case_start[] =
 
 static char const * const action_code[] =
 {
-    "#line 942 \"push.skeleton\"",
+    "#line 1090 \"push.skeleton\"",
     "    %s;",
     "",
     "",
@@ -1007,7 +1160,7 @@ static char const * const action_code[] =
 
 static char const * const action_case_end[] =
 {
-    "#line 946 \"push.skeleton\"",
+    "#line 1094 \"push.skeleton\"",
     "    break;",
     "",
     "",
@@ -1016,92 +1169,102 @@ static char const * const action_case_end[] =
 
 static char const * const action_if_not_yytrial_start[] =
 {
-    "#line 950 \"push.skeleton\"",
-    "if (!yytrial)",
+    "#line 1098 \"push.skeleton\"",
+    "    if (!yytrial)",
+    "    {",
+    "",
+    0
+};
+
+static char const * const action_if_not_yytrial_end[] =
+{
+    "#line 1102 \"push.skeleton\"",
+    "",
+    "    } /* end: if (!yytrial) */",
     "",
     0
 };
 
 static char const * const action_block_start[] =
 {
-    "#line 953 \"push.skeleton\"",
+    "#line 1106 \"push.skeleton\"",
     "{",
     0
 };
 
 static char const * const action_block_end[] =
 {
-    "#line 955 \"push.skeleton\"",
+    "#line 1108 \"push.skeleton\"",
     "}",
     0
 };
 
 static char const * const yyval_tag_reference[] =
 {
-    "#line 957 \"push.skeleton\"",
+    "#line 1110 \"push.skeleton\"",
     "yyval.%s",
     0
 };
 
 static char const * const yyval_reference[] =
 {
-    "#line 959 \"push.skeleton\"",
+    "#line 1112 \"push.skeleton\"",
     "yyval",
     0
 };
 
 static char const * const yyvsp_tag_reference[] =
 {
-    "#line 961 \"push.skeleton\"",
+    "#line 1114 \"push.skeleton\"",
     "yyvsp[%d].%s",
     0
 };
 
 static char const * const yyvsp_reference[] =
 {
-    "#line 963 \"push.skeleton\"",
+    "#line 1116 \"push.skeleton\"",
     "yyvsp[%d]",
     0
 };
 
 static char const * const rflag_prefix[] =
 {
-    "#line 965 \"push.skeleton\"",
+    "#line 1118 \"push.skeleton\"",
     "static",
     0
 };
 
 static char const * const not_rflag_prefix[] =
 {
-    "#line 967 \"push.skeleton\"",
+    "#line 1120 \"push.skeleton\"",
     "",
     0
 };
 
 static char const * const int_table_start[] =
 {
-    "#line 969 \"push.skeleton\"",
+    "#line 1122 \"push.skeleton\"",
     "%sYshort %29s[%5d] = {%5d%s",
     0
 };
 
 static char const * const int_table_entry[] =
 {
-    "#line 971 \"push.skeleton\"",
+    "#line 1124 \"push.skeleton\"",
     "%5d%s",
     0
 };
 
 static char const * const int_table_entry_separator[] =
 {
-    "#line 973 \"push.skeleton\"",
+    "#line 1126 \"push.skeleton\"",
     ",",
     0
 };
 
 static char const * const int_table_end[] =
 {
-    "#line 975 \"push.skeleton\"",
+    "#line 1128 \"push.skeleton\"",
     "",
     "};",
     "",
@@ -1110,7 +1273,7 @@ static char const * const int_table_end[] =
 
 static char const * const table_size[] =
 {
-    "#line 979 \"push.skeleton\"",
+    "#line 1132 \"push.skeleton\"",
     "",
     "",
     "#define YYTABLESIZE %d",
@@ -1122,7 +1285,7 @@ static char const * const table_size[] =
 
 static char const * const defines_file_protection_start[] =
 {
-    "#line 986 \"push.skeleton\"",
+    "#line 1139 \"push.skeleton\"",
     "",
     "#ifndef _BTYACC_DEFINES_H_",
     "#define _BTYACC_DEFINES_H_",
@@ -1134,7 +1297,7 @@ static char const * const defines_file_protection_start[] =
 
 static char const * const defines_file_protection_end[] =
 {
-    "#line 993 \"push.skeleton\"",
+    "#line 1146 \"push.skeleton\"",
     "",
     "",
     "#endif /* _BTYACC_DEFINES_H_ */",
@@ -1145,14 +1308,22 @@ static char const * const defines_file_protection_end[] =
 
 static char const * const token_charset[] =
 {
-    "#line 999 \"push.skeleton\"",
+    "#line 1152 \"push.skeleton\"",
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$",
     0
 };
 
+static char const * const literal_token_name_template[] =
+{
+    "#line 1154 \"push.skeleton\"",
+    "YYSYMBOL_%%s",
+    0
+};
+
+
 static char const * const define_token[] =
 {
-    "#line 1001 \"push.skeleton\"",
+    "#line 1159 \"push.skeleton\"",
     "#define %-60s %5d",
     "",
     0
@@ -1160,7 +1331,7 @@ static char const * const define_token[] =
 
 static char const * const yystype_extern_decl[] =
 {
-    "#line 1004 \"push.skeleton\"",
+    "#line 1162 \"push.skeleton\"",
     "",
     "extern YYSTYPE yylval;",
     "",
@@ -1169,22 +1340,24 @@ static char const * const yystype_extern_decl[] =
 
 static char const * const define_default_yystype[] =
 {
-    "#line 1008 \"push.skeleton\"",
+    "#line 1166 \"push.skeleton\"",
     "",
     "#ifndef YYSTYPE",
     "typedef int YYSTYPE;",
+    "#define YYSTYPE YYSTYPE",
+    "#endif",
     "",
     "#ifdef __cplusplus",
+    "#ifndef YYSTYPE_ZERO",
+    "/* this macro is used to ZERO one YYSTYPE instance: */",
     "#define YYSTYPE_ZERO(yylval)        yylval = 0",
     "#endif",
-    "",
-    "/*",
-    " * Since we know the yylval type, we can also provide a default yydebug log function now:",
-    " */",
-    "#ifndef YYDBPR",
-    "#define YYDBPR(yystype)    BTYACC_DEBUG_LOG_PARTIAL(\"%d\", (yystype))",
     "#endif",
-    "#endif /* YYSTYPE */",
+    "",
+    "#ifndef YYDBPR",
+    "/* display the content of one YYSTYPE instance in the parser debug output: */",
+    "#define YYDBPR(yystype)    BTYACC_DEBUG_LOG_PARTIAL(\"%d\", (int)(yystype))",
+    "#endif",
     "",
     "",
     0
@@ -1192,7 +1365,7 @@ static char const * const define_default_yystype[] =
 
 static char const * const union_decl_start[] =
 {
-    "#line 1026 \"push.skeleton\"",
+    "#line 1186 \"push.skeleton\"",
     "",
     "typedef union",
     0
@@ -1200,7 +1373,7 @@ static char const * const union_decl_start[] =
 
 static char const * const union_decl_end[] =
 {
-    "#line 1029 \"push.skeleton\"",
+    "#line 1189 \"push.skeleton\"",
     " yystype_t;",
     "#define YYSTYPE yystype_t",
     "",
@@ -1210,7 +1383,7 @@ static char const * const union_decl_end[] =
 
 static char const * const define_yymaxtoken[] =
 {
-    "#line 1034 \"push.skeleton\"",
+    "#line 1194 \"push.skeleton\"",
     "",
     "#define YYMAXTOKEN %5d",
     "",
@@ -1220,7 +1393,7 @@ static char const * const define_yymaxtoken[] =
 
 static char const * const define_yyfinal[] =
 {
-    "#line 1039 \"push.skeleton\"",
+    "#line 1199 \"push.skeleton\"",
     "",
     "#define YYFINAL %5d",
     "",
@@ -1230,7 +1403,7 @@ static char const * const define_yyfinal[] =
 
 static char const * const define_yydebug[] =
 {
-    "#line 1044 \"push.skeleton\"",
+    "#line 1204 \"push.skeleton\"",
     "",
     "#ifndef YYDEBUG",
     "#define YYDEBUG %d",
@@ -1242,14 +1415,14 @@ static char const * const define_yydebug[] =
 
 static char const * const debug_yy_null[] =
 {
-    "#line 1051 \"push.skeleton\"",
+    "#line 1211 \"push.skeleton\"",
     "0",
     0
 };
 
 static char const * const debug_yyname_strings_start[] =
 {
-    "#line 1053 \"push.skeleton\"",
+    "#line 1213 \"push.skeleton\"",
     "",
     "#if YYDEBUG",
     "%schar const *yyname[] = {",
@@ -1259,14 +1432,14 @@ static char const * const debug_yyname_strings_start[] =
 
 static char const * const debug_yyname_strings_separator[] =
 {
-    "#line 1058 \"push.skeleton\"",
+    "#line 1218 \"push.skeleton\"",
     ",",
     0
 };
 
 static char const * const debug_yyname_strings_end[] =
 {
-    "#line 1060 \"push.skeleton\"",
+    "#line 1220 \"push.skeleton\"",
     "};",
     "#endif",
     "",
@@ -1276,7 +1449,7 @@ static char const * const debug_yyname_strings_end[] =
 
 static char const * const debug_yyrule_strings_start[] =
 {
-    "#line 1065 \"push.skeleton\"",
+    "#line 1225 \"push.skeleton\"",
     "",
     "#if YYDEBUG",
     "%schar const *yyrule[] = {",
@@ -1286,14 +1459,14 @@ static char const * const debug_yyrule_strings_start[] =
 
 static char const * const debug_yyrule_strings_separator[] =
 {
-    "#line 1070 \"push.skeleton\"",
+    "#line 1230 \"push.skeleton\"",
     ",",
     0
 };
 
 static char const * const debug_yyrule_strings_end[] =
 {
-    "#line 1072 \"push.skeleton\"",
+    "#line 1232 \"push.skeleton\"",
     "};",
     "#endif",
     "",
@@ -1303,28 +1476,28 @@ static char const * const debug_yyrule_strings_end[] =
 
 static char const * const DEFINES_FILENAME[] =
 {
-    "#line 1077 \"push.skeleton\"",
+    "#line 1237 \"push.skeleton\"",
     "%s%s.tab.h",
     0
 };
 
 static char const * const OUTPUT_FILENAME[] =
 {
-    "#line 1079 \"push.skeleton\"",
+    "#line 1239 \"push.skeleton\"",
     "%s%s.tab.c",
     0
 };
 
 static char const * const CODE_FILENAME[] =
 {
-    "#line 1081 \"push.skeleton\"",
+    "#line 1241 \"push.skeleton\"",
     "%s%s.code.c",
     0
 };
 
 static char const * const VERBOSE_FILENAME[] =
 {
-    "#line 1083 \"push.skeleton\"",
+    "#line 1243 \"push.skeleton\"",
     "%s%s.output",
     0
 };
@@ -1338,11 +1511,13 @@ struct section section_list_push[] = {
 	{ "trailer", &trailer[0] },
 	{ "line_position", &line_position[0] },
 	{ "comment_start", &comment_start[0] },
+	{ "comment_next_line", &comment_next_line[0] },
 	{ "comment_end", &comment_end[0] },
 	{ "action_case_start", &action_case_start[0] },
 	{ "action_code", &action_code[0] },
 	{ "action_case_end", &action_case_end[0] },
 	{ "action_if_!yytrial_start", &action_if_not_yytrial_start[0] },
+	{ "action_if_!yytrial_end", &action_if_not_yytrial_end[0] },
 	{ "action_block_start", &action_block_start[0] },
 	{ "action_block_end", &action_block_end[0] },
 	{ "yyval.tag_reference", &yyval_tag_reference[0] },
@@ -1359,6 +1534,7 @@ struct section section_list_push[] = {
 	{ "defines_file_protection_start", &defines_file_protection_start[0] },
 	{ "defines_file_protection_end", &defines_file_protection_end[0] },
 	{ "token_charset", &token_charset[0] },
+	{ "literal_token_name_template", &literal_token_name_template[0] },
 	{ "define_token", &define_token[0] },
 	{ "yystype_extern_decl", &yystype_extern_decl[0] },
 	{ "define_default_yystype", &define_default_yystype[0] },
@@ -1380,5 +1556,5 @@ struct section section_list_push[] = {
 	{ "VERBOSE_FILENAME", &VERBOSE_FILENAME[0] },
 	{ 0, 0 } };
 
-unsigned int section_list_push_count = 48;
+unsigned int section_list_push_count = 51;
 
