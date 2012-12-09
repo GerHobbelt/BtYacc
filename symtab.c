@@ -90,6 +90,8 @@ void create_symbol_table(void)
     bp = make_bucket("error");
     bp->index = 1;
     bp->symbol_class = TERM;
+	assert(bp->assoc == TOKEN);
+	bp->assoc = NTERM;
 
     first_symbol = bp;
     last_symbol = bp;

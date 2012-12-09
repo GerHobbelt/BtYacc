@@ -140,7 +140,7 @@ typedef enum keyword_code_enumeration
     BISON_YACC                      = 127,
     BISON_DESTRUCTOR                = 128,
     BISON_PRINTER                   = 129,
-    BISON_NTERM                     = 130,
+    NTERM		                    = 130,
     DPREC_PRIO                      = 131,
     BISON_MERGE                     = 132,
     PREC                            = 133
@@ -253,6 +253,27 @@ struct reductions
 };
 
 
+typedef enum suppression_reason
+{
+	SUPPR_BY_PRECEDENCE = 1,
+	SUPPR_BY_LEFT_ASSOC = 2,
+	SUPPR_BY_RIGHT_ASSOC = 3,
+	SUPPR_NONE_SR_CONFLICT = 4,
+	SUPPR_NONE_RR_CONFLICT = 5,
+	SUPPR_BY_YACC_DEFAULT1 = 10,
+	SUPPR_BY_YACC_DEFAULT2 = 11
+} suppression_reason_t;
+
+typedef struct suppression_info suppression_info;
+struct suppression_info
+{
+    struct action *conflicting_entry;
+	Yshort state;
+	char me_is_old_pref;
+	char me_is_new_pref;
+	suppression_reason_t reason;
+};
+
 /*  the structure used to represent parser actions  */
 
 typedef struct action action;
@@ -265,6 +286,8 @@ struct action
     BtYacc_action_code action_code;
     BtYacc_keyword_code assoc;	/* associativity: LEFT/RIGHT/NONASSOC/other */
     char   suppressed;
+	char   rej_count;
+	suppression_info *rej_info;
 };
 
 struct section {
@@ -544,6 +567,7 @@ char *get_line(void);
 char *dup_line(void);
 char *skip_comment(void);
 int nextc(int only_skip_whitespace);
+const char *get_keyword_as_string(BtYacc_keyword_code a);
 BtYacc_keyword_code keyword(int fail_when_no_keyword);
 void copy_ident(void);
 void copy_string(int, FILE *, FILE *);
@@ -595,14 +619,14 @@ void free_symbols(void);
 void verbose(void);
 void log_unused(void);
 void log_conflicts(void);
-void print_state(int);
-void print_conflicts(int);
-void print_core(int);
-void print_nulls(int);
-void print_actions(int);
+void print_state(int state);
+void print_conflicts(int state);
+void print_core(int state);
+void print_nulls(int state);
+void print_actions(int state);
 void print_shifts(action const * p);
 void print_reductions(action const * p, int defred);
-void print_gotos(int);
+void print_gotos(int state);
 
 /* warshall.c */
 void transitive_closure(unsigned *, int);

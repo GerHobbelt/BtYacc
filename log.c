@@ -51,3 +51,4 @@ void BtYacc_logf(char const * format, ...)
 		va_end(vl);
 	}
 }
+

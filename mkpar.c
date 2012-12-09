@@ -48,7 +48,7 @@ static void unused_rules(void)
     {
         for (p = parser[i]; p; p = p->next)
         {
-            if (p->action_code == REDUCE && p->suppressed <= 1)
+            if (p->action_code == REDUCE && !(p->suppressed & 2))
                 rules_used[p->number] = 1;
         }
     }
@@ -87,6 +87,31 @@ int is_assigned_explicit_associativity(BtYacc_keyword_code assoc)
 	}
 }
 
+static void push_rejection_reason(action *p1, action *p2, action *old_pref, action *new_pref, int state, suppression_reason_t reason)
+{
+	suppression_info *info;
+
+	if (!p1->rej_count)
+	{
+		p1->rej_info = NEW(p1->rej_info[0]);
+		if (!p1->rej_info) no_space();
+		p1->rej_count = 1;
+	}
+	else
+	{
+		p1->rej_info = RENEW(p1->rej_info, p1->rej_count + 1, p1->rej_info[0]);
+		if (!p1->rej_info) no_space();
+		p1->rej_count += 1;
+	}
+	info = p1->rej_info + p1->rej_count - 1;
+
+	info->conflicting_entry = p2;
+	info->state = state;
+	info->reason = reason;
+	info->me_is_old_pref = (p1 == old_pref);
+	info->me_is_new_pref = (p1 == new_pref);
+}
+
 static void remove_conflicts(void)
 {
     int i;
@@ -108,7 +133,6 @@ static void remove_conflicts(void)
         for (p = parser[i]; p; p = p->next)
         {
 			action *new_pref = pref;
-			int print_resolution = 0;
 
             if (p->symbol != symbol)
             {
@@ -118,128 +142,119 @@ static void remove_conflicts(void)
             }
             else if (i == final_state && symbol == 0)
             {
+				push_rejection_reason(pref, p, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
+				push_rejection_reason(p, pref, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
                 ++SRcount;
-                p->suppressed = 1;
-                if (!pref->suppressed)
-                    pref->suppressed = 1;
+                p->suppressed |= 1;
+                pref->suppressed |= 1;
             }
             else if (pref->action_code == SHIFT)
             {
+				assert(pref->symbol == p->symbol);
                 if (pref->prec > 0 && p->prec > 0)
                 {
                     if (pref->prec < p->prec)
                     {
-					    BtYacc_logf("state %5d: resolving conflict through precedence", i);
-						print_resolution = 1;
-                        pref->suppressed = 2;
+						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_PRECEDENCE);
+                        pref->suppressed |= 2;
                         new_pref = p;
                     }
                     else if (pref->prec > p->prec)
                     {
-					    BtYacc_logf("state %5d: resolving conflict through precedence", i);
-						print_resolution = 1;
-                        p->suppressed = 2;
+						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_PRECEDENCE);
+                        p->suppressed |= 2;
                     }
-                    else if (pref->assoc == LEFT)
+                    else if (pref->assoc == LEFT && (p->assoc == LEFT || !is_assigned_explicit_associativity(p->assoc)))
                     {
-					    BtYacc_logf("state %5d: resolving conflict through LEFT association", i);
-						print_resolution = 1;
-                        pref->suppressed = 2;
+						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
+                        pref->suppressed |= 2;
                         new_pref = p;
                     }
-                    else if (pref->assoc == RIGHT)
+                    else if (pref->assoc == RIGHT && (p->assoc == RIGHT || !is_assigned_explicit_associativity(p->assoc)))
                     {
-					    BtYacc_logf("state %5d: resolving conflict through RIGHT association", i);
-						print_resolution = 1;
-                        p->suppressed = 2;
+						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
+                        p->suppressed |= 2;
+                    }
+                    else if (p->assoc == LEFT && (pref->assoc == LEFT || !is_assigned_explicit_associativity(pref->assoc)))
+                    {
+						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
+                        pref->suppressed |= 2;
+                        new_pref = p;
+                    }
+                    else if (p->assoc == RIGHT && (pref->assoc == RIGHT || !is_assigned_explicit_associativity(pref->assoc)))
+                    {
+						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
+                        p->suppressed |= 2;
                     }
                     else
                     {
-					    BtYacc_logf("state %5d: resolving conflict using the default YACC mechanism as the user specified precedences are equal", i);
-						print_resolution = 1;
-                        pref->suppressed = 2;
-                        p->suppressed = 2;
+						push_rejection_reason(pref, p, pref, pref, i, SUPPR_BY_YACC_DEFAULT1);
+						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_YACC_DEFAULT2);
+						/*
+						WARNING: suppression here was set to '2' before, but I believe that 
+						         failure to resolve conflict via precedence (due to equal
+								 precedence values) should NOT silently discard BOTH actions.
+
+								 Instead, this is another job for the backtracker if you ask me...
+						*/
+						++SRcount;
+						pref->suppressed |= 1;
+                        p->suppressed |= 1;
                     }
                 }
                 else
                 {
                     if (p->prec > 0 && pref->prec < p->prec)
                     {
-					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit precedence", i);
-						print_resolution = 1;
-                        pref->suppressed = 2;
+						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_PRECEDENCE);
+                        pref->suppressed |= 2;
                         new_pref = p;
                     }
                     else if (pref->prec > 0 && pref->prec > p->prec)
                     {
-					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit precedence", i);
-						print_resolution = 1;
-                        p->suppressed = 2;
+						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_PRECEDENCE);
+                        p->suppressed |= 2;
                     }
-                    else if (pref->assoc == LEFT && !is_assigned_explicit_associativity(p->assoc))
+                    else if (pref->assoc == LEFT && (p->assoc == LEFT || !is_assigned_explicit_associativity(p->assoc)))
                     {
-					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit LEFT association preference", i);
-						print_resolution = 1;
-                        pref->suppressed = 2;
+						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
+                        pref->suppressed |= 2;
                         new_pref = p;
                     }
-                    else if (pref->assoc == RIGHT && !is_assigned_explicit_associativity(p->assoc))
+                    else if (pref->assoc == RIGHT && (p->assoc == RIGHT || !is_assigned_explicit_associativity(p->assoc)))
                     {
-					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit RIGHT association preference", i);
-						print_resolution = 1;
-                        p->suppressed = 2;
+						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
+                        p->suppressed |= 2;
                     }
-                    else if (p->assoc == LEFT && !is_assigned_explicit_associativity(pref->assoc))
+                    else if (p->assoc == LEFT && (pref->assoc == LEFT || !is_assigned_explicit_associativity(pref->assoc)))
                     {
-					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit LEFT association preference", i);
-						print_resolution = 1;
-                        pref->suppressed = 2;
+						push_rejection_reason(pref, p, pref, p, i, SUPPR_BY_LEFT_ASSOC);
+                        pref->suppressed |= 2;
                         new_pref = p;
                     }
-                    else if (p->assoc == RIGHT && !is_assigned_explicit_associativity(pref->assoc))
+                    else if (p->assoc == RIGHT && (pref->assoc == RIGHT || !is_assigned_explicit_associativity(pref->assoc)))
                     {
-					    BtYacc_logf("state %5d: resolving conflict through one rule's explicit RIGHT association preference", i);
-						print_resolution = 1;
-                        p->suppressed = 2;
+						push_rejection_reason(p, pref, pref, pref, i, SUPPR_BY_RIGHT_ASSOC);
+                        p->suppressed |= 2;
                     }
                     else
                     {
+						push_rejection_reason(pref, p, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
+						push_rejection_reason(p, pref, pref, pref, i, SUPPR_NONE_SR_CONFLICT);
 						++SRcount;
-						p->suppressed = 1;
-						if (!pref->suppressed)
-							pref->suppressed = 1;
+						p->suppressed |= 1;
+						pref->suppressed |= 1;
 					}
                 }
             }
             else
             {
+				push_rejection_reason(pref, p, pref, pref, i, SUPPR_NONE_RR_CONFLICT);
+				push_rejection_reason(p, pref, pref, pref, i, SUPPR_NONE_RR_CONFLICT);
                 ++RRcount;
-                p->suppressed = 1;
-                if (!pref->suppressed)
-                    pref->suppressed = 1;
+                p->suppressed |= 1;
+                pref->suppressed |= 1;
             }
-
-			if (print_resolution)
-			{
-				if (i == final_state && symbol == 0)
-				{
-					BtYacc_logf("\n           : shift/reduce conflict (%saccept, %sreduce %d) on $end\n\n",
-							(new_pref == pref ? "" : "DO NOT "), (new_pref != pref ? "" : "DO NOT "), p->number - 2);
-				}
-				else
-				{
-					if (pref->action_code == SHIFT)
-					{
-						BtYacc_logf("\n           : shift/reduce conflict (%sshift %d, %sreduce %d) on %s\n\n",
-								(new_pref == pref ? "" : "DO NOT "), number, (new_pref != pref ? "" : "DO NOT "), p->number - 2, symbol_name[symbol]);
-					}
-					else
-					{
-						BtYacc_logf("\n           : reduce/reduce conflict (%sreduce %d, %sreduce %d) on %s\n\n",
-								(new_pref == pref ? "" : "DO NOT "), number - 2, (new_pref != pref ? "" : "DO NOT "), p->number - 2, symbol_name[symbol]);
-					}
-				}
-			}
 
 			pref = new_pref;
         }
@@ -406,9 +421,9 @@ int sole_reduction(int stateno)
     ruleno = 0;
     for (p = parser[stateno]; p; p = p->next)
     {
-        if (p->action_code == SHIFT && p->suppressed <= 1)
+        if (p->action_code == SHIFT && p->suppressed < 2)
             return (0);
-        else if (p->action_code == REDUCE && p->suppressed <= 1)
+        else if (p->action_code == REDUCE && p->suppressed < 2)
         {
             if (ruleno > 0 && p->number != ruleno)
                 return (0);

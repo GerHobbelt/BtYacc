@@ -365,7 +365,7 @@ static struct keyword {
     { "no-lines", BISON_NO_LINES },                   /* [i_a] bison emulation additions */
     { "no_lines", BISON_NO_LINES },                   /* [i_a] bison emulation additions */
     { "nonassoc", NONASSOC },
-    { "nterm", BISON_NTERM },                         /* [i_a] bison emulation additions */
+    { "nterm", NTERM },			                      /* [i_a] bison emulation additions */
     { "output", BISON_OUTPUT },                       /* [i_a] bison emulation additions */
     { "parse-param", BISON_PARSE_PARAM },             /* [i_a] bison emulation additions */
     { "prec", PREC },                                 /* %prec TOKEN: declare a token with precedence according to order of appearance;
@@ -387,6 +387,18 @@ static struct keyword {
     { "verbose", BISON_VERBOSE },                     /* [i_a] bison emulation additions */
     { "yacc", BISON_YACC },                           /* [i_a] bison emulation additions */
 };
+
+const char *get_keyword_as_string(BtYacc_keyword_code a)
+{
+	int i;
+
+	for (i = 0; i < sizeof(keywords)/sizeof(keywords[0]); i++)
+	{
+		if (keywords[i].token == a)
+			return keywords[i].name;
+	}
+	return NULL;
+}
 
 static int search_strcmp(void const * key, void const * element)
 {
@@ -1753,13 +1765,15 @@ void start_rule(bucket *bp, int unsigned s_lineno)
     if (bp->symbol_class == TERM)
         terminal_lhs(s_lineno);
     bp->symbol_class = NONTERM;
+	assert(bp->assoc == TOKEN || bp->assoc == NTERM);
+	bp->assoc = NTERM;
     if (!bp->index)
         bp->index = nrules;
     if (nrules >= maxrules)
         expand_rules();
     plhs[nrules] = bp;
     rprec[nrules] = UNDEFINED;
-    rassoc[nrules] = TOKEN;
+    rassoc[nrules] = NTERM;
 }
 
 void end_rule(void)
@@ -1809,7 +1823,7 @@ void insert_empty_rule(void)
     rprec[nrules] = rprec[nrules-1];
     rprec[nrules-1] = UNDEFINED;
     rassoc[nrules] = rassoc[nrules-1];
-    rassoc[nrules-1] = TOKEN;
+    rassoc[nrules-1] = NTERM;
 }
 
 static char *insert_arg_rule(char *arg, char *tag)
