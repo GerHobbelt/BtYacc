@@ -584,7 +584,7 @@ void reader(void);
 struct section *read_skel(char const * name);
 
 /* symtab.c */
-int hash(char const * name);
+unsigned int hash(char const * name);
 bucket* make_bucket(char const * name);
 bucket* lookup(char const * name);
 void create_symbol_table(void);
