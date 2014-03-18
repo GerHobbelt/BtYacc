@@ -566,7 +566,7 @@ yyloop:
                 ++ctry;
             }
             save->ctry = ctry;
-            if (yytrial == 0)
+            if (!yytrial)
             {
                 /* If this is a first conflict in the stack, start saving lexemes */
                 if (!yylexemes)
