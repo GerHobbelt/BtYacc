@@ -7,72 +7,72 @@ DESTDIR =
 
 VERSION       = 3.0.5
 
-DEST	      = .
+DEST          = .
 
-HDRS	      = defs.h mstring.h
+HDRS          = defs.h mstring.h
 
-#CFLAGS	      = -g -Wall -O2 -Wstrict-prototypes -Wmissing-prototypes
-CFLAGS	      = -ggdb -Wall -O0 -Wstrict-prototypes -Wmissing-prototypes
- 
-LDFLAGS	      = #-static
+#CFLAGS       = -g -Wall -O2 -Wstrict-prototypes -Wmissing-prototypes
+CFLAGS        = -ggdb -Wall -O0 -Wstrict-prototypes -Wmissing-prototypes
 
-LIBS	      =
+LDFLAGS       = #-static
+
+LIBS          =
 
 CC            = gcc
-LINKER	      = gcc
+LINKER        = gcc
 # LINKER      = cl
-# CC	      = cl
+# CC          = cl
 
 DOCBOOK2MAN   = docbook2man
 
 MAKEFILE      = Makefile
 
-OBJS	      = closure.o error.o lalr.o log.o lr0.o main.o mkpar.o output.o	\
+OBJS          = closure.o error.o lalr.o log.o lr0.o main.o mkpar.o output.o    \
 		mstring.o reader.o readskel.o skeleton.o push_skel.o symtab.o verbose.o warshall.o write.o
 
-PRINT	      = pr -f -l88
+PRINT         = pr -f -l88
 
-PROGRAM	      = btyacc
+PROGRAM       = btyacc
 
-SRCS	      = closure.c error.c lalr.c log.c lr0.c main.c mkpar.c output.c	\
+SRCS          = closure.c error.c lalr.c log.c lr0.c main.c mkpar.c output.c    \
 		mstring.c reader.c readskel.c skeleton.c push_skel.c symtab.c verbose.c warshall.c write.c
 
-OTHERS	      = README README.BYACC \
+OTHERS        = README README.BYACC \
 		Makefile btyaccpa.skeleton push.skeleton empty.y skel2c manpage makefile.dos \
 		skeleton.c push_skel.c
 
-all:		$(PROGRAM) btyacc.1
+all:        $(PROGRAM) btyacc.1
 
 $(PROGRAM):     $(OBJS) $(LIBS)
 		$(LINKER) $(LDFLAGS) -o $(PROGRAM) $(OBJS) $(LIBS)
 
-clean:;		rm -f $(OBJS)
+clean:;     rm -f $(OBJS)
 
-clobber:;	rm -f $(OBJS) $(PROGRAM) $(PROGRAM).exe
+clobber:;   rm -f $(OBJS) $(PROGRAM) $(PROGRAM).exe
 
-distclean:;	rm -f $(OBJS) $(PROGRAM) $(PROGRAM).exe skeleton.c push_skel.c *.zip *.gz
+distclean:; rm -f $(OBJS) $(PROGRAM) $(PROGRAM).exe skeleton.c push_skel.c *.zip *.gz
 
-depend:;	mkmf -f $(MAKEFILE) PROGRAM=$(PROGRAM) DEST=$(DEST)
+depend:;    mkmf -f $(MAKEFILE) PROGRAM=$(PROGRAM) DEST=$(DEST)
 
-index:;		ctags -wx $(HDRS) $(SRCS)
+index:;     ctags -wx $(HDRS) $(SRCS)
 
-install:	$(PROGRAM)
+install:    $(PROGRAM)
 		install $(PROGRAM) $(DESTDIR)/usr/bin
 
-oldinstall:	$(PROGRAM)
+oldinstall: $(PROGRAM)
 		@echo Installing $(PROGRAM) in $(DEST)
 		install -s $(PROGRAM) $(DEST)
 
-listing:;	$(PRINT) Makefile $(HDRS) $(SRCS) | lpr
+listing:;   $(PRINT) Makefile $(HDRS) $(SRCS) | lpr
 
-lint:;		lint $(SRCS)
+lint:;      lint $(SRCS)
 
 program:        $(PROGRAM)
 
 tags:           $(HDRS) $(SRCS)
 		ctags $(HDRS) $(SRCS)
 
-dist:		tar zip
+dist:       tar zip
 
 tar:
 		rm -f btyacc.tar btyacc.tar.gz
@@ -86,15 +86,15 @@ zip:
 
 skeleton.c: btyaccpa.skeleton skel2c
 		awk -f skel2c btyaccpa.skeleton > skeleton.c
- 
+
 push_skel.c: push.skeleton skel2c
 		awk -f skel2c push.skeleton > push_skel.c
- 
+
 etags TAGS:
 		etags *.c *.h
 
-btyacc.1:	btyacc.sgml
-		$(DOCBOOK2MAN) --sgml btyacc.sgml 
+btyacc.1:   btyacc.sgml
+		$(DOCBOOK2MAN) --sgml btyacc.sgml
 
 
 ###
